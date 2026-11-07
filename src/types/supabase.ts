@@ -960,6 +960,44 @@ export type Database = {
         Returns: string
       }
       get_workshop_storage_usage: { Args: { p_organization_id: string }; Returns: Json }
+      create_transfer_request: { Args: { p_message?: string; p_motorcycle_id: string; p_to_email: string }; Returns: string }
+      cancel_transfer_request: { Args: { p_transfer_id: string }; Returns: undefined }
+      reject_transfer_request: { Args: { p_transfer_id: string }; Returns: undefined }
+      accept_transfer_request: { Args: { p_acquisition_date?: string; p_transfer_id: string }; Returns: string }
+      get_motorcycle_transfers: {
+        Args: { p_motorcycle_id: string }
+        Returns: { created_at: string; decided_at: string | null; expires_at: string; id: string; message: string | null; status: string; to_email: string }[]
+      }
+      get_my_incoming_transfers: {
+        Args: never
+        Returns: {
+          brand: string
+          created_at: string
+          expires_at: string
+          from_name: string | null
+          id: string
+          latest_mileage: number | null
+          maintenance_count: number
+          manufacturing_year: number
+          message: string | null
+          model: string
+          plate: string | null
+          version: string | null
+        }[]
+      }
+      get_my_previous_motorcycles: {
+        Args: never
+        Returns: {
+          brand: string
+          manufacturing_year: number
+          model: string
+          motorcycle_id: string
+          my_diary_entries: number
+          owned_from: string
+          owned_until: string
+          version: string | null
+        }[]
+      }
       delete_diary_entry: { Args: { p_entry_id: string }; Returns: string[] }
       delete_diary_photo: { Args: { p_attachment_id: string }; Returns: string }
       can_access_attachment_object: { Args: { p_name: string }; Returns: boolean }

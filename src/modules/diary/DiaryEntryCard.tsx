@@ -10,9 +10,11 @@ import { DIARY_CATEGORY_LABEL, VISIBILITY_LABEL } from './schemas'
 type Props = {
   entry: DiaryEntry
   onDelete: (id: string) => Promise<void>
+  /** Moto que já foi do autor: só consultar e excluir. */
+  readOnly?: boolean
 }
 
-export function DiaryEntryCard({ entry: e, onDelete }: Props) {
+export function DiaryEntryCard({ entry: e, onDelete, readOnly = false }: Props) {
   const [confirming, setConfirming] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -55,12 +57,12 @@ export function DiaryEntryCard({ entry: e, onDelete }: Props) {
 
       {e.is_mine && !confirming && (
         <div className="mt-3 flex flex-wrap gap-1">
-          <Link
+          {!readOnly && <Link
             to={`/painel/motos/${e.motorcycle_id}/diario/${e.id}/editar`}
             className="px-2 py-2 text-sm font-semibold text-ink underline-offset-4 hover:underline sm:text-[0.95rem]"
           >
             Editar
-          </Link>
+          </Link>}
           <Button variant="quiet" type="button" onClick={() => setConfirming(true)}>Excluir</Button>
         </div>
       )}

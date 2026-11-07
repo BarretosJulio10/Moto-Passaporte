@@ -10,6 +10,7 @@ import { QrCodePanel } from '@/modules/sharing/QrCodePanel'
 import { MotoHeader } from '@/modules/motorcycles/MotoHeader'
 import { RecentRecords } from '@/modules/maintenance/RecentRecords'
 import { OwnerAccessSection } from '@/modules/workshop_access/OwnerAccessSection'
+import { TransferSection } from '@/modules/transfers/TransferSection'
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
@@ -24,6 +25,7 @@ export function MotorcyclePage() {
   const { id = '' } = useParams()
   const location = useLocation()
   const justCreated = (location.state as { created?: boolean } | null)?.created === true
+  const justTransferred = (location.state as { transferred?: boolean } | null)?.transferred === true
 
   const moto = useQuery({ queryKey: ['motorcycle', id], queryFn: () => fetchMotorcycle(id), enabled: Boolean(id) })
 
@@ -47,6 +49,13 @@ export function MotorcyclePage() {
   return (
     <div>
       <MotoHeader motorcycleId={motoId} />
+      {justTransferred && (
+        <div className="mt-6">
+          <Notice tone="success" title="Agora o passaporte é seu">
+            Todo o histórico veio junto. Oficinas do dono anterior não têm mais acesso; quando você levar a moto a uma oficina, ela pede acesso e você autoriza.
+          </Notice>
+        </div>
+      )}
       {justCreated && (
         <div className="mt-6">
           <Notice tone="success" title="Passaporte criado">
@@ -72,6 +81,7 @@ export function MotorcyclePage() {
           </div>
           <RecentRecords motorcycleId={motoId} />
           <OwnerAccessSection motorcycleId={motoId} />
+          <TransferSection motorcycleId={motoId} />
         </div>
         <aside className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <QrCodePanel publicId={publicId} label={`${m.brand}-${m.model}`} />

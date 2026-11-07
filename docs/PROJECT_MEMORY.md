@@ -63,7 +63,7 @@ Criadas na Fase 2: `maintenance_records`, `maintenance_items`, view `maintenance
 
 Criadas na Fase 3: `plate_search_log`, `motorcycle_workshop_access`, `organization_invites` (+ permissões em `organization_members` e `has_org_permission()`) (+ `workshop_has_access()` para as próximas regras de leitura/escrita da oficina).
 
-Ainda por criar: `transfer_requests` (F4; ao concluir deve encerrar `motorcycle_workshop_access` com `end_reason = 'transfer'`), `passport_shares` (F4), cobrança e `notifications` (F5), `support_cases` (F6).
+Ainda por criar: `passport_shares` (F4), cobrança e `notifications` (F5), `support_cases` (F6).
 
 ## 5. Módulos
 
@@ -80,7 +80,8 @@ Ainda por criar: `transfer_requests` (F4; ao concluir deve encerrar `motorcycle_
 | Oficina de Origem | 3 | `implementado` (ADR-014) |
 | Membros da oficina e permissões | 3 | `implementado` |
 | Registro de serviço pela oficina | 3 | `implementado` (ADR-015) |
-| Transferência e compartilhamento público | 4 | `planejado` |
+| Transferência do passaporte | 4 | `implementado` (ADR-016) |
+| Compartilhamento público controlado | 4 | `planejado` |
 | Planos, Mercado Pago, assinaturas, cotas | 5 | `planejado` |
 | Painel administrativo, testes de segurança, lançamento | 6 | `planejado` |
 
@@ -94,11 +95,11 @@ Ainda por criar: `transfer_requests` (F4; ao concluir deve encerrar `motorcycle_
 
 ## 7. Pendências imediatas
 
-- Próximo item: Fase 4 — transferência (4.1 a 4.3): solicitação e aceite, encerramento de todas as autorizações (inclusive Origem, `end_reason = 'transfer'`), tela de motos anteriores (KI-019). Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
+- Próximo item: Fase 4 — compartilhamento controlado (4.4, 4.5): `passport_shares` com token imprevisível, seleção do que mostrar, revogação, expiração, proteção contra abuso (KI-003, KI-013). Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 
-Decisões já fechadas: Git direto na `main` (ADR-005), 1 moto no gratuito (ADR-006), duplicidade por placa (ADR-007), campos públicos padrão (ADR-008), Supabase em us-east-1 (ADR-009), nomes de migração = versão do Supabase (ADR-010), diário privado nunca muda de dono (ADR-013), Oficina de Origem como tipo de autorização (ADR-014), visão e registro da oficina autorizada (ADR-015).
+Decisões já fechadas: Git direto na `main` (ADR-005), 1 moto no gratuito (ADR-006), duplicidade por placa (ADR-007), campos públicos padrão (ADR-008), Supabase em us-east-1 (ADR-009), nomes de migração = versão do Supabase (ADR-010), diário privado nunca muda de dono (ADR-013), Oficina de Origem como tipo de autorização (ADR-014), visão e registro da oficina autorizada (ADR-015), transferência por e-mail do comprador (ADR-016).
 
 ## 8. Protocolo de trabalho (obrigatório — pedido do responsável pelo produto)
 

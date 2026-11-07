@@ -50,6 +50,8 @@
 | Supabase real — equipe da oficina, em transação desfeita | `tests/security/supabase/phase3c_team_rollback.sql` | 19 aprovadas |
 | PostgreSQL 16 local — serviços da oficina | `tests/security/phase3d_workshop_services_test.sql` | 32 aprovadas |
 | Supabase real — serviços da oficina, em transação desfeita | `tests/security/supabase/phase3d_workshop_services_rollback.sql` | 15 aprovadas |
+| PostgreSQL 16 local — transferência | `tests/security/phase4a_transfer_test.sql` | 42 aprovadas |
+| Supabase real — transferência, em transação desfeita | `tests/security/supabase/phase4a_transfer_rollback.sql` | 19 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
@@ -92,6 +94,13 @@ Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalad
 - A oficina não lê as tabelas de histórico diretamente; vê pela função `get_workshop_timeline`, que oculta valor, observações, comprovantes e funcionário dos registros de terceiros.
 - Arquivos: a oficina envia para a pasta da moto autorizada e lê só os próprios comprovantes; comprovantes do titular continuam invisíveis para ela.
 - Revogação corta o acesso ao histórico e aos arquivos imediatamente; registros da oficina permanecem (imutáveis).
+
+## Transferência (Fase 4, ADR-016)
+
+- Só o titular atual pede; só a conta com o e-mail informado vê, aceita ou recusa. O aceite confere de novo que quem pediu continua titular.
+- Antes do aceite, o comprador vê apenas identificação, placa atual, última km e a quantidade de registros; o histórico só depois.
+- O aceite é atômico: troca a titularidade e encerra todas as autorizações de oficina na mesma transação; o antigo titular perde acesso imediato ao histórico e aos arquivos (regras de titular atual).
+- Pedidos não são apagados nem reabertos; auditados.
 
 ## Advisors do Supabase (06/11/2026, após o reforço)
 

@@ -205,6 +205,14 @@ Implementação em `src/modules/workshop_service/api.ts`.
 - Comprovantes: enviar para `<motorcycle_id>/<uuid>.<ext>` e `rpc('register_workshop_attachment', { p_organization_id, p_storage_path, p_file_name, p_kind, p_maintenance_record_id })`; cota em `rpc('get_workshop_storage_usage', { p_organization_id })`.
 - `maintenance_timeline` (titular) passa a ter `recorded_by_name`.
 
+## Transferência (Fase 4, ADR-016)
+
+Implementação em `src/modules/transfers/api.ts`.
+
+- Titular: `rpc('create_transfer_request', { p_motorcycle_id, p_to_email, p_message? })` → id; `cancel_transfer_request({ p_transfer_id })`; `get_motorcycle_transfers({ p_motorcycle_id })` → lista com `status` (`pending`, `accepted`, `rejected`, `canceled`, `expired`).
+- Comprador: `get_my_incoming_transfers()`; `accept_transfer_request({ p_transfer_id, p_acquisition_date? })` → id da moto; `reject_transfer_request({ p_transfer_id })`.
+- Antigo titular: `get_my_previous_motorcycles()`; o próprio diário continua em `motorcycle_diary_feed` (só leitura e exclusão).
+
 ## Duplicidade
 
 ```ts

@@ -23,6 +23,7 @@ import { WorkshopDashboardPage } from '@/modules/workshop/WorkshopDashboardPage'
 import { WorkshopProfilePage } from '@/modules/workshop/WorkshopProfilePage'
 import { TeamPage } from '@/modules/workshop/TeamPage'
 import { WorkshopMotoPage, WorkshopServiceFormPage } from '@/modules/workshop_service/WorkshopMotoPage'
+import { PreviousDiaryPage } from '@/modules/transfers/PreviousDiaryPage'
 import { InvitePage } from '@/modules/workshop/InvitePage'
 import { PublicWorkshopPage } from '@/modules/workshop/PublicWorkshopPage'
 import { RequireAdmin } from '@/modules/admin/RequireAdmin'
@@ -82,6 +83,7 @@ export const routes = [
           { path: '/painel/motos/:id/historico', element: <TimelinePage /> },
           { path: '/painel/motos/:id/historico/novo', element: <RecordFormPage /> },
           { path: '/painel/motos/:id/diario', element: <DiaryPage /> },
+          { path: '/painel/motos-anteriores/:id', element: <PreviousDiaryPage /> },
           { path: '/painel/motos/:id/diario/novo', element: <DiaryFormPage /> },
           { path: '/painel/motos/:id/diario/:entryId/editar', element: <DiaryFormPage /> },
           { path: '/oficina', element: <WorkshopIndexPage /> },

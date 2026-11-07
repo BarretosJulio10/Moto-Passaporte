@@ -101,6 +101,14 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Comprovantes enviados pela oficina contam na cota da oficina (`workshop_storage_quota_mb`, 500 MB), não do titular. O titular vê todos os comprovantes dos registros da moto.
 - Revogação corta na hora o acesso ao histórico e aos arquivos; os registros da oficina continuam no histórico da moto.
 
+### ADR-016 — Transferência do passaporte por e-mail do comprador (PRD 10)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- O titular informa o **e-mail da conta** do comprador; o pedido vale 7 dias (`transfer_request_days`), um aberto por moto, até 10 por dia por titular. Só a conta com esse e-mail vê, aceita ou recusa; o titular pode cancelar. Pedido vencido aparece como expirado.
+- Antes de aceitar, o comprador vê marca, modelo, versão, ano, placa atual, última km, quantidade de registros, nome de quem envia e a mensagem. O histórico completo só depois de aceitar.
+- Aceite em uma transação: confere que quem pediu ainda é o titular e o limite do plano de quem recebe; encerra a titularidade anterior e cria a nova (ambas ligadas ao pedido, com data de compra opcional); encerra **todas** as autorizações ativas de oficina (inclusive Origem, `end_reason = 'transfer'`) e cancela pedidos de acesso pendentes.
+- Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
+- Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
+
 ---
 
 ## Pendentes — técnicas

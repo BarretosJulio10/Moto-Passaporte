@@ -68,7 +68,7 @@ export function FaqPage() {
       items: [
         {
           q: 'Como funciona quando eu vender a moto?',
-          a: 'Em breve você poderá transferir o passaporte para a conta do comprador. Todo o histórico continua, com a autoria de cada registro preservada, e as oficinas autorizadas por você perdem o acesso.',
+          a: 'Na página da moto, use "Transferir passaporte" e informe o e-mail da conta do comprador. Quando ele aceitar no painel, o passaporte passa para a conta dele com todo o histórico e a autoria de cada registro preservada. As oficinas autorizadas por você perdem o acesso, e suas entradas privadas do diário continuam só suas. Isso não substitui a transferência no DETRAN.',
         },
         {
           q: 'O comprador precisa pagar ou criar conta para ver o histórico?',

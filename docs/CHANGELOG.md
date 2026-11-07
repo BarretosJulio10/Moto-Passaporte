@@ -9,6 +9,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.14.0] — 07/11/2026 — Fase 4: transferência do passaporte
+
+### Adicionado
+- Migração `transfers` (ADR-016): `transfer_requests` (imutável após a decisão, auditada), `create_transfer_request`, `cancel_transfer_request`, `reject_transfer_request`, `accept_transfer_request` (transação única: troca de titularidade ligada ao pedido, encerramento de todas as autorizações de oficina inclusive Origem, cancelamento de pedidos pendentes, limite do plano de quem recebe), `get_motorcycle_transfers`, `get_my_incoming_transfers`, `get_my_previous_motorcycles`. FK de `motorcycle_ownerships.transfer_id`.
+- Página da moto: seção "Vendeu a moto?" com explicação do que acontece, confirmação, pedido em aberto e cancelamento.
+- Painel: "Um passaporte foi transferido para você" (dados da moto, quem envia, data da compra, aceitar ou recusar) e "Motos anteriores", com acesso só de leitura ao próprio diário (resolve KI-019).
+- Testes: banco 42 (local) + 19 (Supabase, transação desfeita); interface 112 no total (7 novos).
+
+### Alterado
+- Perguntas frequentes: resposta sobre venda da moto reflete a transferência disponível.
+
 ## [0.13.0] — 07/11/2026 — Fase 3 concluída: serviços registrados pela oficina
 
 ### Adicionado
