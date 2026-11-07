@@ -4,7 +4,7 @@ import { getSupabase } from '@/lib/supabase'
 import { Notice } from '@/components/Notice'
 import { formatBytes } from '@/modules/attachments/files'
 import { formatPlanPrice } from '@/modules/plans/api'
-import { fetchMetrics, type Metrics } from './adminApi'
+import { fetchJobStatus, fetchMetrics, JOB_LABEL, JOB_STATUS_LABEL, type Metrics } from './adminApi'
 import { ACTION_LABEL, ENTITY_LABEL } from './auditLabels'
 
 type Group = { title: string; items: { label: string; value: (m: Metrics) => string; alert?: (m: Metrics) => boolean; to?: string }[] }
@@ -57,6 +57,7 @@ const GROUPS: Group[] = [
 /** Painel administrativo (PRD 7.1). */
 export function AdminDashboardPage() {
   const metrics = useQuery({ queryKey: ['admin-metrics'], queryFn: fetchMetrics })
+  const jobs = useQuery({ queryKey: ['admin-jobs'], queryFn: fetchJobStatus })
 
   const events = useQuery({
     queryKey: ['admin-audit'],
@@ -100,6 +101,36 @@ export function AdminDashboardPage() {
           </dl>
         </section>
       ))}
+
+      <section className="mt-10" aria-labelledby="jobs-title">
+        <h2 id="jobs-title" className="heading text-2xl text-ink">Rotinas automáticas</h2>
+        {jobs.isError && <div className="mt-4"><Notice tone="error">Não foi possível carregar as rotinas.</Notice></div>}
+        {jobs.data && (
+          <ul className="mt-4 divide-y divide-rule border-y border-rule text-sm">
+            {jobs.data.map((j) => {
+              const label = JOB_LABEL[j.job] ?? { name: j.job, every: '' }
+              const bad = j.last_status === 'failed' || j.failures_24h > 0
+              return (
+                <li key={j.job} className="grid gap-1 py-3 sm:grid-cols-[1fr_auto] sm:gap-4">
+                  <span>
+                    <span className="font-semibold text-ink">{label.name}</span>
+                    <span className="block text-muted">
+                      {label.every}
+                      {j.last_detail ? ` · ${j.last_detail}` : ''}
+                    </span>
+                  </span>
+                  <span className={bad ? 'font-semibold text-danger' : 'text-graphite'}>
+                    {j.last_status
+                      ? `${JOB_STATUS_LABEL[j.last_status] ?? j.last_status} em ${new Date(j.last_started_at ?? '').toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}`
+                      : 'Ainda não executada'}
+                    {j.failures_24h > 0 && ` · ${j.failures_24h} falha(s) em 24 h`}
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </section>
 
       <section className="mt-10" aria-labelledby="audit-title">
         <div className="flex flex-wrap items-baseline justify-between gap-3">

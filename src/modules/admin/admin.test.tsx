@@ -28,6 +28,12 @@ vi.mock('./adminApi', async () => {
   return {
     ...actual,
     fetchMetrics: async () => metrics,
+    fetchJobStatus: async () => [
+      { job: 'reconcile', last_status: 'failed', last_detail: '3 de 4 assinatura(s) conferida(s).', last_started_at: '2026-11-07T21:23:00Z',
+        last_finished_at: '2026-11-07T21:23:05Z', last_ok_at: null, failures_24h: 1, runs_24h: 2 },
+      { job: 'storage_cleanup', last_status: 'ok', last_detail: 'Nada para limpar.', last_started_at: '2026-11-07T07:41:00Z',
+        last_finished_at: '2026-11-07T07:41:01Z', last_ok_at: '2026-11-07T07:41:01Z', failures_24h: 0, runs_24h: 1 },
+    ],
     listUsers: async (q: string) => { calls.push({ fn: 'listUsers', args: [q] }); return users },
     getUserDetail: async (...args: unknown[]) => {
       calls.push({ fn: 'getUser', args })
@@ -95,6 +101,9 @@ describe('dashboard administrativo', () => {
     expect(within(receita).getByText('R$ 1.188,00')).toBeVisible()
     expect(within(receita).getByText('3')).toHaveClass('text-danger')
     expect(screen.getByText('5 GB')).toBeVisible()
+    expect(await screen.findByText('Conciliação com o Mercado Pago')).toBeVisible()
+    expect(screen.getByText(/1 falha\(s\) em 24 h/)).toHaveClass('text-danger')
+    expect(screen.getByText(/Nada para limpar/)).toBeVisible()
     expect(screen.getByRole('link', { name: /Verificar cadastros, suspender/ })).toHaveAttribute('href', '/admin/oficinas')
   })
 })

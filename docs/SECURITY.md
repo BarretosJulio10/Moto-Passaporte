@@ -77,6 +77,7 @@
 | Supabase real — varredura de segurança | `tests/security/supabase/phase6e_security_sweep.sql` | 0 violações |
 | Ponta a ponta no navegador (Supabase simulado) | `scripts/validation/run_e2e.sh` | 7 cenários, 29 verificações |
 | Backup criptografado, restauração e rollback (banco de teste) | `scripts/ops/restore_check.sh` | 13 aprovadas |
+| PostgreSQL 16 local — rotinas automáticas | `tests/security/phase6f_jobs_test.sql` | 17 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
@@ -192,3 +193,9 @@ Ver `KNOWN_ISSUES.md`.
 - Restauração com gatilhos desligados apenas durante a carga; depois, varredura de segurança obrigatória.
 - Rollback de migração nunca reabre falha corrigida (testado: escrita direta em `system_settings` continua fechada).
 - Repositório público: ver KI-031.
+
+## Rotinas automáticas (ADR-029)
+
+- `scheduled-jobs` não usa login: aceita só chamadas com o segredo de 64 caracteres gerado no banco (Vault), conferido no banco (`scheduled_job_secret_ok`, service_role). Testado no Supabase real: segredo errado → 401.
+- `job_runs` fechada para o navegador; o admin vê só o resumo (`admin_job_status`). Detalhes não contêm dados pessoais nem segredos.
+- A varredura de segurança trata `job_run_*`, `scheduled_job_secret_ok` e `system_plan_storage_cleanup` como funções de servidor.

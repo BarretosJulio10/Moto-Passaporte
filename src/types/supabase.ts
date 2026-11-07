@@ -823,6 +823,19 @@ export type Database = {
           status: string
         }[]
       }
+      admin_job_status: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          job: string
+          last_status: string | null
+          last_detail: string | null
+          last_started_at: string | null
+          last_finished_at: string | null
+          last_ok_at: string | null
+          failures_24h: number
+          runs_24h: number
+        }[]
+      }
       admin_storage_overview: { Args: Record<PropertyKey, never>; Returns: Json }
       admin_storage_top_users: {
         Args: { p_limit?: number }

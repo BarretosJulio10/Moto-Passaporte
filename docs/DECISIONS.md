@@ -109,6 +109,14 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-029 — Rotinas automáticas por pg_cron + Edge Function (PRD 8.3, 7.6, 20)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- **Conciliação com o Mercado Pago a cada 6 horas** (KI-024) e **limpeza diária de arquivos sem vínculo** (KI-029), mesmas regras das ações manuais. Sem token do Mercado Pago, a conciliação fica como "pulada".
+- O `pg_cron` chama a Edge Function `scheduled-jobs` via `pg_net`. A autenticação é um segredo de 64 caracteres **gerado no próprio banco** e guardado no Vault: ninguém o digita nem o vê; a função o confere no banco. Sem login de usuário (verify_jwt desligado), sem dados no corpo além do nome da rotina.
+- Cada execução vai para `job_runs` (sem dados pessoais nem segredos); uma por vez; execução presa há mais de 1 hora é encerrada como falha. O painel admin mostra a última execução e as falhas em 24 h.
+- Limpeza automática é auditada com autor vazio (sistema) e o motivo fixo.
+- O endereço das funções fica em `functions_base_url` (não público), para atualizar numa restauração em outro projeto.
+
 ### ADR-028 — Backup, restauração e rollback (PRD 18.4, 20)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - **Backup diário** pelo GitHub Actions (local separado do Supabase): só **dados** (`public`, `auth.users/identities`, `storage.buckets/objects`), estrutura do `public` como referência e todos os arquivos do bucket. Retenção de 30 dias.

@@ -46,7 +46,7 @@ Princípio: **a estrutura vem das migrações do Git; os dados vêm do backup** 
    PGOPTIONS='-c session_replication_role=replica' pg_restore -d "$DB_URL" --data-only public_data.dump
    ```
 4. Enviar os arquivos para o bucket `attachments` nos mesmos caminhos (`MANIFEST.json` lista tudo).
-5. Republicar as Edge Functions (`supabase/functions`) e recadastrar no painel admin o token e o segredo do Mercado Pago (o Vault não vai no backup). Conferir o endereço do Webhook no Mercado Pago se o projeto mudou.
+5. Republicar as Edge Functions (`supabase/functions`); se o projeto mudou, atualizar `functions_base_url` em `system_settings` (as rotinas agendadas usam esse endereço). Recadastrar no painel admin o token e o segredo do Mercado Pago (o Vault não vai no backup). Conferir o endereço do Webhook no Mercado Pago se o projeto mudou.
 6. Conferir: rodar `tests/security/supabase/phase6e_security_sweep.sql` (nenhuma linha), entrar com uma conta de teste e abrir uma moto, um arquivo e o painel admin.
 
 **Teste de restauração:** `scripts/ops/restore_check.sh` faz os passos 1–3 e 6 num banco de teste (dados → criptografia → restauração → mesmas linhas, funções, RLS, permissões, bucket privado, varredura e acesso do titular). Repetir com um backup real a cada 3 meses ou antes de mudanças grandes, num projeto Supabase separado.
@@ -73,6 +73,7 @@ Cada release registra no `CHANGELOG.md` o que precisa para voltar; a nota "Rollb
 | Erros do banco, Auth e Edge Functions | Painel do Supabase → *Logs* |
 | Erros e disponibilidade do site | Painel da Vercel → *Logs* / *Deployments* |
 | Falha do backup | E-mail automático do GitHub Actions |
+| Conciliação e limpeza automáticas | `/admin` → "Rotinas automáticas" (última execução, falhas em 24 h); detalhes em `job_runs` e em *Supabase → Integrations → Cron* |
 
 Ainda não há alerta ativo (e-mail/WhatsApp) para erro de aplicação, falha de login em massa ou indisponibilidade (KI-030). Alertas não devem conter dados pessoais.
 

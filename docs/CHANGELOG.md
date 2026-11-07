@@ -9,6 +9,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.27.0] — 07/11/2026 — Preparação do lançamento: rotinas automáticas
+
+### Adicionado
+- Conciliação automática com o Mercado Pago a cada 6 horas e limpeza diária de arquivos sem vínculo (`pg_cron` → Edge Function `scheduled-jobs`), com registro em `job_runs` e quadro "Rotinas automáticas" no painel admin.
+- Funções `admin_job_status`, `job_run_start`, `job_run_finish`, `scheduled_job_secret_ok`, `system_plan_storage_cleanup`; extensões `pg_cron` e `pg_net`.
+
+### Testes
+- Banco local: 17 verificações novas (21 suítes). Supabase real: as duas rotinas executadas de ponta a ponta pelo banco (conciliação "pulada" sem token; limpeza "nada para limpar"); segredo errado recusado (401); varredura sem violações.
+
+### Rollback desta versão
+- `supabase/rollback/20261107223027_scheduled_jobs.down.sql` (desliga os agendamentos; conciliação e limpeza voltam a ser só manuais) e remover a Edge Function `scheduled-jobs`.
+
 ## [0.26.0] — 07/11/2026 — Fase 6.5: backup, restauração e rollback
 
 ### Adicionado

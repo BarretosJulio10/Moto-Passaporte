@@ -162,3 +162,17 @@ export async function getAuditEntry(id: number, reason: string): Promise<{ previ
   if (error) throw error
   return data as unknown as { previous_data: Record<string, unknown> | null; new_data: Record<string, unknown> | null }
 }
+
+export type JobStatus = Fn['admin_job_status']['Returns'][number]
+export const JOB_LABEL: Record<string, { name: string; every: string }> = {
+  reconcile: { name: 'Conciliação com o Mercado Pago', every: 'a cada 6 horas' },
+  storage_cleanup: { name: 'Limpeza de arquivos sem vínculo', every: 'todo dia às 04:41' },
+}
+export const JOB_STATUS_LABEL: Record<string, string> = { running: 'Em andamento', ok: 'Concluída', failed: 'Falhou', skipped: 'Pulada' }
+
+/** Estado das rotinas automáticas (ADR-029). */
+export async function fetchJobStatus(): Promise<JobStatus[]> {
+  const { data, error } = await getSupabase().rpc('admin_job_status')
+  if (error) throw error
+  return data ?? []
+}
