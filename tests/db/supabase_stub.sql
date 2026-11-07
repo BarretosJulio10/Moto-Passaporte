@@ -30,6 +30,19 @@ as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$
 grant usage on schema public, auth, extensions to anon, authenticated, service_role;
 grant execute on function auth.uid() to anon, authenticated, service_role;
 
+-- Claims da sessão, como no Supabase (request.jwt.claims). Simulação: quando o teste só define
+-- request.jwt.claim.sub, considera sessão com verificação em duas etapas (aal2), para as suítes
+-- antigas de admin; a suíte da MFA define request.jwt.claim.aal = 'aal1' explicitamente.
+create function auth.jwt() returns jsonb
+language sql stable
+as $$
+  select coalesce(
+    nullif(current_setting('request.jwt.claims', true), '')::jsonb,
+    jsonb_build_object('sub', nullif(current_setting('request.jwt.claim.sub', true), ''),
+                       'aal', coalesce(nullif(current_setting('request.jwt.claim.aal', true), ''), 'aal2')));
+$$;
+grant execute on function auth.jwt() to anon, authenticated, service_role;
+
 -- Privilégios padrão do Supabase: tudo concedido a anon/authenticated,
 -- cabendo às migrações revogar e à RLS proteger.
 alter default privileges in schema public grant all on tables    to anon, authenticated, service_role;

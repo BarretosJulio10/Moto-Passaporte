@@ -13,7 +13,7 @@ begin
     (D, 'admin@teste.invalid', '{"full_name":"Admin Teste"}', 'authenticated', 'authenticated');
   insert into public.user_roles (user_id, role) values (D, 'admin');
 
-  perform set_config('request.jwt.claims', json_build_object('sub', D, 'role', 'authenticated')::text, true);
+  perform set_config('request.jwt.claims', json_build_object('sub', D, 'role', 'authenticated', 'aal', 'aal2')::text, true);
   perform set_config('request.jwt.claim.sub', D::text, true);
   set local role authenticated;
   begin update public.system_settings set value = 'true' where key = 'billing_enabled'; raise exception 'FALHOU: escrita direta';

@@ -49,7 +49,7 @@ begin
   reset role;
 
   -- Admin decide
-  perform set_config('request.jwt.claims', json_build_object('sub', D, 'role', 'authenticated')::text, true);
+  perform set_config('request.jwt.claims', json_build_object('sub', D, 'role', 'authenticated', 'aal', 'aal2')::text, true);
   perform set_config('request.jwt.claim.sub', D::text, true);
   set local role authenticated;
   if not exists (select 1 from public.admin_list_claims() where id = claim and motorcycle_id = moto and current_owner_id = A) then raise exception 'FALHOU: fila do admin'; end if; n := n + 1;

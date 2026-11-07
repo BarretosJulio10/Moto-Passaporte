@@ -34,7 +34,7 @@ begin
       execute 'reset role';
       perform set_config('request.jwt.claim.sub', coalesce(p_uid::text, ''), true);
       perform set_config('request.jwt.claims',
-        case when p_uid is null then '{"role":"anon"}' else json_build_object('sub', p_uid, 'role', p_role)::text end, true);
+        case when p_uid is null then '{"role":"anon"}' else json_build_object('sub', p_uid, 'role', p_role, 'aal', 'aal2')::text end, true);
       if p_role is not null then execute format('set role %I', p_role); end if;
     end $b$ $f$;
   execute 'grant usage on schema tests to anon, authenticated';

@@ -33,7 +33,7 @@ begin
   begin perform public.record_payment_check(true, 'x', '1', 'x'); raise exception 'FALHOU: usuário marca verificação'; exception when insufficient_privilege then n := n + 1; end;
   reset role;
 
-  perform set_config('request.jwt.claims', json_build_object('sub', D, 'role', 'authenticated')::text, true);
+  perform set_config('request.jwt.claims', json_build_object('sub', D, 'role', 'authenticated', 'aal', 'aal2')::text, true);
   perform set_config('request.jwt.claim.sub', D::text, true);
   set local role authenticated;
   begin perform public.admin_save_payment_settings('test', null, 'invalido', null); raise exception 'FALHOU: token inválido aceito'; exception when invalid_parameter_value then n := n + 1; end;

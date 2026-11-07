@@ -28,7 +28,7 @@ begin
   reset role;
 
   -- Conta de pagamento configurada (simulada) e contratação liberada pelo admin
-  perform set_config('request.jwt.claims', json_build_object('sub', D, 'role', 'authenticated')::text, true);
+  perform set_config('request.jwt.claims', json_build_object('sub', D, 'role', 'authenticated', 'aal', 'aal2')::text, true);
   perform set_config('request.jwt.claim.sub', D::text, true);
   set local role authenticated;
   begin perform public.admin_set_billing_enabled(true); raise exception 'FALHOU: liberou sem conta configurada'; exception when others then

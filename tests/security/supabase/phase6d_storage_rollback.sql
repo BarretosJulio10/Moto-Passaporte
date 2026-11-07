@@ -31,7 +31,7 @@ begin
   exception when insufficient_privilege then n := n + 1; end;
   reset role;
 
-  perform set_config('request.jwt.claims', json_build_object('sub', D, 'role', 'authenticated')::text, true);
+  perform set_config('request.jwt.claims', json_build_object('sub', D, 'role', 'authenticated', 'aal', 'aal2')::text, true);
   perform set_config('request.jwt.claim.sub', D::text, true);
   set local role authenticated;
   ov := public.admin_storage_overview();

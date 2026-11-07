@@ -823,6 +823,8 @@ export type Database = {
           status: string
         }[]
       }
+      my_admin_access: { Args: Record<PropertyKey, never>; Returns: Json }
+      session_aal: { Args: Record<PropertyKey, never>; Returns: string }
       admin_job_status: {
         Args: Record<PropertyKey, never>
         Returns: {

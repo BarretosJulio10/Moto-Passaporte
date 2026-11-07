@@ -89,12 +89,12 @@ ok "titular vê as próprias motos no banco restaurado (RLS funcionando com os d
 for f in $(ls "$ROOT"/supabase/rollback/*.down.sql | sort -r); do
   "${PSQL[@]}" -d "$DST" -f "$f" >/dev/null
 done
-gone=$("${PSQL[@]}" -d "$DST" -c "select count(*) from (values ('admin_storage_overview'), ('admin_resolve_claim'), ('admin_update_setting'), ('admin_get_metrics'), ('mask_email'), ('admin_job_status')) v(f)
+gone=$("${PSQL[@]}" -d "$DST" -c "select count(*) from (values ('admin_storage_overview'), ('admin_resolve_claim'), ('admin_update_setting'), ('admin_get_metrics'), ('mask_email'), ('admin_job_status'), ('my_admin_access')) v(f)
                                    where exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname = v.f)")
 [ "$gone" = 0 ] || fail "rollback deixou funções para trás"
 cols=$("${PSQL[@]}" -d "$DST" -c "select count(*) from information_schema.columns where table_schema = 'public' and column_name in ('account_status', 'owner_notified_at')")
 [ "$cols" = 0 ] || fail "rollback deixou colunas para trás"
-ok "rollback remove funções, colunas e tabelas das 5 migrações"
+ok "rollback remove funções, colunas e tabelas das 6 migrações"
 [ "$("${PSQL[@]}" -d "$DST" -c "select count(*) from public.motorcycles")" = "$("${PSQL[@]}" -d "$SRC" -c "select count(*) from public.motorcycles")" ] || fail "rollback mexeu em motos"
 [ "$("${PSQL[@]}" -d "$DST" -c "select count(*) from public.maintenance_records")" = "$("${PSQL[@]}" -d "$SRC" -c "select count(*) from public.maintenance_records")" ] || fail "rollback mexeu no histórico"
 ok "histórico e motos intactos após o rollback"
@@ -102,7 +102,7 @@ w=$("${PSQL[@]}" -d "$DST" -c "select count(*) from information_schema.role_tabl
 [ "$w" = 0 ] || fail "rollback reabriu escrita direta em system_settings"
 ok "rollback não reabre a falha de segurança corrigida (escrita direta em configurações)"
 
-for v in 20261107204757 20261107205649 20261107211016 20261107211152 20261107212126 20261107223027; do
+for v in 20261107204757 20261107205649 20261107211016 20261107211152 20261107212126 20261107223027 20261107223918; do
   "${PSQL[@]}" -d "$DST" -f "$(ls "$ROOT"/supabase/migrations/${v}_*.sql)" >/dev/null
 done
 [ "$(SWEEP_COUNT "$DST")" = 0 ] || fail "varredura com violações após reaplicar"

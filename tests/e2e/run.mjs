@@ -34,6 +34,7 @@ function baseWorld(over = {}) {
     rest: { my_motorcycles: [moto], motorcycle_plates: [], mileage_records: [], maintenance_timeline: [], motorcycle_diary_feed: [], organization_members: [], workshops: [], ...over.rest },
     rpc: {
       is_admin: false,
+      my_admin_access: { has_admin_role: false, aal: 'aal1', allowed: false },
       get_my_plan: plan,
       get_storage_usage: { used_bytes: 0, quota_bytes: 104857600, max_file_bytes: 10485760 },
       get_public_plans: [],
@@ -60,7 +61,21 @@ async function scenario(name, world, viewport, steps) {
     const json = (b, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(b) })
     let body = null
     try { body = req.postDataJSON() } catch { body = null }
-    if (p.startsWith('/auth/v1/user')) return world.logged ? json(user) : json({ message: 'no session' }, 401)
+    if (p.startsWith('/auth/v1/user')) return world.logged ? json({ ...user, factors: world.factors ?? [] }) : json({ message: 'no session' }, 401)
+    if (p === '/auth/v1/factors' && req.method() === 'POST') {
+      calls.push({ kind: 'auth', name: 'enroll', body })
+      world.factors = [{ id: 'f1', factor_type: 'totp', status: 'unverified', friendly_name: body?.friendly_name, created_at: '', updated_at: '' }]
+      return json({ id: 'f1', type: 'totp', friendly_name: body?.friendly_name,
+        totp: { qr_code: 'data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"></svg>', secret: 'JBSWY3DPEHPK3PXP', uri: 'otpauth://totp/x' } })
+    }
+    if (/^\/auth\/v1\/factors\/[^/]+\/challenge$/.test(p)) return json({ id: 'ch1', type: 'totp', expires_at: now + 300 })
+    if (/^\/auth\/v1\/factors\/[^/]+\/verify$/.test(p)) {
+      calls.push({ kind: 'auth', name: 'verify', body })
+      if (body?.code !== '123456') return json({ code: 'mfa_verification_failed', message: 'Invalid TOTP code entered' }, 422)
+      world.factors = [{ id: 'f1', factor_type: 'totp', status: 'verified', friendly_name: 'x', created_at: '', updated_at: '' }]
+      world.rpc.my_admin_access = { has_admin_role: true, aal: 'aal2', allowed: true }
+      return json({ ...session, user: { ...user, factors: world.factors } })
+    }
     if (p.startsWith('/auth/v1')) return json({})
     if (p.startsWith('/rest/v1/rpc/')) {
       const fnName = p.slice('/rest/v1/rpc/'.length)
@@ -190,6 +205,7 @@ await scenario('Usuário comum tenta abrir a administração', baseWorld(), desk
 await scenario('Admin limpa arquivos sem vínculo', baseWorld({
   rpc: {
     is_admin: true,
+    my_admin_access: { has_admin_role: true, aal: 'aal2', allowed: true },
     admin_storage_overview: { bucket_files: 3, bucket_bytes: 3145728, linked_files: 1, linked_bytes: 1048576, by_kind: [{ kind: 'photo', files: 1, bytes: 1048576 }],
       by_context: [{ context: 'maintenance', files: 1, bytes: 1048576 }], temporary_files: 0, temporary_bytes: 0, orphan_files: 2, orphan_bytes: 2097152,
       retention_hours: 24, alert_percent: 80, workshop_quota_bytes: 524288000, max_file_bytes: 10485760, users_in_alert: 0, workshops_in_alert: 0, last_cleanup: null },
@@ -206,6 +222,32 @@ await scenario('Admin limpa arquivos sem vínculo', baseWorld({
   await page.getByText(/2 arquivo\(s\) apagado\(s\)/).waitFor()
   const f = calls.find((c) => c.kind === 'function' && c.name === 'storage-cleanup')
   check(f?.body?.reason === 'Limpeza de envios que falharam', 'envia o motivo à função de limpeza')
+})
+
+// 8. Admin sem a segunda etapa ativa o aplicativo autenticador antes de entrar
+await scenario('Admin ativa a verificação em duas etapas', baseWorld({
+  rpc: {
+    my_admin_access: { has_admin_role: true, aal: 'aal1', allowed: false },
+    admin_get_metrics: { users_total: 3, users_new_7d: 0, users_new_30d: 3, users_restricted: 0, motorcycles_total: 1, motorcycles_new_7d: 1, workshops_total: 0,
+      workshops_active: 0, workshops_unverified: 0, records_total: 0, records_30d: 0, subscriptions_active: 0, subscriptions_past_due: 0, subscriptions_canceling: 0,
+      mrr_cents: 0, payments_pending: 0, payments_rejected_30d: 0, invoices_failed: 0, storage_bytes: 0, files_total: 0, transfers_pending: 0,
+      access_requests_pending: 0, claims_pending: 0, reports_30d: 0, billing_environment: 'test' },
+  },
+}), mobile, async ({ page, calls, check, go }) => {
+  await go('/admin')
+  await page.getByRole('heading', { name: 'Verificação em duas etapas' }).waitFor()
+  check(!rpcCalled(calls, 'admin_get_metrics').length, 'sem a segunda etapa não carrega dados administrativos')
+  await page.getByRole('button', { name: 'Ativar agora' }).click()
+  await page.getByAltText('QR Code para o aplicativo autenticador').waitFor()
+  check(await page.getByText('JBSWY3DPEHPK3PXP').isVisible(), 'mostra QR Code e chave')
+  await page.getByLabel('Código de 6 números').fill('000000')
+  await page.getByRole('button', { name: 'Confirmar' }).click()
+  await page.getByText(/Código incorreto/).waitFor()
+  check(true, 'código errado é recusado com mensagem clara')
+  await page.getByLabel('Código de 6 números').fill('123456')
+  await page.getByRole('button', { name: 'Confirmar' }).click()
+  await page.getByRole('heading', { name: 'Administração' }).waitFor()
+  check(rpcCalled(calls, 'admin_get_metrics').length > 0, 'depois do código certo entra na administração')
 })
 
 await browser.close()
