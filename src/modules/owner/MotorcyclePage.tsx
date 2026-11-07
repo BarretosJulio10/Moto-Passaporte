@@ -7,6 +7,8 @@ import { PlateSection } from '@/modules/motorcycles/PlateSection'
 import { ChassisSection } from '@/modules/motorcycles/ChassisSection'
 import { MileageSection } from '@/modules/motorcycles/MileageSection'
 import { QrCodePanel } from '@/modules/sharing/QrCodePanel'
+import { MotoHeader } from '@/modules/motorcycles/MotoHeader'
+import { RecentRecords } from '@/modules/maintenance/RecentRecords'
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
@@ -39,24 +41,18 @@ export function MotorcyclePage() {
   const m = moto.data
   const motoId: string = moto.data.id
   const publicId: string = moto.data.public_id
-  const title = [m.brand, m.model, m.version].filter(Boolean).join(' ')
   const year = m.model_year ? `${m.manufacturing_year}/${m.model_year}` : String(m.manufacturing_year)
 
   return (
     <div>
-      <Link to="/painel" className="text-sm text-ink underline underline-offset-4">Voltar ao painel</Link>
+      <MotoHeader motorcycleId={motoId} />
       {justCreated && (
-        <div className="mt-4">
+        <div className="mt-6">
           <Notice tone="success" title="Passaporte criado">
             A moto já tem identidade própria. Use o QR Code para mostrar o passaporte a quem você quiser.
           </Notice>
         </div>
       )}
-
-      <div className="mt-4 flex flex-col gap-1">
-        <h1 className="heading text-3xl text-ink sm:text-4xl">{title}</h1>
-        <p className="text-muted">Passaporte criado em {formatDate(m.passport_created_at)}</p>
-      </div>
 
       {/* Celular: dados → QR Code → quilometragem. Computador: QR Code na coluna da direita. */}
       <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_17rem]">
@@ -73,6 +69,7 @@ export function MotorcyclePage() {
             <PlateSection motorcycleId={motoId} />
             <ChassisSection motorcycleId={motoId} />
           </div>
+          <RecentRecords motorcycleId={motoId} />
         </div>
         <aside className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <QrCodePanel publicId={publicId} label={`${m.brand}-${m.model}`} />

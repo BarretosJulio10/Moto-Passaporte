@@ -1,8 +1,8 @@
 # PROJECT_STATUS — Moto Passaporte
 
-**Versão atual:** 0.6.0
+**Versão atual:** 0.7.0
 **Data:** 06/11/2026
-**Fase:** Fase 1 concluída (base). Próxima: Fase 2 — histórico e arquivos
+**Fase:** Fase 2 em andamento — linha do tempo e manutenção implementadas
 
 ## Ambientes
 
@@ -27,12 +27,12 @@
 
 ## Próximos passos (em ordem)
 
-Concluído em 0.6.0: perguntas frequentes, contato, painéis base de oficina e admin. **Fase 1 concluída (base).**
+Concluído em 0.7.0: linha do tempo e registros de manutenção com peças, correção e anulação.
 
-1. **Responsável pelo produto:** criar a própria conta no site; pedir ao Claude para conceder o papel admin a ela (via SQL interno); definir e-mail/WhatsApp de atendimento (KI-015).
-2. **Fase 2** — linha do tempo e registros de manutenção (`maintenance_records`, `maintenance_items`), com origem do registro.
-3. Fase 2 — anexos e cotas (Storage privado, compressão de imagens, limites por plano).
-4. Fase 2 — diário da moto (privado/compartilhável).
+1. **Responsável pelo produto:** criar a conta no site e informar o e-mail para receber o papel admin; definir canais de contato (KI-015).
+2. Fase 2, item 2.4 — anexos e cotas: bucket privado no Supabase Storage, fotos/notas fiscais nos registros (origem "com comprovante"), compressão de imagens, limites por plano, URLs temporárias.
+3. Fase 2, item 2.6 — diário da moto (privado/compartilhável).
+4. Fechar a Fase 2 no `PRD_CHECKLIST.md`; depois, Fase 3 (oficinas e autorizações).
 
 ## Riscos ativos
 

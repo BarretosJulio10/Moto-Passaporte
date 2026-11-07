@@ -19,3 +19,4 @@ Problemas conhecidos e sua situação.
 | KI-012 | URLs de autenticação no Supabase (Site URL e Redirect URLs) | Alta | **Resolvido** em 06/11/2026 — configurado pelo responsável |
 | KI-014 | PRD 15.1 exige MFA para administradores; ainda não exigido. Também não existe tela para conceder o papel admin (só via SQL interno, por design) | Média | Aberto — antes de usar o painel admin com dados reais |
 | KI-015 | Canais de contato (`support_email`, `support_whatsapp`) estão vazios; a página de contato mostra "em definição" | Baixa | Aberto — aguardando o responsável definir os canais (P-9) |
+| KI-016 | Anular um registro de manutenção não anula a leitura de km criada junto com ele; a leitura continua no histórico de quilometragem (pode ser corrigida lá) | Baixa | Aberto — avaliar ao implementar anexos/Fase 2 |

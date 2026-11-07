@@ -1,4 +1,4 @@
-// Gerado a partir do Supabase (projeto ripgenhykaajcnzdxoid) em 06/11/2026.
+// Gerado a partir do Supabase (projeto ripgenhykaajcnzdxoid) em 06/11/2026; tabelas de manutenção adicionadas (migração maintenance).
 // NÃO editar manualmente — regenerar após cada migração.
 
 export type Json =
@@ -54,6 +54,46 @@ export type Database = {
           organization_id?: string | null
           previous_data?: Json | null
         }
+        Relationships: []
+      }
+      maintenance_items: {
+        Row: {
+          created_at: string
+          id: string
+          item_name: string
+          brand: string | null
+          maintenance_record_id: string
+          notes: string | null
+          part_number: string | null
+          quantity: number
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
+      maintenance_records: {
+        Row: {
+          category: Database["public"]["Enums"]["maintenance_category"]
+          correction_reason: string | null
+          corrects_record_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_void: boolean
+          mileage: number | null
+          mileage_record_id: string | null
+          motorcycle_id: string
+          notes: string | null
+          organization_id: string | null
+          service_date: string
+          service_value_cents: number | null
+          source_type: Database["public"]["Enums"]["record_source"]
+          title: string
+          workshop_name: string | null
+        }
+        Insert: never
+        Update: never
         Relationships: []
       }
       mileage_records: {
@@ -604,6 +644,29 @@ export type Database = {
       }
     }
     Views: {
+      maintenance_timeline: {
+        Row: {
+          category: Database["public"]["Enums"]["maintenance_category"] | null
+          correction_reason: string | null
+          corrects_record_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          is_void: boolean | null
+          items: Json | null
+          mileage: number | null
+          motorcycle_id: string | null
+          notes: string | null
+          organization_id: string | null
+          service_date: string | null
+          service_value_cents: number | null
+          source_type: Database["public"]["Enums"]["record_source"] | null
+          status: string | null
+          title: string | null
+          workshop_name: string | null
+        }
+        Relationships: []
+      }
       my_motorcycles: {
         Row: {
           acquisition_date: string | null
@@ -630,6 +693,27 @@ export type Database = {
       change_motorcycle_plate: {
         Args: { p_motorcycle_id: string; p_new_plate: string }
         Returns: undefined
+      }
+      create_maintenance_record: {
+        Args: {
+          p_category: Database["public"]["Enums"]["maintenance_category"]
+          p_correction_reason?: string
+          p_corrects_record_id?: string
+          p_description?: string
+          p_items?: Json
+          p_mileage?: number
+          p_motorcycle_id: string
+          p_notes?: string
+          p_service_date: string
+          p_service_value_cents?: number
+          p_title: string
+          p_workshop_name?: string
+        }
+        Returns: Json
+      }
+      void_maintenance_record: {
+        Args: { p_reason: string; p_record_id: string }
+        Returns: string
       }
       create_workshop: {
         Args: {
@@ -700,6 +784,24 @@ export type Database = {
     Enums: {
       app_role: "owner" | "workshop" | "admin"
       claim_status: "pending" | "approved" | "rejected" | "canceled"
+      maintenance_category:
+        | "revision"
+        | "oil_change"
+        | "filters"
+        | "brakes"
+        | "tires"
+        | "suspension"
+        | "engine"
+        | "transmission"
+        | "electrical"
+        | "battery"
+        | "cooling"
+        | "accessories"
+        | "modifications"
+        | "repairs"
+        | "accident"
+        | "inspection"
+        | "other"
       motorcycle_status: "active" | "archived"
       org_member_role: "responsible" | "staff"
       org_member_status: "active" | "removed"
@@ -836,6 +938,11 @@ export const Constants = {
     Enums: {
       app_role: ["owner", "workshop", "admin"],
       claim_status: ["pending", "approved", "rejected", "canceled"],
+      maintenance_category: [
+        "revision", "oil_change", "filters", "brakes", "tires", "suspension", "engine",
+        "transmission", "electrical", "battery", "cooling", "accessories", "modifications",
+        "repairs", "accident", "inspection", "other",
+      ],
       motorcycle_status: ["active", "archived"],
       org_member_role: ["responsible", "staff"],
       org_member_status: ["active", "removed"],

@@ -5,8 +5,8 @@
 > Nunca registrar aqui senhas, tokens, chaves, dados pessoais ou segredos operacionais.
 
 **Última atualização:** 06/11/2026
-**Versão do projeto:** 0.6.0
-**Situação geral:** Fase 1 concluída (base) — publicada em https://moto-passaporte.vercel.app. Próxima: Fase 2 (histórico e arquivos).
+**Versão do projeto:** 0.7.0
+**Situação geral:** Fase 1 concluída (base); Fase 2 em andamento — linha do tempo e manutenção publicadas em https://moto-passaporte.vercel.app.
 
 Legenda de estados (seção 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 
@@ -59,7 +59,9 @@ Padrões adotados:
 - Históricos protegidos por triggers (valem até para o dono do banco).
 - Admin com acesso mínimo: não lê chassi nem placas por padrão.
 
-Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access`, `maintenance_records`, `maintenance_items` (F2/F3), `motorcycle_diary`, `attachments` (F2), `passport_shares` (F4), cobrança e `notifications` (F5), `support_cases` (F6).
+Criadas na Fase 2: `maintenance_records`, `maintenance_items`, view `maintenance_timeline`.
+
+Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access` (F3), `motorcycle_diary`, `attachments` (F2), `passport_shares` (F4), cobrança e `notifications` (F5), `support_cases` (F6).
 
 ## 5. Módulos
 
@@ -69,7 +71,8 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access`, `mainte
 | Site público (início, FAQ, contato, termos, privacidade) | 1 | `implementado` |
 | Cadastro de moto, ID permanente (banco) | 1 | `testado` (Supabase dev) |
 | QR Code, painéis do proprietário, oficina (base) e admin (base) | 1 | `implementado` |
-| Linha do tempo, manutenção, quilometragem, anexos, diário | 2 | `planejado` |
+| Linha do tempo, manutenção e quilometragem | 2 | `implementado` |
+| Anexos, cotas e diário | 2 | `planejado` |
 | Oficinas, membros, pesquisa por placa, autorizações | 3 | `planejado` |
 | Transferência e compartilhamento público | 4 | `planejado` |
 | Planos, Mercado Pago, assinaturas, cotas | 5 | `planejado` |
@@ -85,7 +88,7 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access`, `mainte
 
 ## 7. Pendências imediatas
 
-- Próximo item: Fase 2 — linha do tempo e registros de manutenção. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
+- Próximo item: Fase 2 — anexos e cotas (Storage privado). Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 

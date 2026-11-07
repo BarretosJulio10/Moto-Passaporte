@@ -1,6 +1,6 @@
 # DATABASE — Moto Passaporte
 
-**Situação:** migrações da Fase 1 **aplicadas** no Supabase de desenvolvimento (`ripgenhykaajcnzdxoid`, PostgreSQL 17) em 06/11/2026 e `testado` lá (71 verificações) e localmente (73 verificações).
+**Situação:** migrações das Fases 1 e 2 (manutenção) **aplicadas** no Supabase de desenvolvimento (`ripgenhykaajcnzdxoid`, PostgreSQL 17) em 06/11/2026 e `testado` lá (71 verificações) e localmente (73 verificações).
 
 Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no Supabase, ADR-010):
 
@@ -13,6 +13,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 | `20261107003227_public_passport.sql` | `get_public_passport` (campos públicos padrão — ADR-008) |
 | `20261107003512_phase1_hardening.sql` | Reforço pelos advisors: bloqueia RPC de funções de trigger, otimiza RLS com `(select auth.uid())`, índices de FKs |
 | `20261107013442_contact_settings.sql` | Configurações públicas `support_email` e `support_whatsapp` (vazias até o responsável definir) |
+| `20261107014505_maintenance.sql` | Fase 2: `maintenance_records`, `maintenance_items`, categorias, `create_maintenance_record`, `void_maintenance_record`, view `maintenance_timeline` |
 
 Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limit_per_hour`, `support_email`, `support_whatsapp`. Nenhum dado de teste.
 
@@ -43,6 +44,12 @@ Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limi
 | `mileage_records` | Leituras de km | Imutáveis; correção = novo registro com `corrects_record_id`; `below_previous` sinaliza inconsistência |
 | `motorcycle_claim_requests` | Pedido de verificação de placa duplicada | Solicitante vê só o próprio pedido, nunca o `motorcycle_id` |
 
+### Histórico técnico (Fase 2)
+| Tabela | Finalidade | Regras de integridade |
+|---|---|---|
+| `maintenance_records` | Registros da linha do tempo: categoria (PRD 5.4), título, data, km, oficina (texto livre ou participante), valor em centavos, descrição, origem | Imutáveis. Correção = novo registro com `corrects_record_id` + motivo; anulação = registro `is_void`. Cada registro só pode ser corrigido uma vez (cadeia linear). Dono não corrige registro de oficina |
+| `maintenance_items` | Peças: nome, fabricante, código, quantidade | Imutáveis; até 50 por registro |
+
 ## Operações (funções RPC)
 
 | Função | Quem chama | O que faz |
@@ -52,11 +59,14 @@ Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limi
 | `record_mileage(moto, km, data, nota, corrige)` | Titular atual | Insere leitura; retorna `below_previous` |
 | `create_workshop(...)` | Usuário autenticado | Cria organização, membro responsável, perfil e papel `workshop` |
 | `get_public_passport(public_id)` | Qualquer pessoa | Retorna apenas campos públicos padrão |
+| `create_maintenance_record(...)` | Titular atual | Cria registro (ou correção) com peças; se informar km, cria/reaproveita/corrige a leitura em `mileage_records`. Retorna `{id, below_previous}` |
+| `void_maintenance_record(id, motivo)` | Titular atual | Anula registro do dono; o original continua visível |
 | `has_role`, `is_admin`, `is_current_owner`, `is_org_member`, `is_org_responsible`, `is_org_active` | Políticas RLS | Verificações de permissão |
 
 ## View
 
 - `my_motorcycles` (`security_invoker`): motos do usuário com placa atual, data de aquisição e última km.
+- `maintenance_timeline` (`security_invoker`): registros com `status` (`current`/`superseded`) e peças agregadas em `items`.
 
 ## Pontos de extensão previstos
 

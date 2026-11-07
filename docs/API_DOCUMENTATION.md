@@ -121,6 +121,33 @@ supabase.from('mileage_records').select('*').eq('motorcycle_id', id).order('reco
 
 ---
 
+## Linha do tempo e manutenção (Fase 2)
+
+### `maintenance_timeline` (view)
+```ts
+supabase.from('maintenance_timeline').select('*').eq('motorcycle_id', id)
+  .order('service_date', { ascending: false }).order('created_at', { ascending: false })
+```
+Cada linha traz `status` (`current` ou `superseded`), `items` (peças em JSON), `corrects_record_id`, `correction_reason` e `is_void`. Por padrão a interface mostra só `current` e esconde anulações; um filtro exibe as versões antigas.
+
+### `create_maintenance_record`
+```ts
+supabase.rpc('create_maintenance_record', {
+  p_motorcycle_id, p_category, p_title, p_service_date,          // obrigatórios
+  p_description?, p_mileage?, p_workshop_name?, p_service_value_cents?, p_notes?,
+  p_items?: [{ item_name, brand?, part_number?, quantity? }],      // até 50
+  p_corrects_record_id?, p_correction_reason?,                    // correção
+})
+```
+Retorno `{ id, below_previous }`. Valor sempre em **centavos**. Se `p_mileage` vier, a leitura entra no histórico de km (ou é reaproveitada/corrigida numa correção).
+Erros (exibir a mensagem): data futura, título vazio, "Explique o motivo da correção.", "Este registro já foi corrigido. Corrija a versão mais recente.", "Registros confirmados por oficina só podem ser corrigidos pela oficina."
+
+### `void_maintenance_record`
+```ts
+supabase.rpc('void_maintenance_record', { p_record_id, p_reason })
+```
+Anula um registro do dono. Nada é apagado.
+
 ## Duplicidade
 
 ```ts

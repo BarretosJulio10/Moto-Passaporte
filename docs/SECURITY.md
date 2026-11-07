@@ -36,6 +36,8 @@
 |---|---|---|
 | PostgreSQL 16 local + simulação | `tests/security/phase1_rls_test.sql` | 73 aprovadas |
 | Supabase real (dev, PG 17), em transação desfeita | `tests/security/supabase/phase1_rls_test_rollback.sql` | 71 aprovadas, antes e depois do reforço |
+| PostgreSQL 16 local — Fase 2 (manutenção) | `tests/security/phase2_maintenance_test.sql` | 29 aprovadas |
+| Supabase real — Fase 2, em transação desfeita | `tests/security/supabase/phase2_maintenance_rollback.sql` | 26 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 

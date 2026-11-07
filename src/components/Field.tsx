@@ -80,9 +80,16 @@ export function SelectField({
   error,
   options,
   placeholder,
+  optionLabel,
   className = '',
   ...props
-}: SelectHTMLAttributes<HTMLSelectElement> & { label: string; error?: string; options: readonly string[]; placeholder?: string }) {
+}: SelectHTMLAttributes<HTMLSelectElement> & {
+  label: string
+  error?: string
+  options: readonly string[]
+  placeholder?: string
+  optionLabel?: (value: string) => string
+}) {
   const id = useId()
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
@@ -101,7 +108,7 @@ export function SelectField({
         {placeholder !== undefined && <option value="">{placeholder}</option>}
         {options.map((o) => (
           <option key={o} value={o}>
-            {o}
+            {optionLabel ? optionLabel(o) : o}
           </option>
         ))}
       </select>

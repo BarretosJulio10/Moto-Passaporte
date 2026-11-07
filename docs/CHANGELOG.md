@@ -4,6 +4,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 
 ## [Não publicado]
 
+## [0.7.0] — 06/11/2026 — Fase 2: linha do tempo e manutenção
+
+### Adicionado
+- Migração `maintenance`: `maintenance_records`, `maintenance_items`, 17 categorias do PRD 5.4, `create_maintenance_record`, `void_maintenance_record`, view `maintenance_timeline`. Registros imutáveis com correção e anulação rastreáveis; km do serviço entra no histórico de quilometragem.
+- Aba **Histórico** da moto: linha do tempo por ano, selos de origem, peças, valor, oficina, filtros (categoria, origem, oficina, período, versões antigas), corrigir e anular.
+- Formulário de registro com sugestão de título pela categoria, peças dinâmicas (até 50) e valor em reais.
+- Resumo da moto mostra os últimos registros; abas Resumo/Histórico.
+- Testes: banco 29 (local) + 26 (Supabase, transação desfeita); interface 58 no total (11 novos). Verificação visual em 360 e 1280 px.
+
 ## [0.6.0] — 06/11/2026 — Fase 1 concluída (base)
 
 ### Adicionado
