@@ -113,7 +113,7 @@ export function ReportPage() {
         {register.isError && <div className="mt-3 max-w-xl"><Notice tone="error">{translateDbError(register.error as { code?: string; message?: string })}</Notice></div>}
       </div>
 
-      <article className="report-sheet mx-auto mt-8 max-w-[52rem] rounded-sheet border border-rule bg-white p-8 text-[13px] leading-relaxed text-ink shadow-sm print:mt-0"
+      <article className="report-sheet mx-auto mt-8 max-w-[52rem] rounded-sheet border border-rule bg-white p-4 text-[13px] sm:p-8 leading-relaxed text-ink shadow-sm print:mt-0"
         aria-label="Prévia do relatório">
         <header className="flex items-start justify-between gap-4 border-b-2 border-ink pb-3">
           <div>
@@ -158,17 +158,17 @@ export function ReportPage() {
             <table className="mt-2 w-full border-collapse text-left">
               <thead>
                 <tr className="border-b border-rule text-xs text-muted">
-                  <th className="py-1 font-semibold">Data</th>
-                  <th className="py-1 font-semibold">Quilometragem</th>
-                  <th className="py-1 font-semibold">Origem</th>
+                  <th className="py-1 pr-3 font-semibold">Data</th>
+                  <th className="py-1 pr-3 font-semibold">Quilometragem</th>
+                  <th className="py-1 pr-3 font-semibold">Origem</th>
                 </tr>
               </thead>
               <tbody>
                 {readings.map((r) => (
                   <tr key={r.id} className="border-b border-rule/60">
-                    <td className="py-1">{formatDate(r.recorded_at, 'short')}</td>
-                    <td className="py-1">{formatKm(r.mileage)}{r.below_previous ? ' (abaixo da anterior)' : ''}</td>
-                    <td className="py-1">{SOURCE_LABEL[r.source_type]}</td>
+                    <td className="py-1 pr-3">{formatDate(r.recorded_at, 'short')}</td>
+                    <td className="py-1 pr-3">{formatKm(r.mileage)}{r.below_previous ? ' (abaixo da anterior)' : ''}</td>
+                    <td className="py-1 pr-3">{SOURCE_LABEL[r.source_type]}</td>
                   </tr>
                 ))}
               </tbody>
@@ -215,7 +215,7 @@ export function ReportPage() {
             Este relatório reúne o que foi registrado no Moto Passaporte e indica a origem de cada informação. Registros “informados pelo dono” não
             foram verificados por terceiros. Não é laudo, perícia, vistoria nem certificado oficial e não substitui a consulta aos órgãos de trânsito.
           </p>
-          <p className="mt-1">Passaporte público: {window.location.origin}/p/{m.public_id}</p>
+          <p className="mt-1 break-all">Passaporte público: {window.location.origin}/p/{m.public_id}</p>
         </footer>
       </article>
     </div>
