@@ -1,3 +1,4 @@
+import { lazy } from 'react'
 import { createBrowserRouter, Link, RouterProvider, ScrollRestoration, Outlet } from 'react-router-dom'
 import { PublicLayout } from '@/modules/public_site/PublicLayout'
 import { HomePage } from '@/modules/public_site/HomePage'
@@ -9,40 +10,43 @@ import { SignInPage } from '@/modules/auth/SignInPage'
 import { ForgotPasswordPage } from '@/modules/auth/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/modules/auth/ResetPasswordPage'
 import { AppLayout } from '@/components/AppLayout'
-import { DashboardPage } from '@/modules/owner/DashboardPage'
-import { RegisterMotorcyclePage } from '@/modules/owner/RegisterMotorcyclePage'
-import { MotorcyclePage } from '@/modules/owner/MotorcyclePage'
-import { TimelinePage } from '@/modules/maintenance/TimelinePage'
-import { RecordFormPage } from '@/modules/maintenance/RecordFormPage'
-import { DiaryPage } from '@/modules/diary/DiaryPage'
-import { DiaryFormPage } from '@/modules/diary/DiaryFormPage'
-import { PublicPassportPage } from '@/modules/sharing/PublicPassportPage'
-import { SharedPassportPage } from '@/modules/sharing/SharedPassportPage'
-import { WorkshopIndexPage } from '@/modules/workshop/WorkshopIndexPage'
-import { CreateWorkshopPage } from '@/modules/workshop/CreateWorkshopPage'
-import { WorkshopDashboardPage } from '@/modules/workshop/WorkshopDashboardPage'
-import { WorkshopProfilePage } from '@/modules/workshop/WorkshopProfilePage'
-import { TeamPage } from '@/modules/workshop/TeamPage'
-import { WorkshopMotoPage, WorkshopServiceFormPage } from '@/modules/workshop_service/WorkshopMotoPage'
-import { PreviousDiaryPage } from '@/modules/transfers/PreviousDiaryPage'
-import { InvitePage } from '@/modules/workshop/InvitePage'
-import { PublicWorkshopPage } from '@/modules/workshop/PublicWorkshopPage'
 import { RequireAdmin } from '@/modules/admin/RequireAdmin'
-import { AdminDashboardPage } from '@/modules/admin/AdminDashboardPage'
-import { AdminPlansPage } from '@/modules/admin/AdminPlansPage'
-import { AdminPaymentsPage } from '@/modules/admin/AdminPaymentsPage'
-import { AdminSubscriptionsPage } from '@/modules/admin/AdminSubscriptionsPage'
-import { AdminUsersPage } from '@/modules/admin/AdminUsersPage'
-import { AdminSettingsPage } from '@/modules/admin/AdminSettingsPage'
-import { AdminAuditPage } from '@/modules/admin/AdminAuditPage'
-import { AdminClaimsPage } from '@/modules/admin/AdminClaimsPage'
-import { AdminStoragePage } from '@/modules/admin/AdminStoragePage'
-import { NotificationsPage } from '@/modules/notifications/NotificationsPage'
-import { AdminWorkshopsPage } from '@/modules/admin/AdminWorkshopsPage'
-import { MyPlanPage } from '@/modules/plans/MyPlanPage'
-import { ReceiptPage } from '@/modules/plans/ReceiptPage'
-import { ReportPage } from '@/modules/reports/ReportPage'
 import { RequireAuth } from '@/core/auth/RequireAuth'
+
+// Páginas carregadas sob demanda (KI-010): o site público abre sem baixar painel, oficina e admin.
+const DashboardPage = lazy(() => import('@/modules/owner/DashboardPage').then((m) => ({ default: m.DashboardPage })))
+const RegisterMotorcyclePage = lazy(() => import('@/modules/owner/RegisterMotorcyclePage').then((m) => ({ default: m.RegisterMotorcyclePage })))
+const MotorcyclePage = lazy(() => import('@/modules/owner/MotorcyclePage').then((m) => ({ default: m.MotorcyclePage })))
+const TimelinePage = lazy(() => import('@/modules/maintenance/TimelinePage').then((m) => ({ default: m.TimelinePage })))
+const RecordFormPage = lazy(() => import('@/modules/maintenance/RecordFormPage').then((m) => ({ default: m.RecordFormPage })))
+const DiaryPage = lazy(() => import('@/modules/diary/DiaryPage').then((m) => ({ default: m.DiaryPage })))
+const DiaryFormPage = lazy(() => import('@/modules/diary/DiaryFormPage').then((m) => ({ default: m.DiaryFormPage })))
+const PublicPassportPage = lazy(() => import('@/modules/sharing/PublicPassportPage').then((m) => ({ default: m.PublicPassportPage })))
+const SharedPassportPage = lazy(() => import('@/modules/sharing/SharedPassportPage').then((m) => ({ default: m.SharedPassportPage })))
+const WorkshopIndexPage = lazy(() => import('@/modules/workshop/WorkshopIndexPage').then((m) => ({ default: m.WorkshopIndexPage })))
+const CreateWorkshopPage = lazy(() => import('@/modules/workshop/CreateWorkshopPage').then((m) => ({ default: m.CreateWorkshopPage })))
+const WorkshopDashboardPage = lazy(() => import('@/modules/workshop/WorkshopDashboardPage').then((m) => ({ default: m.WorkshopDashboardPage })))
+const WorkshopProfilePage = lazy(() => import('@/modules/workshop/WorkshopProfilePage').then((m) => ({ default: m.WorkshopProfilePage })))
+const TeamPage = lazy(() => import('@/modules/workshop/TeamPage').then((m) => ({ default: m.TeamPage })))
+const WorkshopMotoPage = lazy(() => import('@/modules/workshop_service/WorkshopMotoPage').then((m) => ({ default: m.WorkshopMotoPage })))
+const WorkshopServiceFormPage = lazy(() => import('@/modules/workshop_service/WorkshopMotoPage').then((m) => ({ default: m.WorkshopServiceFormPage })))
+const PreviousDiaryPage = lazy(() => import('@/modules/transfers/PreviousDiaryPage').then((m) => ({ default: m.PreviousDiaryPage })))
+const InvitePage = lazy(() => import('@/modules/workshop/InvitePage').then((m) => ({ default: m.InvitePage })))
+const PublicWorkshopPage = lazy(() => import('@/modules/workshop/PublicWorkshopPage').then((m) => ({ default: m.PublicWorkshopPage })))
+const AdminDashboardPage = lazy(() => import('@/modules/admin/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })))
+const AdminPlansPage = lazy(() => import('@/modules/admin/AdminPlansPage').then((m) => ({ default: m.AdminPlansPage })))
+const AdminPaymentsPage = lazy(() => import('@/modules/admin/AdminPaymentsPage').then((m) => ({ default: m.AdminPaymentsPage })))
+const AdminSubscriptionsPage = lazy(() => import('@/modules/admin/AdminSubscriptionsPage').then((m) => ({ default: m.AdminSubscriptionsPage })))
+const AdminUsersPage = lazy(() => import('@/modules/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })))
+const AdminSettingsPage = lazy(() => import('@/modules/admin/AdminSettingsPage').then((m) => ({ default: m.AdminSettingsPage })))
+const AdminAuditPage = lazy(() => import('@/modules/admin/AdminAuditPage').then((m) => ({ default: m.AdminAuditPage })))
+const AdminClaimsPage = lazy(() => import('@/modules/admin/AdminClaimsPage').then((m) => ({ default: m.AdminClaimsPage })))
+const AdminStoragePage = lazy(() => import('@/modules/admin/AdminStoragePage').then((m) => ({ default: m.AdminStoragePage })))
+const NotificationsPage = lazy(() => import('@/modules/notifications/NotificationsPage').then((m) => ({ default: m.NotificationsPage })))
+const AdminWorkshopsPage = lazy(() => import('@/modules/admin/AdminWorkshopsPage').then((m) => ({ default: m.AdminWorkshopsPage })))
+const MyPlanPage = lazy(() => import('@/modules/plans/MyPlanPage').then((m) => ({ default: m.MyPlanPage })))
+const ReceiptPage = lazy(() => import('@/modules/plans/ReceiptPage').then((m) => ({ default: m.ReceiptPage })))
+const ReportPage = lazy(() => import('@/modules/reports/ReportPage').then((m) => ({ default: m.ReportPage })))
 
 function Root() {
   return (

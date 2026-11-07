@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import { Logo } from '@/components/Logo'
 import { ButtonLink } from '@/components/Button'
@@ -36,7 +37,9 @@ export function PublicLayout() {
       </header>
 
       <main id="conteudo" className="flex-1">
-        <Outlet />
+        <Suspense fallback={<p className="mx-auto max-w-5xl px-5 py-10 text-muted" role="status">Carregando…</p>}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <footer className="border-t border-rule">

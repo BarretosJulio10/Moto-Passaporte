@@ -9,6 +9,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.31.0] — 07/11/2026 — Site mais leve
+
+### Desempenho
+- Painel, oficina, administração, relatórios e páginas compartilhadas carregam sob demanda (33 páginas). Primeira carga: 207 kB comprimidos (antes 277 kB) (KI-010).
+
+### Rollback desta versão
+- Só o site: voltar o deploy anterior na Vercel.
+
 ## [0.30.0] — 07/11/2026 — Chassi cifrado
 
 ### Segurança

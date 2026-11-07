@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Logo } from '@/components/Logo'
@@ -87,7 +88,9 @@ export function AppLayout() {
         </nav>
       </header>
       <main id="conteudo" className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-5 print:max-w-none print:p-0">
-        <Outlet />
+        <Suspense fallback={<p className="text-muted" role="status">Carregando…</p>}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   )
