@@ -14,14 +14,17 @@ type Props = {
   /** Anexos já salvos no registro (contam no limite por registro). */
   existingCount?: number
   disabled?: boolean
+  /** Diário: só fotos, sem escolher o tipo. */
+  photosOnly?: boolean
+  maxFiles?: number
 }
 
-export function AttachmentPicker({ value, onChange, usage, existingCount = 0, disabled }: Props) {
+export function AttachmentPicker({ value, onChange, usage, existingCount = 0, disabled, photosOnly = false, maxFiles = MAX_FILES_PER_RECORD }: Props) {
   const inputId = useId()
   const inputRef = useRef<HTMLInputElement>(null)
   const [errors, setErrors] = useState<string[]>([])
   const [preparing, setPreparing] = useState(false)
-  const room = MAX_FILES_PER_RECORD - existingCount - value.length
+  const room = maxFiles - existingCount - value.length
 
   async function onFiles(event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? [])
@@ -33,11 +36,15 @@ export function AttachmentPicker({ value, onChange, usage, existingCount = 0, di
     let pendingBytes = value.reduce((s, p) => s + p.file.blob.size, 0)
     for (const [i, f] of files.entries()) {
       if (i >= room) {
-        errs.push(`Limite de ${MAX_FILES_PER_RECORD} arquivos por registro.`)
+        errs.push(photosOnly ? `Limite de ${maxFiles} fotos por entrada.` : `Limite de ${maxFiles} arquivos por registro.`)
         break
       }
       try {
         const prepared = await prepareFile(f)
+        if (photosOnly && prepared.mime === 'application/pdf') {
+          errs.push(`${prepared.name}: no diário, envie apenas fotos.`)
+          continue
+        }
         const limit = checkLimits(prepared.blob.size, usage, pendingBytes)
         if (limit) {
           errs.push(`${prepared.name}: ${limit}`)
@@ -63,8 +70,8 @@ export function AttachmentPicker({ value, onChange, usage, existingCount = 0, di
               <span className="min-w-0 basis-full truncate text-sm text-graphite sm:basis-0 sm:flex-1" title={p.file.name}>
                 {p.file.name} <span className="text-muted">({formatBytes(p.file.blob.size)})</span>
               </span>
-              <label className="sr-only" htmlFor={`${inputId}-${p.key}`}>Tipo de {p.file.name}</label>
-              <select
+              {!photosOnly && <label className="sr-only" htmlFor={`${inputId}-${p.key}`}>Tipo de {p.file.name}</label>}
+              {!photosOnly && <select
                 id={`${inputId}-${p.key}`}
                 value={p.kind}
                 disabled={disabled}
@@ -74,7 +81,7 @@ export function AttachmentPicker({ value, onChange, usage, existingCount = 0, di
                 {KINDS.map((k) => (
                   <option key={k} value={k}>{KIND_LABEL[k]}</option>
                 ))}
-              </select>
+              </select>}
               <Button type="button" variant="quiet" size="sm" disabled={disabled} onClick={() => onChange(value.filter((x) => x.key !== p.key))}>
                 Remover
               </Button>
@@ -96,15 +103,15 @@ export function AttachmentPicker({ value, onChange, usage, existingCount = 0, di
             id={inputId}
             type="file"
             multiple
-            accept="image/jpeg,image/png,image/webp,application/pdf"
+            accept={photosOnly ? 'image/jpeg,image/png,image/webp' : 'image/jpeg,image/png,image/webp,application/pdf'}
             className="sr-only"
             onChange={onFiles}
             disabled={disabled || preparing}
           />
           <Button type="button" variant="secondary" size="sm" loading={preparing} disabled={disabled} onClick={() => inputRef.current?.click()}>
-            {preparing ? 'Preparando…' : 'Escolher arquivos'}
+            {preparing ? 'Preparando…' : photosOnly ? 'Escolher fotos' : 'Escolher arquivos'}
           </Button>
-          <span className="text-sm text-muted">Foto ou PDF, até {usage ? formatBytes(usage.max_file_bytes) : '10 MB'} cada. Fotos grandes são reduzidas.</span>
+          <span className="text-sm text-muted">{photosOnly ? 'JPG, PNG ou WEBP' : 'Foto ou PDF'}, até {usage ? formatBytes(usage.max_file_bytes) : '10 MB'} cada. Fotos grandes são reduzidas.</span>
         </div>
       )}
       {usage && <StorageMeter usage={usage} />}

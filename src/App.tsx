@@ -14,6 +14,8 @@ import { RegisterMotorcyclePage } from '@/modules/owner/RegisterMotorcyclePage'
 import { MotorcyclePage } from '@/modules/owner/MotorcyclePage'
 import { TimelinePage } from '@/modules/maintenance/TimelinePage'
 import { RecordFormPage } from '@/modules/maintenance/RecordFormPage'
+import { DiaryPage } from '@/modules/diary/DiaryPage'
+import { DiaryFormPage } from '@/modules/diary/DiaryFormPage'
 import { PublicPassportPage } from '@/modules/sharing/PublicPassportPage'
 import { WorkshopIndexPage } from '@/modules/workshop/WorkshopIndexPage'
 import { CreateWorkshopPage } from '@/modules/workshop/CreateWorkshopPage'
@@ -76,6 +78,9 @@ export const routes = [
           { path: '/painel/motos/:id', element: <MotorcyclePage /> },
           { path: '/painel/motos/:id/historico', element: <TimelinePage /> },
           { path: '/painel/motos/:id/historico/novo', element: <RecordFormPage /> },
+          { path: '/painel/motos/:id/diario', element: <DiaryPage /> },
+          { path: '/painel/motos/:id/diario/novo', element: <DiaryFormPage /> },
+          { path: '/painel/motos/:id/diario/:entryId/editar', element: <DiaryFormPage /> },
           { path: '/oficina', element: <WorkshopIndexPage /> },
           { path: '/oficina/nova', element: <CreateWorkshopPage /> },
           { path: '/oficina/:orgId', element: <WorkshopDashboardPage /> },

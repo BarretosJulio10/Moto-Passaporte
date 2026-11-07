@@ -75,6 +75,15 @@ Configuração prevista (aplicar quando o frontend existir — ADR-011):
 - Região de funções (se usadas): próxima de us-east-1, onde está o Supabase (ADR-009)
 Até o frontend existir, um deploy na Vercel não terá o que publicar — isso é esperado.
 
+### ADR-013 — Diário: privado nunca muda de dono; diário é editável (PRD 5.7, 11)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- Cada entrada é **privada** (padrão) ou **compartilhável**.
+- Privada: só o autor vê, inclusive depois de vender a moto. O novo dono nunca vê (PRD 11: não expor diário privado nem dados privados de antigos donos).
+- Compartilhável: acompanha a moto. O titular atual vê, sem saber quem escreveu (`author_id` não é exposto). Na Fase 4 poderá entrar no passaporte público, conforme a seleção do dono.
+- Diferente do histórico técnico, o diário não é prova: o autor edita enquanto for titular e exclui a qualquer momento (com as fotos, apagadas de fato no Storage).
+- Auditoria só com metadados (categoria, data, visibilidade); título, texto e local não vão para o log.
+- Fotos do diário reaproveitam `attachments` (`diary_entry_id`), só imagens, até 10 por entrada, contam na cota de quem enviou.
+
 ---
 
 ## Pendentes — técnicas

@@ -109,7 +109,7 @@ function RecordForm({ motorcycleId, original, onDone }: FormProps) {
     setLoading(true)
     try {
       const result = await createMaintenanceRecord(motorcycleId, parsed.data, items)
-      const attachFailures = pending.length ? await uploadAll(motorcycleId, result.id, pending) : []
+      const attachFailures = pending.length ? await uploadAll(motorcycleId, { maintenanceRecordId: result.id }, pending) : []
       await onDone({ saved: original ? 'corrected' : 'created', below: result.below_previous, attachFailures })
     } catch (error) {
       setFormError(translateDbError(error as { code?: string; message?: string }))

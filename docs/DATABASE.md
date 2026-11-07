@@ -14,6 +14,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 | `20261107003512_phase1_hardening.sql` | Reforço pelos advisors: bloqueia RPC de funções de trigger, otimiza RLS com `(select auth.uid())`, índices de FKs |
 | `20261107013442_contact_settings.sql` | Configurações públicas `support_email` e `support_whatsapp` (vazias até o responsável definir) |
 | `20261107014505_maintenance.sql` | Fase 2: `maintenance_records`, `maintenance_items`, categorias, `create_maintenance_record`, `void_maintenance_record`, view `maintenance_timeline` |
+| `20261107095618_diary.sql` | Fase 2: `motorcycle_diary`, fotos do diário em `attachments.diary_entry_id`, RPCs do diário, view `motorcycle_diary_feed`, políticas do Storage separadas (envio, leitura, exclusão de arquivo próprio sem registro) |
 | `20261107015821_attachments.sql` | Fase 2: bucket privado `attachments`, tabela `attachments`, políticas do Storage, `register_attachment`, `get_storage_usage`, cota em `system_settings`; `maintenance_timeline` com anexos e `evidence_level` |
 
 Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limit_per_hour`, `support_email`, `support_whatsapp`. Nenhum dado de teste.
@@ -52,6 +53,8 @@ Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limi
 | `maintenance_items` | Peças: nome, fabricante, código, quantidade | Imutáveis; até 50 por registro |
 | `attachments` | Comprovantes: caminho no Storage (`<moto>/<uuid>.<ext>`), nome, tipo, tamanho, espécie (nota fiscal, OS, recibo, foto, documento, outro), registro vinculado | Imutáveis (só `uploaded_by` pode virar nulo na exclusão de conta). Tamanho e tipo vêm do Storage, não do cliente. Leitura só pelo titular atual |
 
+| `motorcycle_diary` | Diário (PRD 5.7): categoria, título, texto, data, local, visibilidade (`private`/`shareable`) | Autor edita enquanto titular e exclui a qualquer momento. Privada: só o autor. Compartilhável: titular atual. `author_id` não é concedido ao frontend. Auditoria só com metadados (ADR-013) |
+
 **Storage:** bucket `attachments` privado, 10 MB, JPG/PNG/WEBP/PDF. Políticas em `storage.objects`: envio e leitura só na pasta de moto da qual o usuário é titular atual (`can_access_attachment_object`); sem atualização nem exclusão pela API.
 
 ## Operações (funções RPC)
@@ -66,6 +69,8 @@ Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limi
 | `create_maintenance_record(...)` | Titular atual | Cria registro (ou correção) com peças; se informar km, cria/reaproveita/corrige a leitura em `mileage_records`. Retorna `{id, below_previous}` |
 | `void_maintenance_record(id, motivo)` | Titular atual | Anula registro do dono; o original continua visível |
 | `register_attachment(moto, caminho, nome, espécie, registro?)` | Titular atual | Registra arquivo já enviado pelo próprio usuário; confere pasta, tipo, tamanho, cota e registro não anulado. Retorna o id |
+| `create_diary_entry(...)` / `update_diary_entry(...)` | Titular atual (edição: só o autor) | Cria/edita entrada do diário |
+| `delete_diary_entry(id)` / `delete_diary_photo(id)` | Autor | Exclui e devolve os caminhos dos arquivos para o app apagar no Storage |
 | `get_storage_usage()` | Autenticado | `{used_bytes, quota_bytes, max_file_bytes}` do usuário |
 | `has_role`, `is_admin`, `is_current_owner`, `is_org_member`, `is_org_responsible`, `is_org_active` | Políticas RLS | Verificações de permissão |
 

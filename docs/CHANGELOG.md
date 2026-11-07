@@ -9,6 +9,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.9.0] — 07/11/2026 — Fase 2 concluída: diário da moto
+
+### Adicionado
+- Migração `diary`: `motorcycle_diary` (viagem, primeiro passeio, encontro, acessório, personalização, fotos, outro), privado ou compartilhável (ADR-013), `create_diary_entry`, `update_diary_entry`, `delete_diary_entry`, `delete_diary_photo`, view `motorcycle_diary_feed` (com fotos e `is_mine`, sem expor o autor). Auditoria só com metadados.
+- Fotos do diário em `attachments` (`diary_entry_id`): só imagens, até 10 por entrada; leitura segue a visibilidade da entrada; apagadas de fato ao excluir.
+- Storage: política de exclusão só para arquivo próprio sem registro (fotos removidas do diário e envios que falharam — reduz KI-017); envio e leitura com regras separadas.
+- Cota não conta fotos de diário de outros autores.
+- Interface: aba **Diário** da moto com filtro (todas, privadas, compartilháveis), entradas por ano, fotos, editar e excluir com confirmação; formulário com escolha de visibilidade explicada e fotos.
+- Testes: banco 44 (local, com venda simulada) + 27 (Supabase, transação desfeita); interface 77 no total (10 novos). Verificação visual em 360 e 1280 px.
+
 ## [0.8.0] — 06/11/2026 — Fase 2: anexos e comprovantes
 
 ### Adicionado

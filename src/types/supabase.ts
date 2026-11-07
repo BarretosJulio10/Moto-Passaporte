@@ -25,10 +25,28 @@ export type Database = {
           id: string
           kind: Database["public"]["Enums"]["attachment_kind"]
           maintenance_record_id: string | null
+          diary_entry_id: string | null
           mime_type: string
           motorcycle_id: string
           storage_path: string
           uploaded_by: string | null
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
+      motorcycle_diary: {
+        Row: {
+          body: string | null
+          category: Database["public"]["Enums"]["diary_category"]
+          created_at: string
+          entry_date: string
+          id: string
+          location: string | null
+          motorcycle_id: string
+          title: string
+          updated_at: string
+          visibility: Database["public"]["Enums"]["diary_visibility"]
         }
         Insert: never
         Update: never
@@ -661,6 +679,23 @@ export type Database = {
       }
     }
     Views: {
+      motorcycle_diary_feed: {
+        Row: {
+          body: string | null
+          category: Database["public"]["Enums"]["diary_category"] | null
+          created_at: string | null
+          entry_date: string | null
+          id: string | null
+          is_mine: boolean | null
+          location: string | null
+          motorcycle_id: string | null
+          photos: Json | null
+          title: string | null
+          updated_at: string | null
+          visibility: Database["public"]["Enums"]["diary_visibility"] | null
+        }
+        Relationships: []
+      }
       maintenance_timeline: {
         Row: {
           attachments: Json | null
@@ -735,12 +770,39 @@ export type Database = {
           p_file_name: string
           p_kind: Database["public"]["Enums"]["attachment_kind"]
           p_maintenance_record_id?: string
+          p_diary_entry_id?: string
           p_motorcycle_id: string
           p_storage_path: string
         }
         Returns: string
       }
       get_storage_usage: { Args: never; Returns: Json }
+      create_diary_entry: {
+        Args: {
+          p_body?: string
+          p_category: Database["public"]["Enums"]["diary_category"]
+          p_entry_date: string
+          p_location?: string
+          p_motorcycle_id: string
+          p_title: string
+          p_visibility?: Database["public"]["Enums"]["diary_visibility"]
+        }
+        Returns: string
+      }
+      update_diary_entry: {
+        Args: {
+          p_body?: string
+          p_category: Database["public"]["Enums"]["diary_category"]
+          p_entry_date: string
+          p_entry_id: string
+          p_location?: string
+          p_title: string
+          p_visibility?: Database["public"]["Enums"]["diary_visibility"]
+        }
+        Returns: undefined
+      }
+      delete_diary_entry: { Args: { p_entry_id: string }; Returns: string[] }
+      delete_diary_photo: { Args: { p_attachment_id: string }; Returns: string }
       can_access_attachment_object: { Args: { p_name: string }; Returns: boolean }
       void_maintenance_record: {
         Args: { p_reason: string; p_record_id: string }
@@ -813,6 +875,8 @@ export type Database = {
       }
     }
     Enums: {
+      diary_category: "first_ride" | "trip" | "meetup" | "accessory" | "customization" | "photo" | "other"
+      diary_visibility: "private" | "shareable"
       attachment_kind: "photo" | "invoice" | "service_order" | "receipt" | "document" | "other"
       app_role: "owner" | "workshop" | "admin"
       claim_status: "pending" | "approved" | "rejected" | "canceled"

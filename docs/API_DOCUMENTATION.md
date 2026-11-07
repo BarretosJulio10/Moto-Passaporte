@@ -162,6 +162,17 @@ Fluxo: (1) enviar o arquivo ao bucket privado `attachments` no caminho `<motorcy
 ### Ver arquivos
 `storage.from('attachments').createSignedUrls(paths, 600)` — só funciona para o titular atual. Os anexos de cada registro vêm em `maintenance_timeline.attachments`.
 
+## Diário (Fase 2)
+
+Implementação em `src/modules/diary/api.ts`.
+
+- Ler: `from('motorcycle_diary_feed').select('*').eq('motorcycle_id', id)` → entradas visíveis ao usuário, com `is_mine` e `photos`.
+- `create_diary_entry({ p_motorcycle_id, p_category, p_title, p_entry_date, p_body?, p_location?, p_visibility? })` → `uuid`. `p_category`: `first_ride`, `trip`, `meetup`, `accessory`, `customization`, `photo`, `other`. `p_visibility`: `private` (padrão) ou `shareable`.
+- `update_diary_entry({ p_entry_id, ...mesmos campos })` — só o autor, enquanto titular.
+- `delete_diary_entry({ p_entry_id })` → `text[]` (caminhos das fotos); depois `storage.from('attachments').remove(caminhos)`.
+- `delete_diary_photo({ p_attachment_id })` → `text` (caminho); depois `remove([caminho])`.
+- Fotos: mesmo fluxo de anexos com `register_attachment(..., p_diary_entry_id)`; só imagens, até 10.
+
 ## Duplicidade
 
 ```ts

@@ -58,7 +58,7 @@ export function TimelinePage() {
   }
 
   async function handleAttach(recordId: string, pending: PendingAttachment[]) {
-    const failures = await uploadAll(id, recordId, pending)
+    const failures = await uploadAll(id, { maintenanceRecordId: recordId }, pending)
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ['timeline', id] }),
       queryClient.invalidateQueries({ queryKey: ['storage-usage'] }),

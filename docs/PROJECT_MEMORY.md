@@ -59,9 +59,9 @@ Padrões adotados:
 - Históricos protegidos por triggers (valem até para o dono do banco).
 - Admin com acesso mínimo: não lê chassi nem placas por padrão.
 
-Criadas na Fase 2: `maintenance_records`, `maintenance_items`, view `maintenance_timeline` (com anexos e `evidence_level`), `attachments` + bucket privado `attachments` no Storage.
+Criadas na Fase 2: `maintenance_records`, `maintenance_items`, view `maintenance_timeline` (com anexos e `evidence_level`), `attachments` + bucket privado `attachments` no Storage, `motorcycle_diary` + view `motorcycle_diary_feed` (ADR-013).
 
-Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access` (F3), `motorcycle_diary` (F2), `passport_shares` (F4), cobrança e `notifications` (F5), `support_cases` (F6).
+Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access` (F3), `passport_shares` (F4), cobrança e `notifications` (F5), `support_cases` (F6).
 
 ## 5. Módulos
 
@@ -73,7 +73,7 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access` (F3), `m
 | QR Code, painéis do proprietário, oficina (base) e admin (base) | 1 | `implementado` |
 | Linha do tempo, manutenção e quilometragem | 2 | `implementado` |
 | Anexos e cotas | 2 | `implementado` |
-| Diário da moto | 2 | `planejado` |
+| Diário da moto | 2 | `implementado` |
 | Oficinas, membros, pesquisa por placa, autorizações | 3 | `planejado` |
 | Transferência e compartilhamento público | 4 | `planejado` |
 | Planos, Mercado Pago, assinaturas, cotas | 5 | `planejado` |
@@ -89,11 +89,11 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access` (F3), `m
 
 ## 7. Pendências imediatas
 
-- Próximo item: Fase 2 — diário da moto (2.6). Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
+- Próximo item: Fase 3 — pesquisa protegida por placa (3.3), depois autorizações (3.4). Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 
-Decisões já fechadas: Git direto na `main` (ADR-005), 1 moto no gratuito (ADR-006), duplicidade por placa (ADR-007), campos públicos padrão (ADR-008), Supabase em us-east-1 (ADR-009), nomes de migração = versão do Supabase (ADR-010).
+Decisões já fechadas: Git direto na `main` (ADR-005), 1 moto no gratuito (ADR-006), duplicidade por placa (ADR-007), campos públicos padrão (ADR-008), Supabase em us-east-1 (ADR-009), nomes de migração = versão do Supabase (ADR-010), diário privado nunca muda de dono (ADR-013).
 
 ## 8. Protocolo de trabalho (obrigatório — pedido do responsável pelo produto)
 

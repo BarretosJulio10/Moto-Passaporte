@@ -4,8 +4,8 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 06/11/2026 — v0.8.0
-**Item atual na ordem:** Fase 2 → diário da moto (2.6)
+**Última conferência:** 07/11/2026 — v0.9.0
+**Item atual na ordem:** Fase 3 → pesquisa protegida por placa (3.3)
 
 ## Progresso
 
@@ -15,14 +15,14 @@ Conta: item concluído = 1, parcial = 0,5, planejado = 0. Total de 40 itens nas 
 | Fase | Itens | Feito | % |
 |---|---|---|---|
 | 1 — Fundação SaaS e site | 11 | 11 | 100% |
-| 2 — Histórico e arquivos | 6 | 5 | 83% |
+| 2 — Histórico e arquivos | 6 | 5,5 | 92% |
 | 3 — Oficinas e autorizações | 7 | 2 | 29% |
 | 4 — Transferência e compartilhamento | 5 | 1 | 20% |
 | 5 — Monetização e Mercado Pago | 5 | 0 | 0% |
 | 6 — Administração, segurança e lançamento | 6 | 0 | 0% |
-| **Total** | **40** | **19** | **47,5%** |
+| **Total** | **40** | **19,5** | **48,8%** |
 
-Histórico: 0.7.0 = 45% · 0.8.0 = 47,5%.
+Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8%.
 
 **Fase 1: concluída (base)** em 06/11/2026. Pendências que não bloqueiam a Fase 2: ambientes de homologação/produção (KI-007), revisão jurídica de termos/privacidade, MFA para administradores (KI-014), criptografia do chassi (KI-002).
 
@@ -53,7 +53,9 @@ Histórico: 0.7.0 = 45% · 0.8.0 = 47,5%.
 | 2.3 | Quilometragem | 5.6 | `implementado` — banco testado; tela com registro, alerta de leitura menor e correção documentada (antecipado na Fase 1) |
 | 2.4 | Anexos e cotas (`attachments`, Storage privado) | 13 | `implementado` — bucket privado, cota de 100 MB e 10 MB por arquivo (configuráveis), registro só por RPC, links temporários; banco testado (local 22, Supabase 21); tela de envio no formulário e no cartão, com conferência do tipo real e redução de fotos |
 | 2.5 | Origem dos registros | 5.5 | `implementado` (parcial) — "informado pelo dono" e "com comprovante" prontos (nível de evidência); "confirmado por oficina" depende da Fase 3 |
-| 2.6 | Auditoria e diário básico (`motorcycle_diary`) | 5.7, 15.5 | auditoria `testado`; diário `planejado` |
+| 2.6 | Auditoria e diário básico (`motorcycle_diary`) | 5.7, 15.5 | `implementado` — auditoria `testado`; diário com privado/compartilhável, fotos, edição e exclusão pelo autor (ADR-013); banco testado (local 44, Supabase 27) e aba Diário |
+
+**Fase 2: concluída** em 07/11/2026, exceto o selo "confirmado por oficina" (2.5), que depende da Fase 3.
 
 ## Fase 3 — Oficinas e autorizações
 

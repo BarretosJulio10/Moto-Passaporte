@@ -40,6 +40,8 @@
 | Supabase real — Fase 2, em transação desfeita | `tests/security/supabase/phase2a_maintenance_rollback.sql` | 26 aprovadas |
 | PostgreSQL 16 local — Fase 2 (anexos e Storage simulado) | `tests/security/phase2b_attachments_test.sql` | 22 aprovadas |
 | Supabase real — anexos, em transação desfeita | `tests/security/supabase/phase2b_attachments_rollback.sql` | 21 aprovadas |
+| PostgreSQL 16 local — diário, com venda simulada | `tests/security/phase2c_diary_test.sql` | 44 aprovadas |
+| Supabase real — diário, em transação desfeita | `tests/security/supabase/phase2c_diary_rollback.sql` | 27 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
@@ -50,6 +52,14 @@ Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalad
 - Tipo e tamanho registrados a partir dos metadados do Storage; o bucket restringe tipos e tamanho. A interface confere o tipo real pelos primeiros bytes antes de enviar; o servidor ainda não faz essa conferência (KI-018).
 - Arquivos não podem ser trocados nem apagados pela API (prova documental). Exclusão por LGPD será tratada na Fase 6.
 - Após transferência, o novo titular passa a ver os anexos; o anterior perde o acesso (regra `is_current_owner`).
+
+## Diário (Fase 2, ADR-013)
+
+- Entrada privada: só o autor, para sempre. Novo dono não vê entradas nem fotos privadas do anterior (testado com venda simulada).
+- Entrada compartilhável: titular atual vê, sem receber o identificador do autor.
+- Fotos herdam a visibilidade da entrada, inclusive no Storage.
+- Auditoria registra só categoria, data e visibilidade.
+- No Supabase real, arquivos só são apagados pela API do Storage; a política de exclusão (arquivo próprio e sem registro) foi testada no banco local.
 
 ## Advisors do Supabase (06/11/2026, após o reforço)
 

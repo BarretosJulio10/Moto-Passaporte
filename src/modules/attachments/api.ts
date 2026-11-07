@@ -76,6 +76,7 @@ export async function uploadAttachment(params: {
   file: PreparedFile
   kind: AttachmentKind
   maintenanceRecordId?: string
+  diaryEntryId?: string
 }): Promise<string> {
   const supabase = getSupabase()
   const path = buildStoragePath(params.motorcycleId, params.file.mime)
@@ -96,6 +97,7 @@ export async function uploadAttachment(params: {
     p_file_name: params.file.name,
     p_kind: params.kind,
     p_maintenance_record_id: params.maintenanceRecordId,
+    p_diary_entry_id: params.diaryEntryId,
   })
   if (error) throw new AttachmentError(translateDbError(error))
   return data as string
@@ -114,16 +116,29 @@ export async function signedUrls(paths: string[]): Promise<Record<string, string
 /** Envia vários arquivos para um registro. Devolve as mensagens de quem falhou. */
 export async function uploadAll(
   motorcycleId: string,
-  maintenanceRecordId: string,
+  target: { maintenanceRecordId?: string; diaryEntryId?: string },
   pending: Array<{ file: PreparedFile; kind: AttachmentKind }>,
 ): Promise<string[]> {
   const failures: string[] = []
   for (const p of pending) {
     try {
-      await uploadAttachment({ motorcycleId, file: p.file, kind: p.kind, maintenanceRecordId })
+      await uploadAttachment({ motorcycleId, file: p.file, kind: p.kind, ...target })
     } catch (err) {
       failures.push(`${p.file.name}: ${err instanceof Error ? err.message : 'falhou.'}`)
     }
   }
   return failures
+}
+
+/**
+ * Apaga arquivos já desvinculados (fotos removidas do diário). O Storage só
+ * permite apagar arquivo próprio sem registro. Falhas não bloqueiam o usuário.
+ */
+export async function removeFiles(paths: string[]): Promise<void> {
+  if (paths.length === 0) return
+  try {
+    await getSupabase().storage.from(BUCKET).remove(paths)
+  } catch {
+    // Arquivo fica sem uso; limpeza administrativa (KI-017).
+  }
 }

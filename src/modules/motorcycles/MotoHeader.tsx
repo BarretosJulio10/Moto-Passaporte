@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { formatDate } from '@/core/shared/format'
 import { fetchMotorcycle } from './api'
 
-/** Cabeçalho comum das páginas de uma moto, com as abas Resumo e Histórico. */
+/** Cabeçalho comum das páginas de uma moto, com as abas Resumo, Histórico e Diário. */
 export function MotoHeader({ motorcycleId }: { motorcycleId: string }) {
   const moto = useQuery({ queryKey: ['motorcycle', motorcycleId], queryFn: () => fetchMotorcycle(motorcycleId) })
   const m = moto.data
@@ -21,6 +21,7 @@ export function MotoHeader({ motorcycleId }: { motorcycleId: string }) {
       <nav aria-label="Seções da moto" className="mt-6 flex gap-6 border-b border-rule">
         <NavLink end to={`/painel/motos/${motorcycleId}`} className={tab}>Resumo</NavLink>
         <NavLink to={`/painel/motos/${motorcycleId}/historico`} className={tab}>Histórico</NavLink>
+        <NavLink to={`/painel/motos/${motorcycleId}/diario`} className={tab}>Diário</NavLink>
       </nav>
     </div>
   )
