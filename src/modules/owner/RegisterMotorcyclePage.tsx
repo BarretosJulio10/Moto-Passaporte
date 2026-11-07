@@ -1,0 +1,138 @@
+import { useState, type FormEvent, type ReactNode } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
+import { TextField, TextAreaField } from '@/components/Field'
+import { Button } from '@/components/Button'
+import { Notice } from '@/components/Notice'
+import { validate, type FieldErrors } from '@/core/auth/schemas'
+import { translateDbError } from '@/core/shared/dbErrors'
+import { todayISO } from '@/core/shared/format'
+import { registerMotorcycleSchema } from '@/modules/motorcycles/schemas'
+import { registerMotorcycle } from '@/modules/motorcycles/api'
+
+function Group({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <fieldset className="border-t border-rule pt-6">
+      <legend className="heading -mt-0.5 pr-3 text-lg text-ink">{title}</legend>
+      <div className="mt-4 grid gap-5 sm:grid-cols-2">{children}</div>
+    </fieldset>
+  )
+}
+
+export function RegisterMotorcyclePage() {
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const [errors, setErrors] = useState<FieldErrors>({})
+  const [formError, setFormError] = useState<string | null>(null)
+  const [claimed, setClaimed] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setFormError(null)
+    const form = Object.fromEntries(new FormData(event.currentTarget)) as Record<string, string>
+    const result = validate(registerMotorcycleSchema, form)
+    if (!result.ok) {
+      setErrors(result.errors)
+      const first = Object.keys(result.errors)[0]
+      if (first) (event.currentTarget.elements.namedItem(first) as HTMLElement | null)?.focus()
+      return
+    }
+    setErrors({})
+    setLoading(true)
+    try {
+      const outcome = await registerMotorcycle(result.data)
+      await queryClient.invalidateQueries({ queryKey: ['my-motorcycles'] })
+      if (outcome.status === 'created') {
+        navigate(`/painel/motos/${outcome.motorcycle_id}`, { replace: true, state: { created: true } })
+      } else {
+        setClaimed(true)
+      }
+    } catch (error) {
+      setFormError(translateDbError(error as { code?: string; message?: string }))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (claimed) {
+    return (
+      <div className="max-w-2xl">
+        <h1 className="heading text-3xl text-ink">Placa já cadastrada</h1>
+        <div className="mt-6">
+          <Notice tone="info" title="Abrimos uma solicitação de verificação">
+            Esta placa já possui um passaporte no Moto Passaporte. Nossa equipe vai analisar o caso e você será avisado pelo painel.
+          </Notice>
+        </div>
+        <p className="mt-4 text-muted">
+          Se você comprou a moto recentemente, o caminho mais rápido é pedir ao dono anterior que transfira o passaporte para a sua conta.
+        </p>
+        <Link to="/painel" className="mt-6 inline-block font-semibold text-ink underline underline-offset-4">Voltar ao painel</Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className="max-w-3xl">
+      <Link to="/painel" className="text-sm text-ink underline underline-offset-4">Voltar ao painel</Link>
+      <h1 className="heading mt-3 text-3xl text-ink">Cadastrar moto</h1>
+      <p className="mt-2 max-w-xl text-muted">
+        Com estes dados criamos o passaporte da moto. Ela ganha um código próprio, que não muda nem quando a placa muda.
+      </p>
+
+      <form onSubmit={onSubmit} noValidate className="mt-8 flex flex-col gap-8">
+        {formError && <Notice tone="error">{formError}</Notice>}
+
+        <Group title="Identificação">
+          <TextField label="Marca" name="brand" required autoComplete="off" placeholder="Ex.: Honda" error={errors.brand} />
+          <TextField label="Modelo" name="model" required autoComplete="off" placeholder="Ex.: CB 500F" error={errors.model} />
+          <TextField label="Versão (opcional)" name="version" autoComplete="off" placeholder="Ex.: ABS" error={errors.version} />
+          <TextField label="Cor (opcional)" name="color" autoComplete="off" error={errors.color} />
+          <TextField label="Ano de fabricação" name="manufacturingYear" required inputMode="numeric" maxLength={4} placeholder="Ex.: 2022" error={errors.manufacturingYear} />
+          <TextField label="Ano do modelo (opcional)" name="modelYear" inputMode="numeric" maxLength={4} placeholder="Ex.: 2023" error={errors.modelYear} />
+          <TextField label="Cilindrada em cm³ (opcional)" name="displacementCc" inputMode="numeric" maxLength={5} placeholder="Ex.: 471" error={errors.displacementCc} />
+        </Group>
+
+        <Group title="Placa e chassi">
+          <TextField
+            label="Placa"
+            name="plate"
+            required
+            autoComplete="off"
+            autoCapitalize="characters"
+            placeholder="Ex.: ABC1D23"
+            hint="Não aparece na página pública do passaporte."
+            error={errors.plate}
+          />
+          <TextField
+            label="Chassi (opcional)"
+            name="chassis"
+            autoComplete="off"
+            autoCapitalize="characters"
+            maxLength={30}
+            hint="Visível só para você."
+            error={errors.chassis}
+          />
+        </Group>
+
+        <Group title="Situação atual">
+          <TextField label="Quilometragem atual" name="currentMileage" required inputMode="numeric" placeholder="Ex.: 12400" error={errors.currentMileage} />
+          <TextField label="Data em que você comprou (opcional)" name="acquisitionDate" type="date" max={todayISO()} error={errors.acquisitionDate} />
+          <TextAreaField
+            label="Observações (opcional)"
+            name="initialNotes"
+            className="sm:col-span-2"
+            maxLength={2000}
+            placeholder="Ex.: moto de segundo dono, revisões feitas na concessionária até 2023."
+            error={errors.initialNotes}
+          />
+        </Group>
+
+        <div className="flex flex-wrap items-center gap-3 border-t border-rule pt-6">
+          <Button type="submit" loading={loading}>{loading ? 'Criando passaporte…' : 'Criar passaporte'}</Button>
+          <Link to="/painel" className="px-2 py-2 font-semibold text-ink underline-offset-4 hover:underline">Cancelar</Link>
+        </div>
+      </form>
+    </div>
+  )
+}

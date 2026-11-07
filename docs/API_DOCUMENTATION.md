@@ -18,7 +18,7 @@ Tipos TypeScript gerados: [`src/types/supabase.ts`](../src/types/supabase.ts) �
    - `workshops` (responsável): campos do perfil, exceto `verification_status`
 3. **Leitura:** a RLS filtra automaticamente. Uma consulta vazia significa "sem acesso" ou "não existe" — a interface não deve diferenciar.
 4. **Placa:** exibir formatada, mas enviar como o usuário digitou; o banco normaliza (`abc-1d23` → `ABC1D23`).
-5. **QR Code:** gerado no frontend a partir da URL pública `/{rota-publica}/{public_id}`. Nunca usar `id` interno em links.
+5. **QR Code:** gerado no frontend a partir da URL pública `/p/{public_id}` (`publicPassportUrl` em `src/modules/motorcycles/api.ts`). Nunca usar `id` interno em links.
 6. **Linguagem:** não exibir termos de certificação ("verificado", "garantido", "laudo") para dados do histórico (PRD 3.4, 5.5).
 
 ---

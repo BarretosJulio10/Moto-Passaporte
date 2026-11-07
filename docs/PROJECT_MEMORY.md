@@ -5,8 +5,8 @@
 > Nunca registrar aqui senhas, tokens, chaves, dados pessoais ou segredos operacionais.
 
 **Última atualização:** 06/11/2026
-**Versão do projeto:** 0.4.0
-**Situação geral:** banco da Fase 1 testado no Supabase dev; frontend base, site público e autenticação implementados (v0.4.0).
+**Versão do projeto:** 0.5.0
+**Situação geral:** Fase 1 quase concluída — banco testado no Supabase dev; site público, autenticação e painel do proprietário publicados em https://moto-passaporte.vercel.app (v0.5.0).
 
 Legenda de estados (seção 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 
@@ -85,7 +85,7 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access`, `mainte
 
 ## 7. Pendências imediatas
 
-- Interface: em construção direto neste repositório (ADR-011). Próximo: painel do proprietário (cadastro de moto, QR Code, passaporte público). Ver `PROJECT_STATUS.md`.
+- Interface: em construção direto neste repositório (ADR-011). Próximo: FAQ/contato e bases dos painéis de oficina e admin. Ver `PROJECT_STATUS.md`.
 - Configurar URLs de autenticação no Supabase (KI-012) e variáveis na Vercel.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.

@@ -8,6 +8,9 @@ import { ForgotPasswordPage } from '@/modules/auth/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/modules/auth/ResetPasswordPage'
 import { OwnerLayout } from '@/modules/owner/OwnerLayout'
 import { DashboardPage } from '@/modules/owner/DashboardPage'
+import { RegisterMotorcyclePage } from '@/modules/owner/RegisterMotorcyclePage'
+import { MotorcyclePage } from '@/modules/owner/MotorcyclePage'
+import { PublicPassportPage } from '@/modules/sharing/PublicPassportPage'
 import { RequireAuth } from '@/core/auth/RequireAuth'
 
 function Root() {
@@ -43,6 +46,7 @@ export const routes = [
           { path: '/redefinir-senha', element: <ResetPasswordPage /> },
           { path: '/termos', element: <LegalPage kind="terms" /> },
           { path: '/privacidade', element: <LegalPage kind="privacy" /> },
+          { path: '/p/:publicId', element: <PublicPassportPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },
@@ -53,7 +57,11 @@ export const routes = [
             <OwnerLayout />
           </RequireAuth>
         ),
-        children: [{ index: true, element: <DashboardPage /> }],
+        children: [
+          { index: true, element: <DashboardPage /> },
+          { path: 'motos/nova', element: <RegisterMotorcyclePage /> },
+          { path: 'motos/:id', element: <MotorcyclePage /> },
+        ],
       },
     ],
   },

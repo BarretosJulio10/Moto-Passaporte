@@ -8,7 +8,7 @@ SaaS brasileiro que cria um passaporte digital permanente para cada moto — man
 
 ## Situação
 
-Versão **0.4.0** — banco da Fase 1 no Supabase; site público, autenticação e painel inicial do proprietário.
+Versão **0.5.0** — no ar em https://moto-passaporte.vercel.app: site público, contas, cadastro de moto, quilometragem, QR Code e passaporte público.
 
 ## Documentação
 

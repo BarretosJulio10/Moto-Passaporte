@@ -4,8 +4,8 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 06/11/2026 — v0.4.0
-**Item atual na ordem:** Fase 1 → painel do proprietário (cadastro de moto na tela, detalhe da moto, QR Code, passaporte público)
+**Última conferência:** 06/11/2026 — v0.5.0
+**Item atual na ordem:** Fase 1 → páginas de FAQ e contato (1.8b) e bases dos painéis de oficina e admin (1.9b)
 
 ---
 
@@ -13,16 +13,17 @@ Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `te
 
 | # | Item | Seção PRD | Estado | Evidência |
 |---|---|---|---|---|
-| 1.1 | Estrutura do projeto, Git e ambientes | 16, 18, 20 | `implementado` (só dev) | Repositório; Supabase dev. Homologação/produção: KI-007 |
+| 1.1 | Estrutura do projeto, Git e ambientes | 16, 18, 20 | `implementado` (só dev) | Repositório; Supabase dev; Vercel publicando a `main` em https://moto-passaporte.vercel.app. Homologação/produção: KI-007 |
 | 1.2 | Memória técnica e documentação inicial | 17 | `implementado` | `docs/` |
 | 1.3 | Banco inicial, RLS e auditoria | 14, 15 | `testado` (Supabase dev) | 6 migrações; 71 testes no Supabase, 73 local |
 | 1.4 | Papéis, organizações e controle de acesso | 2.3, 15.2 | `testado` (banco) | `user_roles`, `organizations`, `organization_members` |
-| 1.5 | Cadastro de motocicleta, ID permanente | 5.2, 9 | `testado` (banco) | `register_motorcycle` |
-| 1.6 | QR Code | 9 | `em desenvolvimento` | `public_id` e `get_public_passport` prontos; geração do QR na interface pendente |
+| 1.5 | Cadastro de motocicleta, ID permanente | 5.2, 9 | `implementado` (banco testado no Supabase; tela com testes de componente) | `register_motorcycle`; tela `/painel/motos/nova` com tratamento de placa duplicada e limite do plano |
+| 1.6 | QR Code e página pública com campos padrão | 9, ADR-008 | `implementado` | QR na página da moto (baixar PNG, copiar link); `/p/:publicId` sem placa/chassi/dono, `noindex` |
 | 1.7 | Cadastro, login e recuperação de senha | 5.1, 15.1 | `implementado` (testes unitários e de tela OK) | Telas `/criar-conta`, `/entrar`, `/recuperar-senha`, `/redefinir-senha`. Falta: teste ponta a ponta com o Supabase real (KI-009) e URLs do Auth no Supabase (KI-012) |
 | 1.8a | Identidade visual | 3.2 | `implementado` | `docs/DESIGN.md`, `src/index.css` |
 | 1.8b | Site público: início (como funciona, motociclistas, oficinas, o que não é, planos), termos e privacidade (rascunho) | 3.3 | `implementado` (parcial) | Faltam páginas dedicadas: FAQ, contato/suporte. Termos/privacidade aguardam revisão jurídica |
-| 1.9 | Painéis base: proprietário, oficina, admin | 5.3, 6.3, 7.1 | `em desenvolvimento` | Proprietário: painel com "Minhas motos" (leitura). Faltam cadastro de moto na tela, QR Code, painéis de oficina e admin |
+| 1.9a | Painel do proprietário | 5.3 | `implementado` | "Minhas motos", página da moto (dados, placa e histórico, troca de placa, chassi mascarado, quilometragem, QR Code). Próximos registros e lembretes vêm na Fase 2 |
+| 1.9b | Painéis base de oficina e admin | 6.3, 7.1 | `planejado` | — |
 
 ## Fase 2 — Histórico e arquivos
 
@@ -30,7 +31,7 @@ Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `te
 |---|---|---|---|
 | 2.1 | Linha do tempo | 5.4 | `planejado` |
 | 2.2 | Registros de manutenção (`maintenance_records`, `maintenance_items`) | 5.4, 14.3 | `planejado` |
-| 2.3 | Quilometragem | 5.6 | `testado` (banco) — antecipado na Fase 1 |
+| 2.3 | Quilometragem | 5.6 | `implementado` — banco testado; tela com registro, alerta de leitura menor e correção documentada (antecipado na Fase 1) |
 | 2.4 | Anexos e cotas (`attachments`, Storage privado) | 13 | `planejado` |
 | 2.5 | Origem dos registros | 5.5 | `planejado` (enum `record_source` já existe) |
 | 2.6 | Auditoria e diário básico (`motorcycle_diary`) | 5.7, 15.5 | auditoria `testado`; diário `planejado` |

@@ -4,6 +4,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 
 ## [Não publicado]
 
+## [0.5.0] — 06/11/2026
+
+### Adicionado
+- Painel do proprietário: cadastro de moto (`/painel/motos/nova`) com validação, placa duplicada → pedido de verificação, limite do plano.
+- Página da moto (`/painel/motos/:id`): dados, placa atual e anteriores, troca de placa, chassi mascarado (mostrar/editar), quilometragem com alerta de leitura menor e correção documentada.
+- QR Code do passaporte: baixar PNG, copiar link, abrir página pública.
+- Passaporte público (`/p/:publicId`): só os campos padrão (ADR-008), aviso de não certificação, `noindex`.
+- Módulos `motorcycles` (api, schemas, seções) e `sharing`; utilitários `core/shared` (formatação pt-BR, erros do banco).
+- Testes: 37 no total (21 novos) — formatação, validações, erros do banco, tela de cadastro, página pública. Verificação visual com Supabase simulado em 360/390/1280 px, sem erros de console nem rolagem horizontal.
+- KI-013 (página pública ainda não revogável — Fase 4).
+
+### Infraestrutura
+- Site publicado pela Vercel em https://moto-passaporte.vercel.app (deploy automático da `main`), conectado ao Supabase dev.
+
 ## [0.4.0] — 06/11/2026
 
 ### Adicionado
