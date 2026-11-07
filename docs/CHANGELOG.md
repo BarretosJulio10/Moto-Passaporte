@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 
 ## [Não publicado]
 
+## [0.3.1] — 06/11/2026
+
+### Adicionado
+- `docs/PRD_CHECKLIST.md`: conferência item a item do PRD por fase.
+- Protocolo de trabalho obrigatório em `PROJECT_MEMORY.md` (seção 8): conferir o feito, seguir em ordem, sempre a partir do PRD.
+- `docs/API_DOCUMENTATION.md`: contrato frontend ↔ Supabase (Auth, RPCs, view, erros, mensagens).
+- `src/types/supabase.ts`: tipos TypeScript gerados do banco (verificados com `tsc --strict`).
+
 ## [0.3.0] — 06/11/2026
 
 ### Adicionado

@@ -1,6 +1,6 @@
 # PROJECT_STATUS — Moto Passaporte
 
-**Versão atual:** 0.3.0
+**Versão atual:** 0.3.1
 **Data:** 06/11/2026
 **Fase:** Fase 1 — banco de dados aplicado e testado no Supabase dev; frontend não iniciado
 

@@ -5,7 +5,7 @@
 > Nunca registrar aqui senhas, tokens, chaves, dados pessoais ou segredos operacionais.
 
 **Última atualização:** 06/11/2026
-**Versão do projeto:** 0.3.0
+**Versão do projeto:** 0.3.1
 **Situação geral:** banco da Fase 1 aplicado e `testado` no Supabase dev; frontend `planejado`.
 
 Legenda de estados (seção 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
@@ -91,9 +91,19 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access`, `mainte
 
 Decisões já fechadas: Git direto na `main` (ADR-005), 1 moto no gratuito (ADR-006), duplicidade por placa (ADR-007), campos públicos padrão (ADR-008), Supabase em us-east-1 (ADR-009), nomes de migração = versão do Supabase (ADR-010).
 
-## 8. Como retomar o trabalho
+## 8. Protocolo de trabalho (obrigatório — pedido do responsável pelo produto)
 
-1. Ler este arquivo, `PROJECT_STATUS.md`, `DECISIONS.md` e `KNOWN_ISSUES.md`.
-2. Ler `docs/PRD.md` na seção do módulo a ser trabalhado.
-3. Verificar o que já existe no repositório e no banco **antes** de criar algo.
-4. Ao terminar: atualizar este arquivo, `CHANGELOG.md` e `PROJECT_STATUS.md`.
+Seguir **sempre em ordem**, conferindo o que já foi feito antes de continuar, e **sempre a partir do PRD**.
+
+**Ao iniciar qualquer sessão:**
+1. Ler este arquivo, `PRD_CHECKLIST.md`, `PROJECT_STATUS.md`, `DECISIONS.md` e `KNOWN_ISSUES.md`.
+2. Conferir o estado real: `git log` do repositório e `list_migrations` do Supabase — devem bater com a documentação. Divergência = registrar e resolver antes de seguir.
+3. Identificar no `PRD_CHECKLIST.md` o **próximo item na ordem das fases** e ler a seção correspondente do `docs/PRD.md`.
+4. Informar ao responsável: o que já está feito, o que está em andamento e o que será feito agora.
+
+**Durante:** etapas pequenas; nunca pular fase sem registrar o motivo; não marcar como concluído o que não foi testado.
+
+**Ao terminar cada entrega:**
+1. Atualizar `PRD_CHECKLIST.md`, este arquivo, `PROJECT_STATUS.md` e `CHANGELOG.md` (e `DATABASE.md`/`SECURITY.md` quando aplicável).
+2. Commit descritivo e push na `main` (ADR-005).
+3. Informar o próximo item na ordem.

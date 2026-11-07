@@ -56,7 +56,7 @@ Por padrão, a página pública / QR Code exibe somente: marca, modelo, versão,
 
 | ID | Decisão | Impacto | Necessária antes de |
 |---|---|---|---|
-| D-T1 | Quem constrói a interface: Lovable (repositório sincronizado) ou desenvolvimento direto neste repositório | Define o fluxo de trabalho do frontend | Início do frontend da Fase 1 |
+| D-T1 | Quem constrói a interface: Lovable (conectado a este GitHub e Supabase, seguindo `API_DOCUMENTATION.md`) ou desenvolvimento direto neste repositório (exige liberar instalação de pacotes — KI-008) | Define o fluxo de trabalho do frontend | Início do frontend da Fase 1 |
 | D-T3 | Criptografia em coluna do chassi (Supabase Vault/pgsodium) vs. tabela isolada com RLS só do proprietário | Proteção extra do chassi em caso de vazamento do banco | Antes de produção |
 
 ## Pendentes — produto (PRD seção 27)

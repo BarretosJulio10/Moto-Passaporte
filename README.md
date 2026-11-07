@@ -15,7 +15,9 @@ Versão **0.3.0** — banco de dados da Fase 1 aplicado e testado no Supabase de
 | Documento | Conteúdo |
 |---|---|
 | [`docs/PRD.md`](docs/PRD.md) | Requisitos do produto (v2.0) |
-| [`docs/PROJECT_MEMORY.md`](docs/PROJECT_MEMORY.md) | Memória técnica — **ler antes de qualquer alteração** |
+| [`docs/PROJECT_MEMORY.md`](docs/PROJECT_MEMORY.md) | Memória técnica e protocolo de trabalho — **ler antes de qualquer alteração** |
+| [`docs/PRD_CHECKLIST.md`](docs/PRD_CHECKLIST.md) | Conferência item a item do PRD: o que está feito, em andamento e pendente |
+| [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md) | Contrato frontend ↔ banco (Auth, RPCs, erros) |
 | [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) | Estado atual, ambientes e próximos passos |
 | [`docs/DECISIONS.md`](docs/DECISIONS.md) | Decisões tomadas e pendentes |
 | [`docs/CHANGELOG.md`](docs/CHANGELOG.md) | Histórico de mudanças |
