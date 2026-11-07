@@ -7,7 +7,6 @@ import { WorkshopAccessList } from '@/modules/workshop_access/WorkshopAccessList
 
 const COMING = [
   ['Registro de serviços', 'Lançar serviço, peças, quilometragem e fotos da nota no histórico da moto.'],
-  ['Funcionários', 'Dar acesso à equipe, cada um com o próprio login.'],
 ]
 
 export function WorkshopDashboardPage() {
@@ -47,9 +46,12 @@ export function WorkshopDashboardPage() {
             {shop.role === 'responsible' ? ', você é o responsável' : ', você é da equipe'}
           </p>
         </div>
-        {shop.role === 'responsible' && (
-          <ButtonLink to={`/oficina/${shop.organization_id}/perfil`} variant="secondary" size="sm">Editar perfil</ButtonLink>
-        )}
+        <div className="flex flex-wrap gap-2">
+          <ButtonLink to={`/oficina/${shop.organization_id}/equipe`} variant="secondary" size="sm">Equipe</ButtonLink>
+          {shop.role === 'responsible' && (
+            <ButtonLink to={`/oficina/${shop.organization_id}/perfil`} variant="secondary" size="sm">Editar perfil</ButtonLink>
+          )}
+        </div>
       </div>
 
       <dl className="mt-8 grid gap-x-8 gap-y-4 border-y border-rule py-5 sm:grid-cols-2">
@@ -70,7 +72,13 @@ export function WorkshopDashboardPage() {
       </dl>
 
       <div className="mt-8 flex flex-col gap-8">
-        <PlateSearchPanel organizationId={shop.organization_id} />
+        {shop.can_request_access ? (
+          <PlateSearchPanel organizationId={shop.organization_id} />
+        ) : (
+          <Notice tone="info" title="Pesquisa por placa">
+            Seu acesso nesta oficina não inclui pesquisar placas e pedir acesso. Fale com o responsável se precisar.
+          </Notice>
+        )}
         <WorkshopAccessList organizationId={shop.organization_id} />
       </div>
 

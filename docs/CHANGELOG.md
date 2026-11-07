@@ -9,6 +9,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.12.0] — 07/11/2026 — Fase 3: equipe da oficina
+
+### Adicionado
+- Migração `workshop_team`: permissões por membro (`can_request_access`, `can_register_services`), `has_org_permission`, convites (`organization_invites`: link de uso único para o e-mail convidado, 7 dias, só hash guardado, até 20 em aberto), `create_org_invite`, `revoke_org_invite`, `get_invite_preview`, `accept_org_invite`, `get_org_members`, `get_org_invites`, `update_org_member`, `remove_org_member`, `leave_organization`. Ninguém altera o próprio papel ou permissões; a oficina sempre mantém um responsável; membros não são excluídos (só removidos). Pesquisa e pedido de acesso passam a exigir a permissão.
+- Interface: página **Equipe** da oficina (convidar com permissões, link para copiar ou enviar pelo WhatsApp, alterar papel e permissões, remover, convites em aberto, sair da oficina) e página de aceite do convite (`/convite/:token`). Painel da oficina esconde a pesquisa de quem não tem permissão.
+- Testes: banco 44 (local) + 19 (Supabase, transação desfeita); interface 100 no total (8 novos).
+
 ## [0.11.0] — 07/11/2026 — Fase 3: Oficina de Origem
 
 ### Adicionado

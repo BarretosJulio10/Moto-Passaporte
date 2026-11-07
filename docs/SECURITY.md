@@ -46,6 +46,8 @@
 | Supabase real — pesquisa por placa e autorizações, em transação desfeita | `tests/security/supabase/phase3a_workshop_access_rollback.sql` | 22 aprovadas |
 | PostgreSQL 16 local — Oficina de Origem | `tests/security/phase3b_origin_test.sql` | 20 aprovadas |
 | Supabase real — Oficina de Origem, em transação desfeita | `tests/security/supabase/phase3b_origin_rollback.sql` | 13 aprovadas |
+| PostgreSQL 16 local — equipe da oficina | `tests/security/phase3c_team_test.sql` | 44 aprovadas |
+| Supabase real — equipe da oficina, em transação desfeita | `tests/security/supabase/phase3c_team_rollback.sql` | 19 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
@@ -74,6 +76,13 @@ Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalad
 - Autorizações não podem ser apagadas nem ter dados alterados; mudanças de situação seguem transições fixas e são auditadas.
 - Ainda sem CAPTCHA ou detecção de automação além do limite (KI-020).
 - Oficina de Origem: só o titular concede ou tira o título; a oficina não se autodeclara; uma por moto (índice único); fora do prazo é recusado no banco.
+
+## Equipe da oficina (Fase 3, PRD 6.2)
+
+- Convite: token aleatório de 192 bits, devolvido uma única vez; o banco guarda só o sha256. Vale 7 dias, uma vez, e só para a conta com o e-mail convidado. A prévia mostra o e-mail mascarado.
+- Só o responsável convida, altera e remove; ninguém altera o próprio papel ou permissões; a oficina sempre mantém pelo menos um responsável (trigger).
+- Funcionário sem a permissão `can_request_access` não pesquisa placas nem pede acesso (verificado no banco).
+- E-mails da equipe visíveis só ao responsável. Convites e mudanças na equipe são auditados.
 
 ## Advisors do Supabase (06/11/2026, após o reforço)
 

@@ -21,6 +21,8 @@ import { WorkshopIndexPage } from '@/modules/workshop/WorkshopIndexPage'
 import { CreateWorkshopPage } from '@/modules/workshop/CreateWorkshopPage'
 import { WorkshopDashboardPage } from '@/modules/workshop/WorkshopDashboardPage'
 import { WorkshopProfilePage } from '@/modules/workshop/WorkshopProfilePage'
+import { TeamPage } from '@/modules/workshop/TeamPage'
+import { InvitePage } from '@/modules/workshop/InvitePage'
 import { PublicWorkshopPage } from '@/modules/workshop/PublicWorkshopPage'
 import { RequireAdmin } from '@/modules/admin/RequireAdmin'
 import { AdminDashboardPage } from '@/modules/admin/AdminDashboardPage'
@@ -85,6 +87,8 @@ export const routes = [
           { path: '/oficina/nova', element: <CreateWorkshopPage /> },
           { path: '/oficina/:orgId', element: <WorkshopDashboardPage /> },
           { path: '/oficina/:orgId/perfil', element: <WorkshopProfilePage /> },
+          { path: '/oficina/:orgId/equipe', element: <TeamPage /> },
+          { path: '/convite/:token', element: <InvitePage /> },
           {
             path: '/admin',
             element: (

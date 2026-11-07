@@ -188,6 +188,14 @@ Titular:
 - `rpc('decide_workshop_access', { p_access_id, p_approve, p_as_origin? })` (`p_as_origin = false` aprova pedido de Origem só como acesso), `rpc('revoke_workshop_access', { p_access_id })`.
 - `rpc('set_origin_workshop', { p_access_id, p_origin })` — Oficina de Origem (ADR-014).
 
+## Equipe da oficina (Fase 3)
+
+Implementação em `src/modules/workshop/teamApi.ts`.
+
+- Responsável: `create_org_invite({ p_organization_id, p_email, p_can_request_access?, p_can_register_services? })` → `{ id, token, expires_at }` (o link é `/convite/<token>`; o token não pode ser recuperado depois), `get_org_invites`, `revoke_org_invite`, `update_org_member({ p_member_id, p_role, p_can_request_access, p_can_register_services })`, `remove_org_member`.
+- Convidado: `get_invite_preview({ p_token })` → `{ status: open|accepted|revoked|expired|inactive|invalid, workshop_name, email_matches, email_hint, can_* , expires_at }`; `accept_org_invite({ p_token })` → id da oficina.
+- Membro: `get_org_members({ p_organization_id })`, `leave_organization`, `has_org_permission`.
+
 ## Duplicidade
 
 ```ts

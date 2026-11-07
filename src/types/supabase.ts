@@ -441,6 +441,8 @@ export type Database = {
       }
       organization_members: {
         Row: {
+          can_register_services: boolean
+          can_request_access: boolean
           created_at: string
           id: string
           organization_id: string
@@ -859,6 +861,50 @@ export type Database = {
           status: Database["public"]["Enums"]["workshop_access_status"]
         }[]
       }
+      has_org_permission: { Args: { p_organization: string; p_permission: string }; Returns: boolean }
+      create_org_invite: {
+        Args: { p_can_register_services?: boolean; p_can_request_access?: boolean; p_email: string; p_organization_id: string }
+        Returns: Json
+      }
+      revoke_org_invite: { Args: { p_invite_id: string }; Returns: undefined }
+      get_invite_preview: { Args: { p_token: string }; Returns: Json }
+      accept_org_invite: { Args: { p_token: string }; Returns: string }
+      get_org_members: {
+        Args: { p_organization_id: string }
+        Returns: {
+          can_register_services: boolean
+          can_request_access: boolean
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          is_me: boolean
+          role: Database["public"]["Enums"]["org_member_role"]
+          user_id: string
+        }[]
+      }
+      get_org_invites: {
+        Args: { p_organization_id: string }
+        Returns: {
+          can_register_services: boolean
+          can_request_access: boolean
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+        }[]
+      }
+      update_org_member: {
+        Args: {
+          p_can_register_services: boolean
+          p_can_request_access: boolean
+          p_member_id: string
+          p_role: Database["public"]["Enums"]["org_member_role"]
+        }
+        Returns: undefined
+      }
+      remove_org_member: { Args: { p_member_id: string }; Returns: undefined }
+      leave_organization: { Args: { p_organization_id: string }; Returns: undefined }
       delete_diary_entry: { Args: { p_entry_id: string }; Returns: string[] }
       delete_diary_photo: { Args: { p_attachment_id: string }; Returns: string }
       can_access_attachment_object: { Args: { p_name: string }; Returns: boolean }

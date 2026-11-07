@@ -5,6 +5,9 @@ import type { WorkshopInput, WorkshopProfileInput } from './schemas'
 export type MyWorkshop = {
   organization_id: string
   role: 'responsible' | 'staff'
+  /** Permissões do funcionário (o responsável tem todas). */
+  can_request_access: boolean
+  can_register_services: boolean
   business_name: string
   public_slug: string
   city: string | null
@@ -17,7 +20,7 @@ export async function fetchMyWorkshops(userId: string): Promise<MyWorkshop[]> {
   const supabase = getSupabase()
   const { data: members, error } = await supabase
     .from('organization_members')
-    .select('organization_id, role')
+    .select('organization_id, role, can_request_access, can_register_services')
     .eq('user_id', userId)
     .eq('status', 'active')
   if (error) throw error
@@ -29,8 +32,17 @@ export async function fetchMyWorkshops(userId: string): Promise<MyWorkshop[]> {
     .in('organization_id', ids)
     .order('business_name')
   if (shopError) throw shopError
-  const roleById = new Map(members.map((m) => [m.organization_id, m.role]))
-  return shops.map((s) => ({ ...s, role: roleById.get(s.organization_id) ?? 'staff' }))
+  const byId = new Map(members.map((m) => [m.organization_id, m]))
+  return shops.map((s) => {
+    const m = byId.get(s.organization_id)
+    const responsible = m?.role === 'responsible'
+    return {
+      ...s,
+      role: m?.role ?? 'staff',
+      can_request_access: responsible || Boolean(m?.can_request_access),
+      can_register_services: responsible || Boolean(m?.can_register_services),
+    }
+  })
 }
 
 export async function createWorkshop(input: WorkshopInput): Promise<string> {

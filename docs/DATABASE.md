@@ -16,6 +16,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 | `20261107014505_maintenance.sql` | Fase 2: `maintenance_records`, `maintenance_items`, categorias, `create_maintenance_record`, `void_maintenance_record`, view `maintenance_timeline` |
 | `20261107101141_workshop_access.sql` | Fase 3: `plate_search_log`, `motorcycle_workshop_access`, pesquisa por placa, pedido, decisão, revogação e leituras por papel |
 | `20261107101234_workshop_access_indexes.sql` | Índices de `decided_by` e `ended_by` |
+| `20261107103155_workshop_team.sql` | Equipe (PRD 6.2): permissões em `organization_members`, `organization_invites`, convites, gestão de membros, `has_org_permission` |
 | `20261107102312_origin_workshop.sql` | Oficina de Origem (ADR-014): índice de uma Origem ativa por moto, `origin_available`, `set_origin_workshop`, parâmetros de Origem em pedido e decisão |
 | `20261107095618_diary.sql` | Fase 2: `motorcycle_diary`, fotos do diário em `attachments.diary_entry_id`, RPCs do diário, view `motorcycle_diary_feed`, políticas do Storage separadas (envio, leitura, exclusão de arquivo próprio sem registro) |
 | `20261107015821_attachments.sql` | Fase 2: bucket privado `attachments`, tabela `attachments`, políticas do Storage, `register_attachment`, `get_storage_usage`, cota em `system_settings`; `maintenance_timeline` com anexos e `evidence_level` |
@@ -63,6 +64,7 @@ Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limi
 | Tabela | Conteúdo | Regras |
 |---|---|---|
 | `plate_search_log` | Pesquisas por placa: oficina, usuário, hash sha256 da placa, encontrou ou não | Imutável; só admin lê; base do limite de tentativas |
+| `organization_invites` | Convites para a equipe: e-mail, permissões, hash do token, validade, aceite/cancelamento | Sem acesso direto; só pelas funções. Um convite aberto por e-mail e oficina |
 | `motorcycle_workshop_access` | Pedidos e autorizações por moto e oficina: tipo (`regular`/`origin`), situação, mensagem, quem pediu/decidiu/encerrou e quando | Nunca apagada. Transições só pending → approved/rejected/canceled e approved → revoked/ended. No máximo um pedido aberto por oficina e moto. Leitura pelas funções `get_*` |
 
 **Storage:** bucket `attachments` privado, 10 MB, JPG/PNG/WEBP/PDF. Políticas em `storage.objects`: envio e leitura só na pasta de moto da qual o usuário é titular atual (`can_access_attachment_object`); sem atualização nem exclusão pela API.
@@ -87,6 +89,12 @@ Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limi
 | `set_origin_workshop(id, origem)` | Titular atual | Define (no prazo, se não houver outra) ou tira o título de Oficina de Origem de uma autorização ativa |
 | `get_motorcycle_workshop_access(moto)` / `get_my_pending_access_requests()` | Titular atual | Autorizações da moto com dados públicos da oficina / pendências em todas as motos |
 | `get_workshop_access_list(org)` | Membro da oficina | Pedidos da oficina; placa, km e id só quando autorizada |
+| `create_org_invite(org, email, pedir?, registrar?)` / `revoke_org_invite(id)` / `get_org_invites(org)` | Responsável | Cria convite (devolve o token uma única vez) / cancela / lista abertos |
+| `get_invite_preview(token)` / `accept_org_invite(token)` | Autenticado com o e-mail convidado | Prévia (oficina, permissões, situação) / aceite como funcionário |
+| `get_org_members(org)` | Membro | Equipe; e-mails só para o responsável |
+| `update_org_member(id, papel, pedir, registrar)` / `remove_org_member(id)` | Responsável, nunca sobre si mesmo | Altera papel e permissões / remove |
+| `leave_organization(org)` | Membro | Sai da equipe (bloqueado para o único responsável) |
+| `has_org_permission(org, 'request_access' \| 'register_services')` | Autenticado | Membro ativo de oficina ativa com a permissão (responsável tem todas) |
 | `workshop_has_access(moto, org?)` | Autenticado | Verdadeiro se o usuário é membro ativo de oficina ativa com autorização aprovada |
 | `get_storage_usage()` | Autenticado | `{used_bytes, quota_bytes, max_file_bytes}` do usuário |
 | `has_role`, `is_admin`, `is_current_owner`, `is_org_member`, `is_org_responsible`, `is_org_active` | Políticas RLS | Verificações de permissão |
