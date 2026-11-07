@@ -784,6 +784,42 @@ export type Database = {
       get_public_plans: { Args: never; Returns: Json }
       get_payment_public_config: { Args: never; Returns: Json }
       get_my_subscription: { Args: never; Returns: Json }
+      admin_get_metrics: { Args: never; Returns: Json }
+      admin_list_users: {
+        Args: { p_limit?: number; p_search?: string | null }
+        Returns: {
+          account_status: string
+          created_at: string
+          email_masked: string | null
+          full_name: string | null
+          id: string
+          is_admin: boolean
+          motorcycles: number
+          plan_name: string | null
+          workshops: number
+        }[]
+      }
+      admin_get_user: { Args: { p_reason: string; p_user_id: string }; Returns: Json }
+      admin_set_user_status: { Args: { p_reason: string; p_status: string; p_user_id: string }; Returns: undefined }
+      admin_list_workshops: {
+        Args: { p_limit?: number; p_search?: string | null }
+        Returns: {
+          active_accesses: number
+          business_name: string
+          city: string | null
+          created_at: string
+          id: string
+          members: number
+          public_slug: string | null
+          records: number
+          responsible_name: string | null
+          state: string | null
+          status: string
+          verification_status: string
+        }[]
+      }
+      admin_set_workshop_status: { Args: { p_organization_id: string; p_reason: string; p_status: string }; Returns: undefined }
+      admin_set_workshop_verification: { Args: { p_organization_id: string; p_reason: string; p_verification: string }; Returns: undefined }
       get_my_invoices: {
         Args: never
         Returns: {

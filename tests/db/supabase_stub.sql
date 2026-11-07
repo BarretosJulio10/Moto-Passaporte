@@ -18,6 +18,8 @@ create table auth.users (
   raw_user_meta_data jsonb,
   aud                text,
   role               text,
+  banned_until       timestamptz,
+  last_sign_in_at    timestamptz,
   created_at         timestamptz not null default now()
 );
 

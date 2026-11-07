@@ -9,6 +9,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.21.0] — 07/11/2026 — Fase 6.1: painel administrativo
+
+### Adicionado
+- Migração `admin_management` (ADR-023): situação da conta em `profiles`; `admin_get_metrics`, `admin_list_users`, `admin_get_user` (com motivo), `admin_set_user_status` (bloqueia login no Auth), `admin_list_workshops`, `admin_set_workshop_status`, `admin_set_workshop_verification`.
+- Painel: indicadores de uso, assinaturas e receita, pendências e armazenamento, com destaque para problemas.
+- Páginas `/admin/usuarios` e `/admin/oficinas` com busca, consulta com motivo e ações com motivo.
+- Testes: banco 27 (local) + 11 (Supabase, transação desfeita, inclui bloqueio no Auth); interface 163 no total (5 novos).
+
 ## [0.20.0] — 07/11/2026 — Fase 5 concluída: faturas por ciclo e recibo
 
 ### Adicionado

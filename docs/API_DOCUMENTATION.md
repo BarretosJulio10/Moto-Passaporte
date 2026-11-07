@@ -222,6 +222,15 @@ Implementação em `src/modules/admin/paymentsApi.ts`.
 - Público: `rpc('get_payment_public_config')` → `{ billing_enabled, environment, public_key }` (chave só com a contratação liberada).
 - Servidor (`service_role`): `payment_access_token()`, `payment_webhook_secret()`, `record_payment_check(...)`.
 
+## Administração (Fase 6.1, ADR-023)
+
+Implementação em `src/modules/admin/adminApi.ts`. Todas exigem administrador.
+
+- `admin_get_metrics()` → indicadores (uso, assinaturas, receita mensal recorrente, pendências, armazenamento).
+- `admin_list_users({ p_search?, p_limit? })` (e-mail mascarado); `admin_get_user({ p_user_id, p_reason })` (dados privados, auditado); `admin_set_user_status({ p_user_id, p_status: 'active'|'suspended'|'blocked', p_reason })`.
+- `admin_list_workshops({ p_search?, p_limit? })`; `admin_set_workshop_status({ p_organization_id, p_status, p_reason })`; `admin_set_workshop_verification({ p_organization_id, p_verification: 'unverified'|'verified'|'rejected', p_reason })`.
+- Motivo: 10 a 500 caracteres.
+
 ## Faturas (Fase 5.3, ADR-022)
 
 - Usuário: `get_my_invoices()` → `number`, `period_start/end`, `amount_cents`, `due_date`, `status` (`open`, `failed`, `paid`, `refunded`, `charged_back`, `canceled`), `attempts`; `get_invoice_receipt({ p_invoice_id })` → dados do recibo (só faturas pagas/reembolsadas/contestadas, só do próprio usuário).

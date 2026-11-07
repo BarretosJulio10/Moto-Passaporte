@@ -73,7 +73,8 @@ export function guessKind(name: string, mime: AllowedMime): AttachmentKind {
 export function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024).toLocaleString('pt-BR')} KB`
-  return `${(bytes / (1024 * 1024)).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} MB`
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} MB`
+  return `${(bytes / (1024 * 1024 * 1024)).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} GB`
 }
 
 export type StorageUsage = { used_bytes: number; quota_bytes: number; max_file_bytes: number }

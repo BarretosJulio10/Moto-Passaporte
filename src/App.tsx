@@ -32,6 +32,8 @@ import { AdminDashboardPage } from '@/modules/admin/AdminDashboardPage'
 import { AdminPlansPage } from '@/modules/admin/AdminPlansPage'
 import { AdminPaymentsPage } from '@/modules/admin/AdminPaymentsPage'
 import { AdminSubscriptionsPage } from '@/modules/admin/AdminSubscriptionsPage'
+import { AdminUsersPage } from '@/modules/admin/AdminUsersPage'
+import { AdminWorkshopsPage } from '@/modules/admin/AdminWorkshopsPage'
 import { MyPlanPage } from '@/modules/plans/MyPlanPage'
 import { ReceiptPage } from '@/modules/plans/ReceiptPage'
 import { ReportPage } from '@/modules/reports/ReportPage'
@@ -134,6 +136,22 @@ export const routes = [
             element: (
               <RequireAdmin>
                 <AdminSubscriptionsPage />
+              </RequireAdmin>
+            ),
+          },
+          {
+            path: '/admin/usuarios',
+            element: (
+              <RequireAdmin>
+                <AdminUsersPage />
+              </RequireAdmin>
+            ),
+          },
+          {
+            path: '/admin/oficinas',
+            element: (
+              <RequireAdmin>
+                <AdminWorkshopsPage />
               </RequireAdmin>
             ),
           },

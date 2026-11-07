@@ -64,6 +64,8 @@
 | Supabase real — benefícios Premium, em transação desfeita | `tests/security/supabase/phase5d_premium_rollback.sql` | 13 aprovadas |
 | PostgreSQL 16 local — faturas | `tests/security/phase5e_invoices_test.sql` | 20 aprovadas |
 | Supabase real — faturas, em transação desfeita | `tests/security/supabase/phase5e_invoices_rollback.sql` | 11 aprovadas |
+| PostgreSQL 16 local — administração | `tests/security/phase6a_admin_test.sql` | 27 aprovadas |
+| Supabase real — administração, em transação desfeita | `tests/security/supabase/phase6a_admin_rollback.sql` | 11 aprovadas |
 | Tipos das Edge Functions | `scripts/validation/check_edge_functions.sh` | OK |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
@@ -142,6 +144,12 @@ Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalad
 - Idempotência: cada cobrança concede período uma vez; aviso repetido já processado é ignorado; aviso que falhou é reprocessado.
 - Funções `billing_*` só para `service_role`; tabelas de cobrança sem acesso direto e sem exclusão; nenhum dado de cartão é armazenado.
 - `back_url` do checkout só aceita a origem HTTPS do próprio site (ou localhost) e a interface só redireciona para domínios do Mercado Pago.
+
+## Administração (ADR-023)
+
+- Ações e consultas a dados privados exigem motivo e ficam na auditoria com autor.
+- Usuário comum não altera a própria situação (sem permissão de coluna) nem chama funções de admin.
+- Suspensão bloqueia o login no Supabase Auth; sessão aberta expira com o token (até 1 hora).
 
 ## Advisors do Supabase (06/11/2026, após o reforço)
 

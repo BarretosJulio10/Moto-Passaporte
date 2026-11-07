@@ -101,7 +101,8 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 - Benefícios Premium (ADR-021): `user_has_entitlement(user, key)`; lembretes em `maintenance_reminders`; relatório é página de impressão (`/painel/motos/:id/relatorio`), sem biblioteca de PDF.
 - Migrações com DROP/DELETE de dados pedem confirmação do responsável no Supabase: preferir mudanças aditivas.
 - Faturas (ADR-022) mantidas dentro de `billing_apply_payment`; recibo interno sem valor fiscal.
-- Próximo item: Fase 6.1 — painel administrativo. Limites já vêm de `user_plan()` (ADR-018): a 5.4 só troca a regra para a assinatura ativa. Antes de cobrar: decisões P-1, P-3, P-4, P-5 e credenciais de teste do Mercado Pago. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
+- Administração (ADR-023): ações com motivo (`require_admin_reason`), auditadas; suspensão usa `auth.users.banned_until`.
+- Próximo item: completar 6.1 (auditoria com filtros, configurações gerais), depois 6.2 (placas duplicadas) e 6.3 (armazenamento). Limites já vêm de `user_plan()` (ADR-018): a 5.4 só troca a regra para a assinatura ativa. Antes de cobrar: decisões P-1, P-3, P-4, P-5 e credenciais de teste do Mercado Pago. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 

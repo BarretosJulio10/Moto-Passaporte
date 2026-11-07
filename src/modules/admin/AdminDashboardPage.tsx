@@ -2,16 +2,9 @@ import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getSupabase } from '@/lib/supabase'
 import { Notice } from '@/components/Notice'
-
-type Metric = { label: string; value: number | null }
-
-async function count(table: 'profiles' | 'motorcycles' | 'organizations' | 'audit_logs', since?: string) {
-  let q = getSupabase().from(table).select('*', { count: 'exact', head: true })
-  if (since) q = q.gte('created_at', since)
-  const { count: c, error } = await q
-  if (error) throw error
-  return c ?? 0
-}
+import { formatBytes } from '@/modules/attachments/files'
+import { formatPlanPrice } from '@/modules/plans/api'
+import { fetchMetrics, type Metrics } from './adminApi'
 
 const ACTION_LABEL: Record<string, string> = {
   insert: 'criou',
@@ -19,6 +12,11 @@ const ACTION_LABEL: Record<string, string> = {
   delete: 'removeu',
   chassis_changed: 'alterou o chassi de',
   duplicate_plate_claim: 'pediu verificação de placa em',
+  admin_viewed_user: 'consultou dados de',
+  admin_set_user_status: 'mudou a situação de',
+  admin_set_workshop_status: 'mudou a situação de',
+  admin_set_workshop_verification: 'mudou a verificação de',
+  payment_credentials_saved: 'alterou credenciais de',
 }
 
 const ENTITY_LABEL: Record<string, string> = {
@@ -37,31 +35,60 @@ const ENTITY_LABEL: Record<string, string> = {
   payment_gateway_settings: 'pagamentos',
   subscriptions: 'assinatura',
   payments: 'pagamento',
+  invoices: 'fatura',
+  profiles: 'conta',
 }
 
-/** Painel administrativo base (PRD 7.1). Indicadores financeiros entram com a Fase 5. */
-export function AdminDashboardPage() {
-  const weekAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString()
+type Group = { title: string; items: { label: string; value: (m: Metrics) => string; alert?: (m: Metrics) => boolean; to?: string }[] }
 
-  const metrics = useQuery({
-    queryKey: ['admin-metrics'],
-    queryFn: async (): Promise<Metric[]> => {
-      const [users, newUsers, motos, newMotos, shops] = await Promise.all([
-        count('profiles'),
-        count('profiles', weekAgo),
-        count('motorcycles'),
-        count('motorcycles', weekAgo),
-        count('organizations'),
-      ])
-      return [
-        { label: 'Usuários', value: users },
-        { label: 'Novos usuários (7 dias)', value: newUsers },
-        { label: 'Motocicletas', value: motos },
-        { label: 'Novas motos (7 dias)', value: newMotos },
-        { label: 'Oficinas', value: shops },
-      ]
-    },
-  })
+const n = (v: number) => v.toLocaleString('pt-BR')
+
+const GROUPS: Group[] = [
+  {
+    title: 'Uso',
+    items: [
+      { label: 'Usuários', value: (m) => n(m.users_total), to: '/admin/usuarios' },
+      { label: 'Novos (7 dias)', value: (m) => n(m.users_new_7d) },
+      { label: 'Motos', value: (m) => n(m.motorcycles_total) },
+      { label: 'Oficinas ativas', value: (m) => `${n(m.workshops_active)} de ${n(m.workshops_total)}`, to: '/admin/oficinas' },
+      { label: 'Registros (30 dias)', value: (m) => n(m.records_30d) },
+      { label: 'Relatórios (30 dias)', value: (m) => n(m.reports_30d) },
+    ],
+  },
+  {
+    title: 'Assinaturas e receita',
+    items: [
+      { label: 'Assinaturas ativas', value: (m) => n(m.subscriptions_active), to: '/admin/assinaturas' },
+      { label: 'Em atraso', value: (m) => n(m.subscriptions_past_due), alert: (m) => m.subscriptions_past_due > 0 },
+      { label: 'Canceladas (ainda no período)', value: (m) => n(m.subscriptions_canceling) },
+      { label: 'Receita mensal recorrente', value: (m) => formatPlanPrice(m.mrr_cents) },
+      { label: 'Pagamentos pendentes', value: (m) => n(m.payments_pending) },
+      { label: 'Recusados (30 dias)', value: (m) => n(m.payments_rejected_30d), alert: (m) => m.payments_rejected_30d > 0 },
+    ],
+  },
+  {
+    title: 'Pendências',
+    items: [
+      { label: 'Verificações de placa', value: (m) => n(m.claims_pending), alert: (m) => m.claims_pending > 0 },
+      { label: 'Oficinas não verificadas', value: (m) => n(m.workshops_unverified), to: '/admin/oficinas' },
+      { label: 'Contas suspensas/bloqueadas', value: (m) => n(m.users_restricted) },
+      { label: 'Faturas com falha', value: (m) => n(m.invoices_failed), alert: (m) => m.invoices_failed > 0 },
+      { label: 'Transferências em aberto', value: (m) => n(m.transfers_pending) },
+      { label: 'Pedidos de acesso de oficinas', value: (m) => n(m.access_requests_pending) },
+    ],
+  },
+  {
+    title: 'Armazenamento',
+    items: [
+      { label: 'Espaço usado', value: (m) => formatBytes(m.storage_bytes) },
+      { label: 'Arquivos', value: (m) => n(m.files_total) },
+    ],
+  },
+]
+
+/** Painel administrativo (PRD 7.1). */
+export function AdminDashboardPage() {
+  const metrics = useQuery({ queryKey: ['admin-metrics'], queryFn: fetchMetrics })
 
   const events = useQuery({
     queryKey: ['admin-audit'],
@@ -79,17 +106,32 @@ export function AdminDashboardPage() {
   return (
     <div>
       <h1 className="heading text-3xl text-ink">Administração</h1>
-      <p className="mt-1 text-muted">Visão geral da plataforma. Dados privados (placas, chassis) não aparecem aqui.</p>
+      <p className="mt-1 text-muted">Visão geral da plataforma. Dados privados só aparecem na consulta de uma conta, com motivo registrado.</p>
 
       {metrics.isError && <div className="mt-6"><Notice tone="error">Não foi possível carregar os indicadores.</Notice></div>}
-      <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-6 border-y border-rule py-6 sm:grid-cols-5">
-        {(metrics.data ?? [{ label: 'Usuários', value: null }, { label: 'Novos usuários (7 dias)', value: null }, { label: 'Motocicletas', value: null }, { label: 'Novas motos (7 dias)', value: null }, { label: 'Oficinas', value: null }]).map((m) => (
-          <div key={m.label}>
-            <dt className="text-sm text-muted">{m.label}</dt>
-            <dd className="heading mt-1 text-3xl text-ink">{m.value === null ? '…' : m.value.toLocaleString('pt-BR')}</dd>
-          </div>
-        ))}
-      </dl>
+      {metrics.data?.billing_environment === 'test' && (
+        <p className="mt-4 text-sm text-muted">Pagamentos em ambiente de teste: a receita mostrada considera só assinaturas de produção.</p>
+      )}
+      {GROUPS.map((g) => (
+        <section key={g.title} className="mt-8" aria-label={g.title}>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">{g.title}</h2>
+          <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-5 border-y border-rule py-5 sm:grid-cols-3 lg:grid-cols-6">
+            {g.items.map((it) => {
+              const m = metrics.data
+              const alert = m && it.alert?.(m)
+              const value = m ? it.value(m) : '…'
+              return (
+                <div key={it.label}>
+                  <dt className="text-sm text-muted">{it.label}</dt>
+                  <dd className={`heading mt-1 text-2xl ${alert ? 'text-danger' : 'text-ink'}`}>
+                    {it.to && m ? <Link to={it.to} className="underline-offset-4 hover:underline">{value}</Link> : value}
+                  </dd>
+                </div>
+              )
+            })}
+          </dl>
+        </section>
+      ))}
 
       <section className="mt-10" aria-labelledby="audit-title">
         <h2 id="audit-title" className="heading text-2xl text-ink">Atividade recente</h2>
@@ -113,6 +155,18 @@ export function AdminDashboardPage() {
         <h2 id="tools-title" className="heading text-2xl text-ink">Ferramentas</h2>
         <ul className="mt-4 divide-y divide-rule border-y border-rule">
           <li>
+            <Link to="/admin/usuarios" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
+              <span className="font-semibold text-ink">Usuários</span>
+              <span className="block text-sm text-muted">Buscar contas, ver dados com motivo registrado, suspender, bloquear ou reativar.</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/oficinas" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
+              <span className="font-semibold text-ink">Oficinas</span>
+              <span className="block text-sm text-muted">Verificar cadastros, suspender, bloquear ou reativar, com motivo registrado.</span>
+            </Link>
+          </li>
+          <li>
             <Link to="/admin/planos" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
               <span className="font-semibold text-ink">Planos e preços</span>
               <span className="block text-sm text-muted">Preço, periodicidade, limites, benefícios e visibilidade no site, com histórico.</span>
@@ -126,7 +180,7 @@ export function AdminDashboardPage() {
           </li>
         </ul>
         <p className="mt-3 text-muted">
-          Gestão de usuários e oficinas, verificação de placa, pagamentos e armazenamento chegam nas próximas etapas.
+          Verificação de placas duplicadas e gestão de armazenamento chegam nas próximas etapas.
         </p>
       </section>
     </div>

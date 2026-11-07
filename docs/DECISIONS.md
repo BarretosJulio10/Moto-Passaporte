@@ -109,6 +109,14 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-023 — Administração com motivo obrigatório e bloqueio pelo Auth (PRD 7.1–7.3, 7.7)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- Indicadores do painel numa só função (`admin_get_metrics`). Receita recorrente mensal considera só assinaturas de produção com direito vigente (semestral ÷ 6, anual ÷ 12).
+- Lista de usuários mostra e-mail mascarado. Ver dados de uma conta (e-mail, telefone, motos com placa, assinatura) exige motivo de 10 a 500 caracteres e grava `admin_viewed_user` na auditoria.
+- Suspender/bloquear/reativar conta e oficina, e mudar a verificação de oficina, exigem motivo e ficam auditados com situação anterior e nova. Conta suspensa ou bloqueada recebe `banned_until = infinity` no Supabase Auth: não entra de novo; sessão aberta termina quando o token de acesso vence (até 1 hora). Administradores não podem ser suspensos por essa tela nem suspender a si mesmos.
+- Nenhuma ação administrativa altera motos, histórico, pagamentos aprovados ou registros de oficina. Oficina suspensa/bloqueada para de operar pelas regras já existentes (`is_org_active`).
+- "Suspensa" e "bloqueada" têm o mesmo efeito técnico hoje; a diferença é de registro (temporária × definitiva).
+
 ### ADR-022 — Faturas por ciclo e recibo interno (PRD 8.6)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - `invoices` registra cada ciclo: ao aprovar um pagamento, a fatura mais antiga em aberto é quitada (ou criada já paga) com o período concedido, e abre-se a fatura do ciclo seguinte com vencimento no fim do período pago. Cobrança recusada marca a fatura como "cobrança não aprovada" e conta tentativas (um aviso repetido não conta duas vezes). Reembolso/contestação mudam a fatura paga; assinatura cancelada ou encerrada cancela as faturas em aberto (gatilho).

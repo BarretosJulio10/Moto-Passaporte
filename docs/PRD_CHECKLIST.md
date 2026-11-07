@@ -4,8 +4,8 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 07/11/2026 — v0.20.0
-**Item atual na ordem:** Fase 6 → painel administrativo (6.1)
+**Última conferência:** 07/11/2026 — v0.21.0
+**Item atual na ordem:** Fase 6 → completar 6.1 (consulta de auditoria e configurações gerais) e 6.2 (verificação de placas)
 
 ## Progresso
 
@@ -19,10 +19,10 @@ Conta: item concluído = 1, parcial = 0,5, planejado = 0. Total de 40 itens nas 
 | 3 — Oficinas e autorizações | 7 | 7 | 100% |
 | 4 — Transferência e compartilhamento | 5 | 5 | 100% |
 | 5 — Monetização e Mercado Pago | 5 | 5 | 100% |
-| 6 — Administração, segurança e lançamento | 6 | 0 | 0% |
-| **Total** | **40** | **34** | **85%** |
+| 6 — Administração, segurança e lançamento | 6 | 0,5 | 8% |
+| **Total** | **40** | **34,5** | **86,3%** |
 
-Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0.11.0 = 56,3% · 0.12.0 = 58,8% · 0.13.0 = 62,5% · 0.14.0 = 67,5% · 0.15.0 = 72,5% · 0.16.0 = 75% · 0.17.0 = 76,3% · 0.18.0 = 82,5% · 0.19.0 = 83,8% · 0.20.0 = 85%.
+Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0.11.0 = 56,3% · 0.12.0 = 58,8% · 0.13.0 = 62,5% · 0.14.0 = 67,5% · 0.15.0 = 72,5% · 0.16.0 = 75% · 0.17.0 = 76,3% · 0.18.0 = 82,5% · 0.19.0 = 83,8% · 0.20.0 = 85% · 0.21.0 = 86,3%.
 
 **Fase 1: concluída (base)** em 06/11/2026. Pendências que não bloqueiam a Fase 2: ambientes de homologação/produção (KI-007), revisão jurídica de termos/privacidade, MFA para administradores (KI-014), criptografia do chassi (KI-002).
 
@@ -99,7 +99,7 @@ Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0
 
 | # | Item | Seção PRD | Estado |
 |---|---|---|---|
-| 6.1 | Dashboard e gestão administrativa | 7 | `planejado` |
+| 6.1 | Dashboard e gestão administrativa | 7 | `parcial` — indicadores (7.1), usuários (7.2), oficinas (7.3), planos (7.4) e pagamentos (7.5) prontos, com motivo e auditoria (ADR-023). Falta: consulta de auditoria com filtros (7.7) e tela de configurações gerais (7.8) |
 | 6.2 | Resolução de pedidos de duplicidade | ADR-007 | `planejado` (KI-004) |
 | 6.3 | Monitoramento de armazenamento | 7.6 | `planejado` |
 | 6.4 | Testes de segurança, integração, regressão, E2E | 19 | segurança do banco Fase 1 `testado`; demais `planejado` |
