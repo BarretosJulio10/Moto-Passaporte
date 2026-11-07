@@ -32,7 +32,23 @@
 
 ## Testes de segurança
 
-`tests/security/phase1_rls_test.sql` — 73 verificações aprovadas em 06/11/2026 (PostgreSQL 16 + simulação do Supabase), cobrindo isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; e preservação da história na exclusão de conta.
+| Ambiente | Script | Resultado (06/11/2026) |
+|---|---|---|
+| PostgreSQL 16 local + simulação | `tests/security/phase1_rls_test.sql` | 73 aprovadas |
+| Supabase real (dev, PG 17), em transação desfeita | `tests/security/supabase/phase1_rls_test_rollback.sql` | 71 aprovadas, antes e depois do reforço |
+
+Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
+
+## Advisors do Supabase (06/11/2026, após o reforço)
+
+**Performance:** sem alertas WARN. Restam apenas avisos INFO de "índice não utilizado" (normal num banco sem uso).
+
+**Segurança:** restam apenas alertas WARN de "função SECURITY DEFINER executável", todos **intencionais**:
+- Operações do app chamadas via RPC: `register_motorcycle`, `change_motorcycle_plate`, `record_mileage`, `create_workshop`, `get_public_passport` (anônimo, por design). Cada uma valida `auth.uid()` e titularidade internamente.
+- Verificações usadas nas políticas RLS: `has_role`, `is_admin`, `is_current_owner`, `is_org_member`, `is_org_responsible`, `is_org_active`. Só revelam informação sobre o próprio usuário ou o status de uma organização.
+- `rls_auto_enable`: função do próprio Supabase (event trigger `ensure_rls`), não chamável via API. Não alterar.
+
+As funções de trigger internas tiveram o EXECUTE revogado (migração `phase1_hardening`).
 
 ## Pendências de segurança
 

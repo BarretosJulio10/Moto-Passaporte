@@ -4,6 +4,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 
 ## [Não publicado]
 
+## [0.3.0] — 06/11/2026
+
+### Adicionado
+- Migrações da Fase 1 aplicadas no Supabase dev (`ripgenhykaajcnzdxoid`).
+- Migração `20261107003512_phase1_hardening.sql`: EXECUTE revogado das funções de trigger, políticas RLS com `(select auth.uid())`, 10 índices de chaves estrangeiras.
+- Teste para Supabase real em transação desfeita: `tests/security/supabase/phase1_rls_test_rollback.sql` (71 verificações aprovadas).
+- Decisões ADR-009 (região us-east-1) e ADR-010 (nomes de migração = versão no Supabase).
+
+### Alterado
+- Arquivos de migração renomeados para as versões registradas no Supabase.
+- `tests/db/supabase_stub.sql`: colunas `aud` e `role` em `auth.users`.
+
+### Rollback
+- Banco sem dados de usuários: reverter = remover os objetos das migrações na ordem inversa. Nenhum dado a restaurar.
+
 ## [0.2.0] — 06/11/2026
 
 ### Adicionado

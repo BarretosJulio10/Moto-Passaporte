@@ -8,7 +8,7 @@ SaaS brasileiro que cria um passaporte digital permanente para cada moto — man
 
 ## Situação
 
-Versão **0.2.0** — banco de dados da Fase 1 escrito e testado localmente (ainda não aplicado no Supabase). Interface não iniciada.
+Versão **0.3.0** — banco de dados da Fase 1 aplicado e testado no Supabase de desenvolvimento. Interface não iniciada.
 
 ## Documentação
 

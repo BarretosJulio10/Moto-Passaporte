@@ -5,8 +5,8 @@
 > Nunca registrar aqui senhas, tokens, chaves, dados pessoais ou segredos operacionais.
 
 **Última atualização:** 06/11/2026
-**Versão do projeto:** 0.2.0
-**Situação geral:** banco da Fase 1 `testado` localmente (não aplicado no Supabase); frontend `planejado`.
+**Versão do projeto:** 0.3.0
+**Situação geral:** banco da Fase 1 aplicado e `testado` no Supabase dev; frontend `planejado`.
 
 Legenda de estados (seção 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 
@@ -29,7 +29,7 @@ Documento de referência: [`docs/PRD.md`](./PRD.md) (v2.0). As regras da v1.0 co
 | Camada | Tecnologia | Situação |
 |---|---|---|
 | Frontend | React + TypeScript, responsivo (Lovable previsto) | `planejado` |
-| Backend | Supabase: PostgreSQL, Auth, Storage, RLS, Edge Functions | `planejado` — projeto Supabase ainda não conectado |
+| Backend | Supabase: PostgreSQL 17, Auth, Storage, RLS, Edge Functions | Projeto dev `ripgenhykaajcnzdxoid` (us-east-1) com banco da Fase 1 aplicado |
 | Pagamentos | Mercado Pago (API de Assinaturas + Webhooks) | `planejado` — Fase 5 |
 | Versionamento | Git / GitHub `BarretosJulio10/Moto-Passaporte` | `implementado` |
 
@@ -47,9 +47,9 @@ Documento de referência: [`docs/PRD.md`](./PRD.md) (v2.0). As regras da v1.0 co
 
 ## 4. Banco de dados
 
-Situação: Fase 1 `testado` em PostgreSQL 16 local com simulação do Supabase (73 testes de segurança aprovados). **Não aplicado** no Supabase ainda. Detalhes completos em [`DATABASE.md`](./DATABASE.md) e [`SECURITY.md`](./SECURITY.md).
+Situação: Fase 1 **aplicada** no Supabase dev e `testado` lá (71 verificações, em transação desfeita) e localmente (73). Advisors revisados. Detalhes em [`DATABASE.md`](./DATABASE.md) e [`SECURITY.md`](./SECURITY.md).
 
-Estratégia (ADR-002): migrações versionadas em `supabase/migrations/`, aplicadas quando o Supabase for conectado. Mudanças futuras = **nova** migração, nunca edição das antigas (exceto enquanto nenhuma tiver sido aplicada em ambiente algum).
+Estratégia (ADR-002, ADR-010): migrações versionadas em `supabase/migrations/`, com o mesmo prefixo de versão do Supabase. Como já estão aplicadas, mudanças futuras = **nova** migração; nunca editar as existentes. Após aplicar uma migração via MCP, renomear o arquivo local para a versão retornada por `list_migrations`.
 
 Já criadas (Fase 1): `audit_logs`, `profiles`, `user_roles`, `system_settings`, `organizations`, `organization_members`, `workshops`, `motorcycles`, `motorcycle_plates`, `motorcycle_ownerships`, `motorcycle_private`, `mileage_records`, `motorcycle_claim_requests`, view `my_motorcycles`.
 
@@ -65,9 +65,9 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access`, `mainte
 
 | Módulo | Fase | Situação |
 |---|---|---|
-| Fundação SaaS, auth, papéis, organizações, RLS, auditoria (banco) | 1 | `testado` (local) |
+| Fundação SaaS, auth, papéis, organizações, RLS, auditoria (banco) | 1 | `testado` (Supabase dev) |
 | Site público | 1 | `planejado` |
-| Cadastro de moto, ID permanente (banco) | 1 | `testado` (local) |
+| Cadastro de moto, ID permanente (banco) | 1 | `testado` (Supabase dev) |
 | QR Code e telas da Fase 1 | 1 | `planejado` |
 | Linha do tempo, manutenção, quilometragem, anexos, diário | 2 | `planejado` |
 | Oficinas, membros, pesquisa por placa, autorizações | 3 | `planejado` |
@@ -79,17 +79,17 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access`, `mainte
 
 | Ambiente | Situação |
 |---|---|
-| Desenvolvimento | não configurado |
+| Desenvolvimento | Supabase `ripgenhykaajcnzdxoid` (banco da Fase 1); frontend não configurado |
 | Homologação | não configurado |
 | Produção | não configurado |
 
 ## 7. Pendências imediatas
 
-- Conectar o projeto Supabase novo (conta separada; região sugerida: São Paulo), aplicar migrações e rodar `scripts/validation/run_db_tests.sh` equivalente lá.
 - Decidir quem constrói a interface: Lovable ou desenvolvimento direto no repositório (D-T1).
+- Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 
-Decisões já fechadas: Git direto na `main` (ADR-005), 1 moto no gratuito (ADR-006), duplicidade por placa (ADR-007), campos públicos padrão (ADR-008).
+Decisões já fechadas: Git direto na `main` (ADR-005), 1 moto no gratuito (ADR-006), duplicidade por placa (ADR-007), campos públicos padrão (ADR-008), Supabase em us-east-1 (ADR-009), nomes de migração = versão do Supabase (ADR-010).
 
 ## 8. Como retomar o trabalho
 

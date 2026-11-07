@@ -19,7 +19,15 @@ O PRD v2.0 (`docs/PRD.md`) consolida a v1.0. As regras da v1.0 continuam válida
 
 ### ADR-003 — Projeto Supabase em conta separada
 **Data:** 06/11/2026 · **Status:** aceita
-O Moto Passaporte usará um projeto Supabase novo, em conta própria, isolado de outros projetos. Região sugerida: São Paulo (menor latência para o público brasileiro) — confirmar na criação.
+O Moto Passaporte usa um projeto Supabase próprio, isolado de outros projetos: **MOTO_Passaporte** (`ripgenhykaajcnzdxoid`), PostgreSQL 17.
+
+### ADR-009 — Região do Supabase: us-east-1
+**Data:** 06/11/2026 · **Status:** aceita
+O projeto foi criado em us-east-1 (EUA). São Paulo (sa-east-1) daria menor latência ao público brasileiro (estimativa: ~100–150 ms a menos por requisição), mas o responsável pelo produto optou por manter. A região não pode ser alterada depois; mudar exigirá criar outro projeto e migrar dados. Reavaliar antes do lançamento público se a latência for perceptível.
+
+### ADR-010 — Nomes dos arquivos de migração = versão registrada no Supabase
+**Data:** 06/11/2026 · **Status:** aceita
+Cada arquivo em `supabase/migrations/` tem o mesmo prefixo de versão registrado pelo Supabase ao aplicar a migração, para que o histórico do repositório e o do banco coincidam (e a Supabase CLI reconheça as migrações já aplicadas).
 
 ### ADR-004 — Mercado Pago como provedor de cobrança
 **Data:** 06/11/2026 · **Status:** aceita (definido no PRD v2.0)

@@ -1,16 +1,19 @@
 # DATABASE — Moto Passaporte
 
-**Situação:** migrações da Fase 1 `testado` em PostgreSQL 16 local com simulação do Supabase; **ainda não aplicadas** em um projeto Supabase real.
+**Situação:** migrações da Fase 1 **aplicadas** no Supabase de desenvolvimento (`ripgenhykaajcnzdxoid`, PostgreSQL 17) em 06/11/2026 e `testado` lá (71 verificações) e localmente (73 verificações).
 
-Migrações em `supabase/migrations/`, aplicadas em ordem:
+Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no Supabase, ADR-010):
 
 | Arquivo | Conteúdo |
 |---|---|
-| `20261106000100_base.sql` | pgcrypto, utilitários (placa), auditoria imutável, triggers genéricos |
-| `20261106000200_identity.sql` | `profiles`, `user_roles`, criação automática no cadastro, `has_role`/`is_admin`, `system_settings` |
-| `20261106000300_organizations.sql` | `organizations`, `organization_members`, `workshops`, `create_workshop` |
-| `20261106000400_motorcycles.sql` | `motorcycles`, `motorcycle_plates`, `motorcycle_ownerships`, `motorcycle_private`, `mileage_records`, `motorcycle_claim_requests`, operações e view `my_motorcycles` |
-| `20261106000500_public_passport.sql` | `get_public_passport` (campos públicos padrão — ADR-008) |
+| `20261107003043_base.sql` | pgcrypto, utilitários (placa), auditoria imutável, triggers genéricos |
+| `20261107003102_identity.sql` | `profiles`, `user_roles`, criação automática no cadastro, `has_role`/`is_admin`, `system_settings` |
+| `20261107003124_organizations.sql` | `organizations`, `organization_members`, `workshops`, `create_workshop` |
+| `20261107003222_motorcycles.sql` | `motorcycles`, `motorcycle_plates`, `motorcycle_ownerships`, `motorcycle_private`, `mileage_records`, `motorcycle_claim_requests`, operações e view `my_motorcycles` |
+| `20261107003227_public_passport.sql` | `get_public_passport` (campos públicos padrão — ADR-008) |
+| `20261107003512_phase1_hardening.sql` | Reforço pelos advisors: bloqueia RPC de funções de trigger, otimiza RLS com `(select auth.uid())`, índices de FKs |
+
+Dados existentes após a aplicação: apenas as 2 configurações iniciais de `system_settings` (e seus 2 eventos de auditoria). Nenhum dado de teste.
 
 ## Tabelas
 
@@ -63,7 +66,10 @@ Migrações em `supabase/migrations/`, aplicadas em ordem:
 
 ## Como testar
 
+**Local (PostgreSQL puro):**
 ```
 PGHOST=... PGPORT=... PGUSER=postgres scripts/validation/run_db_tests.sh
 ```
 Usa `tests/db/supabase_stub.sql` para simular o Supabase e roda `tests/security/*.sql`.
+
+**No Supabase (sem deixar dados):** executar `tests/security/supabase/phase1_rls_test_rollback.sql` no SQL Editor ou via MCP. O script roda tudo em uma transação e termina com o erro proposital `RESULTADO: N testes passaram`, que desfaz todos os dados de teste. Qualquer outro erro (`FALHOU: ...`) indica falha real.
