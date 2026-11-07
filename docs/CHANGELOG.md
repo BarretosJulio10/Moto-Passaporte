@@ -9,6 +9,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.29.0] — 07/11/2026 — Central de notificações
+
+### Adicionado
+- Sino com contador no topo da área logada e página `/painel/notificacoes` (lista, marcar como lidas ao abrir, preferências).
+- Avisos automáticos de oficina, serviços, transferências, pagamentos, verificação de placa e rotina diária (lembretes, fim do Premium, atraso, espaço), mais aviso administrativo em `/admin/usuarios` (ADR-031; KI-020).
+- Tabelas `notifications` e `notification_preferences`; agendamento diário `moto-passaporte-notifications`.
+
+### Testes
+- Banco local: 36 verificações novas, incluindo os avisos gerados pelos fluxos reais das 22 suítes anteriores (todas continuam passando). Supabase real: 9 (transferência real de ponta a ponta). Tela: 2 novos (176). Ponta a ponta: 9 cenários, 41 verificações. Varredura: 0 violações.
+
+### Rollback desta versão
+- `supabase/rollback/20261107225331_notifications.down.sql` e publicar o site anterior.
+
 ## [0.28.0] — 07/11/2026 — Verificação em duas etapas para administradores
 
 ### Segurança

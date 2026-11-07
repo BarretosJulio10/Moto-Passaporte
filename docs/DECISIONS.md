@@ -109,6 +109,14 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-031 — Central de notificações gerada no banco (PRD 12)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- Avisos internos no site para todos os eventos do PRD 12: pedido/decisão/revogação de oficina, novo serviço de oficina, transferência (recebida e respondida), lembretes, fim do Premium, pagamento confirmado, falha/atraso de pagamento, espaço quase cheio, respostas da verificação de placa e aviso administrativo (com motivo, auditado).
+- Gerados **no banco** (gatilhos nas tabelas do evento + rotina diária às 08:07), não pelo navegador: não dá para forjar aviso, e nenhum fluxo esquece de avisar. Falha ao gerar aviso nunca desfaz a ação principal.
+- Cada um só lê os próprios avisos (funções `get_my_*`); tabela fechada. Repetição evitada por chave do evento. Avisos lidos há mais de 180 dias são apagados.
+- Preferências: só os avisos opcionais (lembretes, espaço, fim do Premium, serviços de oficina) podem ser silenciados; os essenciais não. A opção "por e-mail" é gravada (`email_pending`) para quando houver provedor de e-mail — **o PRD não exige e-mail no MVP**; ativar é decisão do responsável (provedor e custo).
+- O aviso ao titular sobre possível venda (verificação de placa) continua sem identificar o solicitante.
+
 ### ADR-030 — Verificação em duas etapas obrigatória para administradores (PRD 15.1)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - `is_admin()` só vale com sessão verificada em duas etapas (claim `aal` = `aal2` do Supabase Auth). Como toda autorização administrativa passa por ela (funções `admin_*`, políticas RLS de admin, Edge Functions com login de admin), a regra vale no banco, não só na tela. Token sem `aal` conta como `aal1`.

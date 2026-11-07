@@ -1,9 +1,10 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Logo } from '@/components/Logo'
 import { Button } from '@/components/Button'
 import { useAuth } from '@/core/auth/AuthProvider'
 import { getSupabase } from '@/lib/supabase'
+import { fetchUnreadCount } from '@/modules/notifications/api'
 
 /**
  * Layout da área autenticada. A mesma conta pode alternar entre contextos
@@ -25,6 +26,14 @@ export function AppLayout() {
     },
   })
   const isAdmin = roles.data?.has('admin') ?? false
+  const unread = useQuery({
+    queryKey: ['notifications-unread', user?.id],
+    enabled: Boolean(user),
+    queryFn: fetchUnreadCount,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+  })
+  const count = unread.data ?? 0
 
   const tab = ({ isActive }: { isActive: boolean }) =>
     `whitespace-nowrap border-b-2 px-1 pb-2.5 pt-1 text-sm font-semibold ${
@@ -44,6 +53,21 @@ export function AppLayout() {
           <Logo to="/painel" />
           <div className="flex items-center gap-3">
             <span className="hidden text-sm text-muted sm:inline">{name}</span>
+            <Link
+              to="/painel/notificacoes"
+              className="relative inline-flex h-9 w-9 items-center justify-center rounded-doc text-ink hover:bg-paper focus-visible:bg-paper"
+              aria-label={count > 0 ? `Notificações: ${count} não lida${count > 1 ? 's' : ''}` : 'Notificações'}
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8" />
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+              </svg>
+              {count > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 min-w-[1.15rem] rounded-full bg-danger px-1 text-center text-[0.68rem] font-bold leading-[1.15rem] text-white">
+                  {count > 99 ? '99+' : count}
+                </span>
+              )}
+            </Link>
             <Button
               variant="secondary"
               size="sm"

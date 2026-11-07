@@ -224,6 +224,33 @@ await scenario('Admin limpa arquivos sem vínculo', baseWorld({
   check(f?.body?.reason === 'Limpeza de envios que falharam', 'envia o motivo à função de limpeza')
 })
 
+// 9. Proprietário vê o aviso no sino e abre a central de notificações
+await scenario('Proprietário abre as notificações pelo sino', baseWorld({
+  rpc: {
+    count_my_unread_notifications: (_b, calls) => (calls.some((c) => c.name === 'mark_my_notifications_read') ? 0 : 2),
+    get_my_notifications: [
+      { id: 'n1', kind: 'workshop_access_request', title: 'Oficina do Zé pediu acesso', body: 'A oficina pediu para ver o histórico da Honda CB 500F.',
+        link: `/painel/motos/${MOTO}`, created_at: '2026-11-07T12:00:00Z', read_at: null },
+      { id: 'n2', kind: 'payment_failed', title: 'Falha no pagamento', body: 'Confira o cartão.', link: '/painel/plano', created_at: '2026-11-06T12:00:00Z', read_at: null },
+    ],
+    mark_my_notifications_read: 2,
+    get_my_notification_preferences: [{ kind: 'payment_failed', optional: false, in_app: true, email: false }, { kind: 'reminder_due', optional: true, in_app: true, email: false }],
+  },
+}), mobile, async ({ page, calls, check, go }) => {
+  await go('/painel')
+  const bell = page.getByRole('link', { name: 'Notificações: 2 não lidas' })
+  await bell.waitFor()
+  check(true, 'sino mostra 2 não lidas')
+  await bell.click()
+  await page.getByRole('heading', { name: 'Notificações' }).waitFor()
+  const item = page.getByRole('link', { name: 'Oficina do Zé pediu acesso' })
+  await item.waitFor()
+  check((await item.getAttribute('href')) === `/painel/motos/${MOTO}`, 'aviso com link para a moto')
+  await page.waitForTimeout(2200)
+  check(rpcCalled(calls, 'mark_my_notifications_read').length === 1, 'marca como lidas ao abrir')
+  check(await page.getByLabel(/Falhas e atrasos de pagamento no site \(essencial\)/).isDisabled(), 'aviso essencial não pode ser desligado')
+})
+
 // 8. Admin sem a segunda etapa ativa o aplicativo autenticador antes de entrar
 await scenario('Admin ativa a verificação em duas etapas', baseWorld({
   rpc: {

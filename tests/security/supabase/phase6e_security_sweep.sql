@@ -10,7 +10,7 @@ anon_exec_ok(f) as (values ('get_payment_public_config'), ('get_public_passport'
   ('is_org_active'), ('is_valid_plate'), ('mask_email'), ('normalize_plate'), ('setting_spec'), ('transfer_status_of'), ('rls_auto_enable')),
 service_only(f) as (values ('payment_access_token'), ('payment_webhook_secret'), ('storage_cleanup_finish'), ('record_payment_check'),
   ('user_storage_used_bytes'), ('upsert_vault_secret'), ('scheduled_job_secret_ok'), ('job_run_start'), ('job_run_finish'),
-  ('system_plan_storage_cleanup')),
+  ('system_plan_storage_cleanup'), ('notify'), ('moto_label'), ('moto_owner'), ('org_label'), ('system_generate_notifications')),
 fns as (
   select p.oid, p.proname, p.prosecdef, p.proconfig, p.prosrc, t.typname as rettype
     from pg_proc p join pg_namespace n on n.oid = p.pronamespace join pg_type t on t.oid = p.prorettype

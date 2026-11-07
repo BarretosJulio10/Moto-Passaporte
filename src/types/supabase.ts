@@ -823,6 +823,18 @@ export type Database = {
           status: string
         }[]
       }
+      get_my_notifications: {
+        Args: { p_limit?: number; p_before?: string }
+        Returns: { id: string; kind: string; title: string; body: string | null; link: string | null; created_at: string; read_at: string | null }[]
+      }
+      count_my_unread_notifications: { Args: Record<PropertyKey, never>; Returns: number }
+      mark_my_notifications_read: { Args: { p_ids?: string[] }; Returns: number }
+      get_my_notification_preferences: {
+        Args: Record<PropertyKey, never>
+        Returns: { kind: string; optional: boolean; in_app: boolean; email: boolean }[]
+      }
+      set_my_notification_preference: { Args: { p_kind: string; p_in_app: boolean; p_email: boolean }; Returns: undefined }
+      admin_send_notice: { Args: { p_user_id: string; p_title: string; p_body: string; p_reason: string }; Returns: undefined }
       my_admin_access: { Args: Record<PropertyKey, never>; Returns: Json }
       session_aal: { Args: Record<PropertyKey, never>; Returns: string }
       admin_job_status: {

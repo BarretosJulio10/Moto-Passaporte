@@ -75,10 +75,12 @@
 | Tipos das Edge Functions | `scripts/validation/check_edge_functions.sh` | OK |
 | PostgreSQL 16 local — varredura de segurança por catálogo (e detecção de 10 brechas plantadas) | `tests/security/phase6e_security_sweep_test.sql` | 12 aprovadas |
 | Supabase real — varredura de segurança | `tests/security/supabase/phase6e_security_sweep.sql` | 0 violações |
-| Ponta a ponta no navegador (Supabase simulado) | `scripts/validation/run_e2e.sh` | 8 cenários, 35 verificações |
+| Ponta a ponta no navegador (Supabase simulado) | `scripts/validation/run_e2e.sh` | 9 cenários, 41 verificações |
 | Backup criptografado, restauração e rollback (banco de teste) | `scripts/ops/restore_check.sh` | 13 aprovadas |
 | PostgreSQL 16 local — rotinas automáticas | `tests/security/phase6f_jobs_test.sql` | 17 aprovadas |
 | PostgreSQL 16 local — MFA de administradores | `tests/security/phase6g_admin_mfa_test.sql` | 15 aprovadas |
+| PostgreSQL 16 local — central de notificações | `tests/security/phase6h_notifications_test.sql` | 36 aprovadas |
+| Supabase real — central de notificações (transferência real), em transação desfeita | `tests/security/supabase/phase6h_notifications_rollback.sql` | 9 aprovadas |
 | Supabase real — MFA de administradores, em transação desfeita | `tests/security/supabase/phase6g_admin_mfa_rollback.sql` | 8 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
@@ -200,6 +202,11 @@ Ver `KNOWN_ISSUES.md`.
 
 - `is_admin()` = papel admin **e** sessão `aal2`. Testado: sem a segunda etapa, indicadores, usuários, configurações, limpeza e auditoria ficam bloqueados (local 15, Supabase real 8).
 - Celular perdido: remover o fator em Supabase → Authentication → Users. Nunca desligar a regra para contornar.
+
+## Notificações (ADR-031)
+
+- Geradas só no banco (gatilhos e rotina diária); `notify()` fechada para o navegador. Cada pessoa lê só os próprios avisos; a tabela não tem acesso direto. Links só internos (começam com `/`). Testado local (36) e no Supabase real (9).
+- Aviso de possível venda ao titular não traz nome nem contato do solicitante.
 
 ## Rotinas automáticas (ADR-029)
 

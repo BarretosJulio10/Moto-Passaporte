@@ -2,17 +2,52 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/Button'
-import { TextField } from '@/components/Field'
+import { TextAreaField, TextField } from '@/components/Field'
 import { Notice } from '@/components/Notice'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { formatPlate } from '@/core/shared/format'
-import { ACCOUNT_STATUS_LABEL, getUserDetail, listUsers, setUserStatus, type AccountStatus, type AdminUserDetail, type AdminUserRow } from './adminApi'
+import { ACCOUNT_STATUS_LABEL, getUserDetail, listUsers, sendNotice, setUserStatus, validReason, type AccountStatus, type AdminUserDetail, type AdminUserRow } from './adminApi'
 import { ReasonForm } from './ReasonForm'
 
 const err = (e: unknown) => translateDbError(e as { code?: string; message?: string })
 const d = (iso: string | null) => (iso ? new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '—')
 
+function SendNotice({ userId, onDone }: { userId: string; onDone: () => void }) {
+  const [title, setTitle] = useState('')
+  const [body, setBody] = useState('')
+  const [reason, setReason] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [sent, setSent] = useState(false)
+  const send = useMutation({
+    mutationFn: () => sendNotice(userId, title.trim(), body.trim(), reason.trim()),
+    onSuccess: () => setSent(true),
+    onError: (e) => setError(err(e)),
+  })
+  if (sent) return <div className="mt-3"><Notice tone="success">Aviso enviado. A pessoa vê na central de notificações.</Notice></div>
+  function submit(e: FormEvent) {
+    e.preventDefault()
+    if (title.trim().length < 3 || body.trim().length < 3) return setError('Escreva o título e a mensagem.')
+    const r = validReason(reason)
+    if (r) return setError(r)
+    setError(null)
+    send.mutate()
+  }
+  return (
+    <form onSubmit={submit} noValidate className="mt-3 grid gap-3 rounded-doc border border-rule bg-paper p-4" aria-label="Enviar aviso">
+      <TextField label="Título" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} />
+      <TextAreaField label="Mensagem (a pessoa lê na central de notificações)" value={body} onChange={(e) => setBody(e.target.value)} rows={3} maxLength={1000} />
+      <TextField label="Motivo interno (fica na auditoria)" value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} />
+      {error && <Notice tone="error">{error}</Notice>}
+      <div className="flex gap-3">
+        <Button type="submit" size="sm" loading={send.isPending}>Enviar aviso</Button>
+        <Button type="button" size="sm" variant="secondary" onClick={onDone}>Cancelar</Button>
+      </div>
+    </form>
+  )
+}
+
 function UserDetail({ user, detail, onClose }: { user: AdminUserRow; detail: AdminUserDetail; onClose: () => void }) {
+  const [notice, setNotice] = useState(false)
   const qc = useQueryClient()
   const [action, setAction] = useState<AccountStatus | null>(null)
   const change = useMutation({
@@ -48,9 +83,11 @@ function UserDetail({ user, detail, onClose }: { user: AdminUserRow; detail: Adm
           {detail.account_status !== 'active' && <Button size="sm" variant="secondary" onClick={() => setAction('active')}>Reativar conta</Button>}
           {detail.account_status !== 'suspended' && <Button size="sm" variant="secondary" onClick={() => setAction('suspended')}>Suspender</Button>}
           {detail.account_status !== 'blocked' && <Button size="sm" variant="secondary" onClick={() => setAction('blocked')}>Bloquear</Button>}
+          <Button size="sm" variant="secondary" onClick={() => setNotice(true)}>Enviar aviso</Button>
           <Button size="sm" variant="quiet" onClick={onClose}>Fechar</Button>
         </div>
       )}
+      {notice && <SendNotice userId={user.id} onDone={() => setNotice(false)} />}
       {action && (
         <ReasonForm
           title={action === 'active' ? 'Reativar conta' : action === 'suspended' ? 'Suspender conta' : 'Bloquear conta'}

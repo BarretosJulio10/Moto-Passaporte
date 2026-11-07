@@ -176,3 +176,9 @@ export async function fetchJobStatus(): Promise<JobStatus[]> {
   if (error) throw error
   return data ?? []
 }
+
+/** Aviso administrativo para uma conta, com motivo auditado (ADR-031). */
+export async function sendNotice(userId: string, title: string, body: string, reason: string): Promise<void> {
+  const { error } = await getSupabase().rpc('admin_send_notice', { p_user_id: userId, p_title: title, p_body: body, p_reason: reason })
+  if (error) throw error
+}

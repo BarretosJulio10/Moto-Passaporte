@@ -73,6 +73,7 @@ Cada release registra no `CHANGELOG.md` o que precisa para voltar; a nota "Rollb
 | Erros do banco, Auth e Edge Functions | Painel do Supabase → *Logs* |
 | Erros e disponibilidade do site | Painel da Vercel → *Logs* / *Deployments* |
 | Falha do backup | E-mail automático do GitHub Actions |
+| Avisos aos usuários | Gerados pelo banco; rotina diária às 08:07 (*Supabase → Integrations → Cron*: `moto-passaporte-notifications`) |
 | Conciliação e limpeza automáticas | `/admin` → "Rotinas automáticas" (última execução, falhas em 24 h); detalhes em `job_runs` e em *Supabase → Integrations → Cron* |
 
 Ainda não há alerta ativo (e-mail/WhatsApp) para erro de aplicação, falha de login em massa ou indisponibilidade (KI-030). Alertas não devem conter dados pessoais.

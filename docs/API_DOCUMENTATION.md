@@ -328,3 +328,8 @@ Implementação em `src/modules/plans/api.ts`.
 
 ### Acesso administrativo (ADR-030)
 - `my_admin_access()` → `{ has_admin_role, aal, allowed }` da própria sessão. Ativação e código: `supabase.auth.mfa.enroll({ factorType: 'totp' })`, `mfa.challengeAndVerify({ factorId, code })`.
+
+### Notificações (ADR-031)
+- `get_my_notifications({ p_limit?, p_before? })`, `count_my_unread_notifications()`, `mark_my_notifications_read({ p_ids? })` (sem ids = todas).
+- `get_my_notification_preferences()` → `{ kind, optional, in_app, email }[]`; `set_my_notification_preference({ p_kind, p_in_app, p_email })` (essenciais não podem ter `in_app = false`).
+- Admin: `admin_send_notice({ p_user_id, p_title, p_body, p_reason })` (auditado).
