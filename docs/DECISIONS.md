@@ -109,6 +109,12 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-024 — Configurações por catálogo e auditoria em duas camadas (PRD 7.7, 7.8)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- **Correção de segurança:** o admin podia alterar `system_settings` direto pela API (política de RLS), inclusive ligar `billing_enabled` sem as checagens do ADR-020. A escrita direta foi revogada; configurações mudam só por `admin_update_setting`.
+- Catálogo (`setting_spec`) define o que é editável, o tipo (inteiro com faixa, e-mail, WhatsApp) e o grupo na tela. Valores são validados e normalizados no servidor; alteração exige motivo e é auditada (antes/depois). Valor igual não gera registro. `billing_enabled` continua só pela tela de Pagamentos; chaves antigas (KI-023) não aparecem.
+- Auditoria: a busca (`admin_search_audit`, filtros por tipo, ação, autor, moto, oficina, período; paginação por id) mostra só metadados e o motivo. O conteúdo antes/depois pode ter dados privados: abrir exige motivo e grava `admin_viewed_audit`.
+
 ### ADR-023 — Administração com motivo obrigatório e bloqueio pelo Auth (PRD 7.1–7.3, 7.7)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - Indicadores do painel numa só função (`admin_get_metrics`). Receita recorrente mensal considera só assinaturas de produção com direito vigente (semestral ÷ 6, anual ÷ 12).

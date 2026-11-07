@@ -33,6 +33,8 @@ import { AdminPlansPage } from '@/modules/admin/AdminPlansPage'
 import { AdminPaymentsPage } from '@/modules/admin/AdminPaymentsPage'
 import { AdminSubscriptionsPage } from '@/modules/admin/AdminSubscriptionsPage'
 import { AdminUsersPage } from '@/modules/admin/AdminUsersPage'
+import { AdminSettingsPage } from '@/modules/admin/AdminSettingsPage'
+import { AdminAuditPage } from '@/modules/admin/AdminAuditPage'
 import { AdminWorkshopsPage } from '@/modules/admin/AdminWorkshopsPage'
 import { MyPlanPage } from '@/modules/plans/MyPlanPage'
 import { ReceiptPage } from '@/modules/plans/ReceiptPage'
@@ -152,6 +154,22 @@ export const routes = [
             element: (
               <RequireAdmin>
                 <AdminWorkshopsPage />
+              </RequireAdmin>
+            ),
+          },
+          {
+            path: '/admin/configuracoes',
+            element: (
+              <RequireAdmin>
+                <AdminSettingsPage />
+              </RequireAdmin>
+            ),
+          },
+          {
+            path: '/admin/auditoria',
+            element: (
+              <RequireAdmin>
+                <AdminAuditPage />
               </RequireAdmin>
             ),
           },

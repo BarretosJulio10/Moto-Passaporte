@@ -785,6 +785,41 @@ export type Database = {
       get_payment_public_config: { Args: never; Returns: Json }
       get_my_subscription: { Args: never; Returns: Json }
       admin_get_metrics: { Args: never; Returns: Json }
+      admin_list_settings: {
+        Args: never
+        Returns: { description: string | null; is_public: boolean; key: string; spec: Json; updated_at: string; updated_by_name: string | null; value: Json }[]
+      }
+      admin_update_setting: { Args: { p_key: string; p_reason: string; p_value: Json }; Returns: undefined }
+      admin_search_audit: {
+        Args: {
+          p_action?: string | null
+          p_actor?: string | null
+          p_before_id?: number | null
+          p_entity_type?: string | null
+          p_from?: string | null
+          p_limit?: number
+          p_motorcycle_id?: string | null
+          p_organization_id?: string | null
+          p_to?: string | null
+        }
+        Returns: {
+          action: string
+          actor_name: string
+          actor_user_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          has_data: boolean
+          id: number
+          motorcycle_id: string | null
+          motorcycle_label: string | null
+          organization_id: string | null
+          organization_name: string | null
+          reason: string | null
+        }[]
+      }
+      admin_get_audit_entry: { Args: { p_id: number; p_reason: string }; Returns: Json }
+      admin_audit_facets: { Args: never; Returns: Json }
       admin_list_users: {
         Args: { p_limit?: number; p_search?: string | null }
         Returns: {

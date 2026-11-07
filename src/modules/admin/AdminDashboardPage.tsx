@@ -5,39 +5,7 @@ import { Notice } from '@/components/Notice'
 import { formatBytes } from '@/modules/attachments/files'
 import { formatPlanPrice } from '@/modules/plans/api'
 import { fetchMetrics, type Metrics } from './adminApi'
-
-const ACTION_LABEL: Record<string, string> = {
-  insert: 'criou',
-  update: 'alterou',
-  delete: 'removeu',
-  chassis_changed: 'alterou o chassi de',
-  duplicate_plate_claim: 'pediu verificação de placa em',
-  admin_viewed_user: 'consultou dados de',
-  admin_set_user_status: 'mudou a situação de',
-  admin_set_workshop_status: 'mudou a situação de',
-  admin_set_workshop_verification: 'mudou a verificação de',
-  payment_credentials_saved: 'alterou credenciais de',
-}
-
-const ENTITY_LABEL: Record<string, string> = {
-  motorcycles: 'moto',
-  motorcycle_plates: 'placa',
-  motorcycle_ownerships: 'titularidade',
-  motorcycle_private: 'moto',
-  mileage_records: 'leitura de km',
-  motorcycle_claim_requests: 'pedido de verificação',
-  organizations: 'organização',
-  organization_members: 'membro de oficina',
-  workshops: 'perfil de oficina',
-  user_roles: 'papel de usuário',
-  system_settings: 'configuração',
-  subscription_plans: 'plano',
-  payment_gateway_settings: 'pagamentos',
-  subscriptions: 'assinatura',
-  payments: 'pagamento',
-  invoices: 'fatura',
-  profiles: 'conta',
-}
+import { ACTION_LABEL, ENTITY_LABEL } from './auditLabels'
 
 type Group = { title: string; items: { label: string; value: (m: Metrics) => string; alert?: (m: Metrics) => boolean; to?: string }[] }
 
@@ -134,7 +102,10 @@ export function AdminDashboardPage() {
       ))}
 
       <section className="mt-10" aria-labelledby="audit-title">
-        <h2 id="audit-title" className="heading text-2xl text-ink">Atividade recente</h2>
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <h2 id="audit-title" className="heading text-2xl text-ink">Atividade recente</h2>
+          <Link to="/admin/auditoria" className="text-sm font-semibold text-ink underline underline-offset-4">Ver toda a auditoria</Link>
+        </div>
         {events.isError && <div className="mt-4"><Notice tone="error">Não foi possível carregar a auditoria.</Notice></div>}
         {events.data && events.data.length === 0 && <p className="mt-4 text-muted">Nenhuma atividade registrada ainda.</p>}
         {events.data && events.data.length > 0 && (
@@ -164,6 +135,18 @@ export function AdminDashboardPage() {
             <Link to="/admin/oficinas" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
               <span className="font-semibold text-ink">Oficinas</span>
               <span className="block text-sm text-muted">Verificar cadastros, suspender, bloquear ou reativar, com motivo registrado.</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/auditoria" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
+              <span className="font-semibold text-ink">Auditoria</span>
+              <span className="block text-sm text-muted">Buscar quem fez o quê e quando, com filtros; conteúdo dos eventos com motivo.</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/configuracoes" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
+              <span className="font-semibold text-ink">Configurações</span>
+              <span className="block text-sm text-muted">Contatos de suporte, limites e regras da plataforma.</span>
             </Link>
           </li>
           <li>

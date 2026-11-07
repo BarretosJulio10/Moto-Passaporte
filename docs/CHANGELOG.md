@@ -9,6 +9,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.22.0] — 07/11/2026 — Fase 6.1 concluída: auditoria e configurações
+
+### Segurança
+- Fechada a escrita direta do admin em `system_settings` (permitia ligar a contratação sem as checagens) — ADR-024.
+
+### Adicionado
+- Migração `admin_audit_settings`: `setting_spec`, `admin_list_settings`, `admin_update_setting` (validação, normalização, motivo), `admin_search_audit` (filtros e paginação), `admin_get_audit_entry` (com motivo, auditado), `admin_audit_facets`.
+- Páginas `/admin/configuracoes` (contato, limites, regras, cobrança) e `/admin/auditoria` (filtros, "carregar mais", conteúdo com motivo mostrando o que mudou).
+- Testes: banco 26 (local) + 9 (Supabase, transação desfeita); interface 167 no total (4 novos).
+
 ## [0.21.0] — 07/11/2026 — Fase 6.1: painel administrativo
 
 ### Adicionado

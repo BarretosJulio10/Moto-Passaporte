@@ -39,6 +39,19 @@ vi.mock('./adminApi', async () => {
     listWorkshops: async () => workshops,
     setWorkshopStatus: async (...args: unknown[]) => { calls.push({ fn: 'setWorkshopStatus', args }) },
     setWorkshopVerification: async (...args: unknown[]) => { calls.push({ fn: 'setWorkshopVerification', args }) },
+    listSettings: async () => [
+      { key: 'support_email', value: null, description: null, is_public: true, updated_at: '', updated_by_name: null, spec: { kind: 'email', group: 'Contato', label: 'E-mail de suporte' } },
+      { key: 'billing_grace_days', value: 7, description: null, is_public: false, updated_at: '2026-11-07T12:00:00Z', updated_by_name: 'Julio', spec: { kind: 'int', min: 0, max: 30, group: 'Cobrança', label: 'Tolerância após falha de cobrança (dias)' } },
+    ],
+    updateSetting: async (...args: unknown[]) => { calls.push({ fn: 'updateSetting', args }) },
+    auditFacets: async () => ({ entity_types: ['motorcycles', 'system_settings'], actions: ['insert', 'admin_update_setting'] }),
+    searchAudit: async (f: unknown, before: unknown) => {
+      calls.push({ fn: 'searchAudit', args: [f, before] })
+      return [{ id: 99, created_at: '2026-11-07T12:00:00Z', entity_type: 'system_settings', entity_id: 'billing_grace_days', action: 'admin_update_setting',
+        actor_user_id: 'u2', actor_name: 'Julio Admin', motorcycle_id: null, motorcycle_label: null, organization_id: null, organization_name: null,
+        reason: 'Decisão comercial', has_data: true }]
+    },
+    getAuditEntry: async (...args: unknown[]) => { calls.push({ fn: 'getAuditEntry', args }); return { previous_data: { value: 7 }, new_data: { value: 5, reason: 'Decisão comercial' } } },
   }
 })
 vi.mock('@/lib/supabase', () => ({
@@ -50,7 +63,9 @@ vi.mock('@/lib/supabase', () => ({
 import { AdminDashboardPage } from './AdminDashboardPage'
 import { AdminUsersPage } from './AdminUsersPage'
 import { AdminWorkshopsPage } from './AdminWorkshopsPage'
-import { validReason } from './adminApi'
+import { AdminSettingsPage } from './AdminSettingsPage'
+import { AdminAuditPage } from './AdminAuditPage'
+import { parseSettingInput, validReason } from './adminApi'
 
 function wrap(node: React.ReactNode) {
   render(
@@ -127,5 +142,54 @@ describe('oficinas', () => {
     await user.type(within(form).getByLabelText(/Motivo/), 'CNPJ e endereço conferidos')
     await user.click(within(form).getByRole('button', { name: 'Confirmar' }))
     expect(calls.find((c) => c.fn === 'setWorkshopVerification')!.args).toEqual(['o1', 'verified', 'CNPJ e endereço conferidos'])
+  })
+})
+
+describe('configurações', () => {
+  it('valida e normaliza antes de enviar', () => {
+    expect(parseSettingInput({ kind: 'int', min: 0, max: 30, group: '', label: '' }, '45')).toMatch(/Máximo 30/)
+    expect(parseSettingInput({ kind: 'phone', group: '', label: '' }, '+55 (21) 98215-3814')).toEqual({ value: '5521982153814' })
+    expect(parseSettingInput({ kind: 'email', group: '', label: '' }, '')).toEqual({ value: null })
+    expect(parseSettingInput({ kind: 'email', group: '', label: '' }, 'x@')).toMatch(/inválido/)
+  })
+
+  it('altera com motivo', async () => {
+    const user = userEvent.setup()
+    wrap(<AdminSettingsPage />)
+    await user.click(await screen.findByRole('button', { name: 'Alterar E-mail de suporte' }))
+    const form = screen.getByRole('form', { name: 'Alterar E-mail de suporte' })
+    await user.type(within(form).getByLabelText('Novo valor'), 'Suporte@Exemplo.com')
+    await user.click(within(form).getByRole('button', { name: 'Salvar' }))
+    expect(within(form).getByText(/10 caracteres/)).toBeVisible()
+    await user.type(within(form).getByLabelText(/Motivo/), 'Canal de suporte definido')
+    await user.click(within(form).getByRole('button', { name: 'Salvar' }))
+    expect(calls.find((c) => c.fn === 'updateSetting')!.args).toEqual(['support_email', 'suporte@exemplo.com', 'Canal de suporte definido'])
+  })
+})
+
+describe('auditoria', () => {
+  it('lista com motivo e mostra o conteúdo só após informar motivo', async () => {
+    const user = userEvent.setup()
+    wrap(<AdminAuditPage />)
+    expect(await screen.findByText('Motivo: Decisão comercial')).toBeVisible()
+    expect(screen.getByText('Julio Admin')).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Ver conteúdo' }))
+    await user.type(screen.getByLabelText(/Motivo/), 'Conferência de alteração comercial')
+    await user.click(within(screen.getByRole('form', { name: /conteúdo deste evento/ })).getByRole('button', { name: 'Ver conteúdo' }))
+    expect(calls.find((c) => c.fn === 'getAuditEntry')!.args).toEqual([99, 'Conferência de alteração comercial'])
+    const table = await screen.findByRole('table')
+    expect(within(table).getByText('value')).toBeVisible()
+    expect(within(table).getByText('5')).toBeVisible()
+  })
+
+  it('aplica filtros', async () => {
+    const user = userEvent.setup()
+    wrap(<AdminAuditPage />)
+    await screen.findByText('Motivo: Decisão comercial')
+    await user.selectOptions(await screen.findByLabelText('Ação'), 'admin_update_setting')
+    await user.click(screen.getByRole('button', { name: 'Filtrar' }))
+    await vi.waitFor(() =>
+      expect(calls.filter((c) => c.fn === 'searchAudit').some((c) => (c.args[0] as { action: string }).action === 'admin_update_setting')).toBe(true),
+    )
   })
 })

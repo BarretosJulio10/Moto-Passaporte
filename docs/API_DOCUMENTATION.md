@@ -229,6 +229,8 @@ Implementação em `src/modules/admin/adminApi.ts`. Todas exigem administrador.
 - `admin_get_metrics()` → indicadores (uso, assinaturas, receita mensal recorrente, pendências, armazenamento).
 - `admin_list_users({ p_search?, p_limit? })` (e-mail mascarado); `admin_get_user({ p_user_id, p_reason })` (dados privados, auditado); `admin_set_user_status({ p_user_id, p_status: 'active'|'suspended'|'blocked', p_reason })`.
 - `admin_list_workshops({ p_search?, p_limit? })`; `admin_set_workshop_status({ p_organization_id, p_status, p_reason })`; `admin_set_workshop_verification({ p_organization_id, p_verification: 'unverified'|'verified'|'rejected', p_reason })`.
+- `admin_list_settings()` → configurações editáveis com `spec` (`kind`, `min`, `max`, `group`, `label`); `admin_update_setting({ p_key, p_value, p_reason })`.
+- `admin_search_audit({ p_entity_type?, p_action?, p_actor?, p_motorcycle_id?, p_organization_id?, p_from?, p_to?, p_limit?, p_before_id? })` (sem conteúdo); `admin_get_audit_entry({ p_id, p_reason })`; `admin_audit_facets()`.
 - Motivo: 10 a 500 caracteres.
 
 ## Faturas (Fase 5.3, ADR-022)

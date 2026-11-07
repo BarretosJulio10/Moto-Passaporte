@@ -66,6 +66,8 @@
 | Supabase real — faturas, em transação desfeita | `tests/security/supabase/phase5e_invoices_rollback.sql` | 11 aprovadas |
 | PostgreSQL 16 local — administração | `tests/security/phase6a_admin_test.sql` | 27 aprovadas |
 | Supabase real — administração, em transação desfeita | `tests/security/supabase/phase6a_admin_rollback.sql` | 11 aprovadas |
+| PostgreSQL 16 local — auditoria e configurações | `tests/security/phase6b_audit_settings_test.sql` | 26 aprovadas |
+| Supabase real — auditoria e configurações, em transação desfeita | `tests/security/supabase/phase6b_audit_settings_rollback.sql` | 9 aprovadas |
 | Tipos das Edge Functions | `scripts/validation/check_edge_functions.sh` | OK |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
@@ -150,6 +152,8 @@ Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalad
 - Ações e consultas a dados privados exigem motivo e ficam na auditoria com autor.
 - Usuário comum não altera a própria situação (sem permissão de coluna) nem chama funções de admin.
 - Suspensão bloqueia o login no Supabase Auth; sessão aberta expira com o token (até 1 hora).
+- `system_settings` sem escrita direta para ninguém além do servidor; alterações por catálogo validado (ADR-024).
+- Conteúdo de eventos de auditoria só com motivo, e a consulta também é auditada.
 
 ## Advisors do Supabase (06/11/2026, após o reforço)
 

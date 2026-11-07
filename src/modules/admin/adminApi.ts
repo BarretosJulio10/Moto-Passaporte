@@ -103,3 +103,62 @@ export function validReason(reason: string): string | null {
   if (r.length > 500) return 'Motivo com até 500 caracteres.'
   return null
 }
+
+// Configurações gerais (PRD 7.8) e auditoria (PRD 7.7) — ADR-024.
+export type SettingSpec = { kind: 'int' | 'email' | 'phone'; min?: number; max?: number; group: string; label: string }
+export type AdminSetting = Omit<Fn['admin_list_settings']['Returns'][number], 'spec'> & { spec: SettingSpec }
+export type AuditRow = Fn['admin_search_audit']['Returns'][number]
+export type AuditFilters = { entityType: string; action: string; from: string; to: string; actor: string }
+
+export async function listSettings(): Promise<AdminSetting[]> {
+  const { data, error } = await getSupabase().rpc('admin_list_settings')
+  if (error) throw error
+  return (data ?? []) as unknown as AdminSetting[]
+}
+
+export async function updateSetting(key: string, value: string | number | null, reason: string): Promise<void> {
+  const { error } = await getSupabase().rpc('admin_update_setting', { p_key: key, p_value: value, p_reason: reason })
+  if (error) throw error
+}
+
+/** Converte o texto do formulário no valor da configuração; devolve mensagem se inválido. */
+export function parseSettingInput(spec: SettingSpec, raw: string): { value: string | number | null } | string {
+  const v = raw.trim()
+  if (spec.kind === 'int') {
+    if (!/^\d+$/.test(v)) return 'Use um número inteiro.'
+    const n = Number(v)
+    if (spec.min !== undefined && n < spec.min) return `Mínimo ${spec.min}.`
+    if (spec.max !== undefined && n > spec.max) return `Máximo ${spec.max}.`
+    return { value: n }
+  }
+  if (v === '') return { value: null }
+  if (spec.kind === 'email') return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) ? { value: v.toLowerCase() } : 'E-mail inválido.'
+  const digits = v.replace(/\D/g, '')
+  return /^\d{12,13}$/.test(digits) ? { value: digits } : 'Use DDI + DDD + número, ex. 5521999998888.'
+}
+
+export async function searchAudit(f: AuditFilters, beforeId: number | null): Promise<AuditRow[]> {
+  const { data, error } = await getSupabase().rpc('admin_search_audit', {
+    p_entity_type: f.entityType || null,
+    p_action: f.action || null,
+    p_actor: /^[0-9a-f-]{36}$/i.test(f.actor.trim()) ? f.actor.trim() : null,
+    p_from: f.from ? new Date(`${f.from}T00:00:00`).toISOString() : null,
+    p_to: f.to ? new Date(new Date(`${f.to}T00:00:00`).getTime() + 86400000).toISOString() : null,
+    p_limit: 50,
+    p_before_id: beforeId,
+  })
+  if (error) throw error
+  return data ?? []
+}
+
+export async function auditFacets(): Promise<{ entity_types: string[]; actions: string[] }> {
+  const { data, error } = await getSupabase().rpc('admin_audit_facets')
+  if (error) throw error
+  return data as unknown as { entity_types: string[]; actions: string[] }
+}
+
+export async function getAuditEntry(id: number, reason: string): Promise<{ previous_data: Record<string, unknown> | null; new_data: Record<string, unknown> | null }> {
+  const { data, error } = await getSupabase().rpc('admin_get_audit_entry', { p_id: id, p_reason: reason })
+  if (error) throw error
+  return data as unknown as { previous_data: Record<string, unknown> | null; new_data: Record<string, unknown> | null }
+}
