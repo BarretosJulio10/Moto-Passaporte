@@ -37,6 +37,6 @@ describe('FaqPage', () => {
     await user.click(screen.getByText('Como funciona quando eu vender a moto?'))
     expect(screen.getByText(/use "Transferir passaporte"/)).toBeVisible()
     await user.click(screen.getByText('O que aparece quando alguém escaneia o QR Code?'))
-    expect(screen.getByText(/links que você pode desativar, chega em breve/)).toBeVisible()
+    expect(screen.getByText(/crie um link de compartilhamento/)).toBeVisible()
   })
 })

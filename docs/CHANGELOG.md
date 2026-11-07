@@ -9,6 +9,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.15.0] — 07/11/2026 — Fase 4 concluída: compartilhamento controlado
+
+### Adicionado
+- Migração `passport_shares` (ADR-017): `passport_shares` (código de 192 bits, opções fixas, validade, revogação, contagem de acessos, auditada), `passport_settings` (página básica desativável), `create_passport_share`, `revoke_passport_share`, `get_motorcycle_shares`, `get_shared_passport` (sem cadastro; nunca expõe dados pessoais, chassi, observações, funcionários ou ids; vale só enquanto quem criou é o titular), `get_passport_settings`, `set_public_page_enabled`; `get_public_passport` respeita a página desativada.
+- Página da moto: "Compartilhar com comprador" (criar link com nome, validade e o que mostrar; copiar, QR Code, ver como o comprador, revogar, links encerrados). QR Code da página básica com ativar/desativar.
+- Página do comprador `/c/:código`: identificação, Oficina de Origem, resumo de evidências, quilometragem documentada, histórico com selos de origem, valores, tipos de comprovante e diário conforme escolhido; aviso de que não é laudo nem documento oficial.
+- Perguntas frequentes atualizadas.
+- Testes: banco 36 (local) + 17 (Supabase, transação desfeita); interface 120 no total (8 novos).
+
 ## [0.14.0] — 07/11/2026 — Fase 4: transferência do passaporte
 
 ### Adicionado

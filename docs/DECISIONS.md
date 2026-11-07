@@ -109,6 +109,14 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-017 — Compartilhamento controlado e página básica desativável (PRD 11)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- Links de compartilhamento (`passport_shares`): código de 192 bits na URL `/c/<código>`, nome opcional, validade de 7, 30, 90 dias ou sem prazo, até 10 ativos por moto, revogáveis, contagem de acessos. Opções não mudam depois de criadas (crie outro link).
+- O titular escolhe: histórico (padrão), quilometragem (padrão), placa, valores, indicação de comprovantes e diário compartilhável. Sempre: identificação da moto, data do passaporte e Oficina de Origem. Nunca: dados pessoais, chassi, observações, nome de funcionários, ids, diário privado.
+- O link vale só enquanto quem criou é o titular: a venda encerra os links do antigo dono, e o novo dono não os herda.
+- A página básica do QR Code permanente (ADR-008) passa a poder ser desativada pelo titular (resolve KI-013).
+- Arquivos dos comprovantes não abrem pelo link (só tipo e quantidade): exigiria assinar URLs no servidor para visitantes sem login (KI-022).
+
 ---
 
 ## Pendentes — técnicas

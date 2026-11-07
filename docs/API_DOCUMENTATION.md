@@ -213,6 +213,13 @@ Implementação em `src/modules/transfers/api.ts`.
 - Comprador: `get_my_incoming_transfers()`; `accept_transfer_request({ p_transfer_id, p_acquisition_date? })` → id da moto; `reject_transfer_request({ p_transfer_id })`.
 - Antigo titular: `get_my_previous_motorcycles()`; o próprio diário continua em `motorcycle_diary_feed` (só leitura e exclusão).
 
+## Compartilhamento (Fase 4, ADR-017)
+
+Implementação em `src/modules/sharing/sharesApi.ts`.
+
+- Titular: `rpc('create_passport_share', { p_motorcycle_id, p_label?, p_expires_in_days?, p_show_plate?, p_show_mileage?, p_show_history?, p_show_values?, p_show_attachments?, p_show_diary? })` → `{ id, token }` (URL `/c/<token>`); `revoke_passport_share({ p_share_id })`; `get_motorcycle_shares({ p_motorcycle_id })` → lista com `status` (`active`, `expired`, `revoked`) e `view_count`; `get_passport_settings` / `set_public_page_enabled({ p_motorcycle_id, p_enabled })`.
+- Público: `rpc('get_shared_passport', { p_token })` → objeto com identificação, `options`, `origin_workshop` e as seções escolhidas (`plate`, `mileage`, `history`, `diary`), ou `null`.
+
 ## Duplicidade
 
 ```ts

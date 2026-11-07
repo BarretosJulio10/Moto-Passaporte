@@ -4,8 +4,8 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 07/11/2026 — v0.14.0
-**Item atual na ordem:** Fase 4 → página pública controlada (4.4) e link revogável (4.5)
+**Última conferência:** 07/11/2026 — v0.15.0
+**Item atual na ordem:** Fase 5 → planos e preços configuráveis (5.1)
 
 ## Progresso
 
@@ -17,12 +17,12 @@ Conta: item concluído = 1, parcial = 0,5, planejado = 0. Total de 40 itens nas 
 | 1 — Fundação SaaS e site | 11 | 11 | 100% |
 | 2 — Histórico e arquivos | 6 | 6 | 100% |
 | 3 — Oficinas e autorizações | 7 | 7 | 100% |
-| 4 — Transferência e compartilhamento | 5 | 3 | 60% |
+| 4 — Transferência e compartilhamento | 5 | 5 | 100% |
 | 5 — Monetização e Mercado Pago | 5 | 0 | 0% |
 | 6 — Administração, segurança e lançamento | 6 | 0 | 0% |
-| **Total** | **40** | **27** | **67,5%** |
+| **Total** | **40** | **29** | **72,5%** |
 
-Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0.11.0 = 56,3% · 0.12.0 = 58,8% · 0.13.0 = 62,5% · 0.14.0 = 67,5%.
+Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0.11.0 = 56,3% · 0.12.0 = 58,8% · 0.13.0 = 62,5% · 0.14.0 = 67,5% · 0.15.0 = 72,5%.
 
 **Fase 1: concluída (base)** em 06/11/2026. Pendências que não bloqueiam a Fase 2: ambientes de homologação/produção (KI-007), revisão jurídica de termos/privacidade, MFA para administradores (KI-014), criptografia do chassi (KI-002).
 
@@ -78,8 +78,10 @@ Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0
 | 4.1 | Solicitação e aceite de transferência (`transfer_requests`) | 10 | `implementado` — pedido para o e-mail do comprador (7 dias), aceite/recusa pelo comprador, cancelamento pelo titular, aceite em uma transação, limite do plano de quem recebe (ADR-016); banco testado (local 42, Supabase 19) |
 | 4.2 | Preservação do histórico | 10 | `testado` (banco) — triggers de imutabilidade |
 | 4.3 | Encerramento de acessos anteriores | 10 | `implementado` — aceite encerra todas as autorizações (inclusive Origem) e cancela pedidos pendentes; antigo titular perde acesso; "Motos anteriores" para o próprio diário |
-| 4.4 | Página pública controlada (`passport_shares`) | 11 | `planejado` (campos padrão prontos — ADR-008) |
-| 4.5 | Link e QR Code compartilhável e revogável | 11 | `planejado` |
+| 4.4 | Página pública controlada (`passport_shares`) | 11 | `implementado` — o titular escolhe o que mostrar; página `/c/:código` sem cadastro, fora de buscadores; página básica desativável (ADR-017); banco testado (local 36, Supabase 17) |
+| 4.5 | Link e QR Code compartilhável e revogável | 11 | `implementado` — código de 192 bits, QR Code por link, validade opcional, revogação imediata, contagem de acessos, links do antigo dono encerrados na venda |
+
+**Fase 4: concluída** em 07/11/2026.
 
 ## Fase 5 — Monetização e Mercado Pago
 

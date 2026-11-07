@@ -50,7 +50,7 @@ export function FaqPage() {
         },
         {
           q: 'O que aparece quando alguém escaneia o QR Code?',
-          a: 'A página pública do passaporte, com os dados básicos acima. Ela não aparece em buscadores. A opção de escolher o que mostrar ao comprador, com links que você pode desativar, chega em breve.',
+          a: 'A página pública básica do passaporte, com os dados acima. Ela não aparece em buscadores e você pode desativá-la. Para mostrar mais a um comprador, crie um link de compartilhamento: você escolhe o que aparece (histórico, quilometragem, placa, valores, comprovantes, diário), define a validade e revoga quando quiser.',
         },
         {
           q: 'Como meus dados são protegidos?',

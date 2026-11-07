@@ -52,6 +52,8 @@
 | Supabase real — serviços da oficina, em transação desfeita | `tests/security/supabase/phase3d_workshop_services_rollback.sql` | 15 aprovadas |
 | PostgreSQL 16 local — transferência | `tests/security/phase4a_transfer_test.sql` | 42 aprovadas |
 | Supabase real — transferência, em transação desfeita | `tests/security/supabase/phase4a_transfer_rollback.sql` | 19 aprovadas |
+| PostgreSQL 16 local — compartilhamento | `tests/security/phase4b_shares_test.sql` | 36 aprovadas |
+| Supabase real — compartilhamento, em transação desfeita | `tests/security/supabase/phase4b_shares_rollback.sql` | 17 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
@@ -101,6 +103,13 @@ Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalad
 - Antes do aceite, o comprador vê apenas identificação, placa atual, última km e a quantidade de registros; o histórico só depois.
 - O aceite é atômico: troca a titularidade e encerra todas as autorizações de oficina na mesma transação; o antigo titular perde acesso imediato ao histórico e aos arquivos (regras de titular atual).
 - Pedidos não são apagados nem reabertos; auditados.
+
+## Compartilhamento (Fase 4, ADR-017)
+
+- Código de 192 bits; a função pública devolve NULL para qualquer falha (inválido, revogado, vencido, antigo dono), sem diferenciar o motivo.
+- Lista branca de campos: nunca dados pessoais, contatos, chassi, observações, nomes de funcionários, ids internos ou diário privado; valores e comprovantes só se o titular escolher.
+- Arquivos não são expostos a visitantes (KI-022). Sem limite de requisições na borda ainda (KI-003).
+- Página fora dos buscadores (`noindex`). Criação e revogação auditadas.
 
 ## Advisors do Supabase (06/11/2026, após o reforço)
 

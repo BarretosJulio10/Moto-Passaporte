@@ -998,6 +998,44 @@ export type Database = {
           version: string | null
         }[]
       }
+      create_passport_share: {
+        Args: {
+          p_expires_in_days?: number
+          p_label?: string
+          p_motorcycle_id: string
+          p_show_attachments?: boolean
+          p_show_diary?: boolean
+          p_show_history?: boolean
+          p_show_mileage?: boolean
+          p_show_plate?: boolean
+          p_show_values?: boolean
+        }
+        Returns: Json
+      }
+      revoke_passport_share: { Args: { p_share_id: string }; Returns: undefined }
+      get_motorcycle_shares: {
+        Args: { p_motorcycle_id: string }
+        Returns: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          label: string | null
+          last_viewed_at: string | null
+          revoked_at: string | null
+          show_attachments: boolean
+          show_diary: boolean
+          show_history: boolean
+          show_mileage: boolean
+          show_plate: boolean
+          show_values: boolean
+          status: string
+          token: string
+          view_count: number
+        }[]
+      }
+      get_shared_passport: { Args: { p_token: string }; Returns: Json }
+      get_passport_settings: { Args: { p_motorcycle_id: string }; Returns: Json }
+      set_public_page_enabled: { Args: { p_enabled: boolean; p_motorcycle_id: string }; Returns: undefined }
       delete_diary_entry: { Args: { p_entry_id: string }; Returns: string[] }
       delete_diary_photo: { Args: { p_attachment_id: string }; Returns: string }
       can_access_attachment_object: { Args: { p_name: string }; Returns: boolean }

@@ -1,23 +1,19 @@
 import { useEffect, useState } from 'react'
-import QRCode from 'qrcode'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/Button'
 import { publicPassportUrl } from '@/modules/motorcycles/api'
-
-const QR_OPTIONS = {
-  errorCorrectionLevel: 'M' as const,
-  margin: 1,
-  color: { dark: '#1C2B4A', light: '#F8FAF5' },
-}
+import { downloadQrPng, qrSvg } from './qr'
+import { fetchPublicPageEnabled, setPublicPageEnabled } from './sharesApi'
 
 /** QR Code do passaporte público. Aponta para /p/:public_id — nunca para o id interno. */
-export function QrCodePanel({ publicId, label }: { publicId: string; label: string }) {
+export function QrCodePanel({ publicId, label, motorcycleId }: { publicId: string; label: string; motorcycleId?: string }) {
   const url = publicPassportUrl(publicId)
   const [svg, setSvg] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     let active = true
-    QRCode.toString(url, { ...QR_OPTIONS, type: 'svg' }).then((markup) => {
+    qrSvg(url).then((markup) => {
       if (active) setSvg(markup)
     })
     return () => {
@@ -26,11 +22,7 @@ export function QrCodePanel({ publicId, label }: { publicId: string; label: stri
   }, [url])
 
   async function download() {
-    const dataUrl = await QRCode.toDataURL(url, { ...QR_OPTIONS, width: 1024 })
-    const link = document.createElement('a')
-    link.href = dataUrl
-    link.download = `moto-passaporte-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-qrcode.png`
-    link.click()
+    await downloadQrPng(url, label)
   }
 
   async function copy() {
@@ -65,7 +57,37 @@ export function QrCodePanel({ publicId, label }: { publicId: string; label: stri
           Abrir página pública
         </a>
       </div>
+      {motorcycleId && <PublicPageToggle motorcycleId={motorcycleId} />}
       <span className="sr-only" aria-live="polite">{copied ? 'Link copiado para a área de transferência.' : ''}</span>
     </section>
+  )
+}
+
+/** O titular pode desativar a página básica do QR Code permanente (ADR-017). */
+function PublicPageToggle({ motorcycleId }: { motorcycleId: string }) {
+  const queryClient = useQueryClient()
+  const setting = useQuery({ queryKey: ['public-page', motorcycleId], queryFn: () => fetchPublicPageEnabled(motorcycleId) })
+  const [busy, setBusy] = useState(false)
+  if (setting.data === undefined) return null
+  const enabled = setting.data
+  async function toggle() {
+    setBusy(true)
+    try {
+      await setPublicPageEnabled(motorcycleId, !enabled)
+      await queryClient.invalidateQueries({ queryKey: ['public-page', motorcycleId] })
+    } finally {
+      setBusy(false)
+    }
+  }
+  return (
+    <div className="mt-4 border-t border-rule pt-3 text-sm">
+      <p className="text-graphite">
+        Página básica: <strong className="text-ink">{enabled ? 'ativa' : 'desativada'}</strong>
+      </p>
+      {!enabled && <p className="text-muted">Quem escanear este QR Code vê "indisponível".</p>}
+      <Button type="button" size="sm" variant="quiet" loading={busy} onClick={toggle}>
+        {enabled ? 'Desativar página básica' : 'Reativar página básica'}
+      </Button>
+    </div>
   )
 }

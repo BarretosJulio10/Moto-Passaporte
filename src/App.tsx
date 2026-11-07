@@ -17,6 +17,7 @@ import { RecordFormPage } from '@/modules/maintenance/RecordFormPage'
 import { DiaryPage } from '@/modules/diary/DiaryPage'
 import { DiaryFormPage } from '@/modules/diary/DiaryFormPage'
 import { PublicPassportPage } from '@/modules/sharing/PublicPassportPage'
+import { SharedPassportPage } from '@/modules/sharing/SharedPassportPage'
 import { WorkshopIndexPage } from '@/modules/workshop/WorkshopIndexPage'
 import { CreateWorkshopPage } from '@/modules/workshop/CreateWorkshopPage'
 import { WorkshopDashboardPage } from '@/modules/workshop/WorkshopDashboardPage'
@@ -66,6 +67,7 @@ export const routes = [
           { path: '/termos', element: <LegalPage kind="terms" /> },
           { path: '/privacidade', element: <LegalPage kind="privacy" /> },
           { path: '/p/:publicId', element: <PublicPassportPage /> },
+          { path: '/c/:token', element: <SharedPassportPage /> },
           { path: '/oficinas/:slug', element: <PublicWorkshopPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
