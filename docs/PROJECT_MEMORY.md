@@ -82,7 +82,8 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 | Registro de serviço pela oficina | 3 | `implementado` (ADR-015) |
 | Transferência do passaporte | 4 | `implementado` (ADR-016) |
 | Compartilhamento público controlado | 4 | `implementado` (ADR-017) |
-| Planos, Mercado Pago, assinaturas, cotas | 5 | `planejado` |
+| Planos e preços configuráveis | 5 | `implementado` (ADR-018) |
+| Mercado Pago, assinaturas, cotas | 5 | `planejado` |
 | Painel administrativo, testes de segurança, lançamento | 6 | `planejado` |
 
 ## 6. Ambientes
@@ -95,7 +96,7 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 
 ## 7. Pendências imediatas
 
-- Próximo item: Fase 5 — planos e preços configuráveis (5.1), depois Mercado Pago (5.2). Antes de cobrar: decisões P-1, P-3, P-4, P-5 com o responsável. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
+- Próximo item: Fase 5.2 — Mercado Pago (Edge Function, assinaturas, Webhooks idempotentes, conciliação). Limites já vêm de `user_plan()` (ADR-018): a 5.4 só troca a regra para a assinatura ativa. Antes de cobrar: decisões P-1, P-3, P-4, P-5 e credenciais de teste do Mercado Pago. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 

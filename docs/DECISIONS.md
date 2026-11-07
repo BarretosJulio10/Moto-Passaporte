@@ -109,6 +109,15 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-018 — Catálogo de planos como fonte única dos limites (PRD 4, 7.4, 8.5, 8.6)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- `subscription_plans` guarda os planos: um gratuito (sempre ativo, visível e sem cobrança) e Premium por periodicidade (mensal, semestral, anual), cada um com preço, observação de preço, limite de motos, espaço, benefícios, teste grátis (0 a 90 dias), regras de cancelamento, visibilidade e ordem.
+- Código, tipo e periodicidade não mudam depois de criados; planos não são excluídos (só desativados). Cada alteração gera uma versão imutável em `subscription_plan_versions` (quem, quando, conteúdo) e entra na auditoria.
+- Limites de motos e espaço passam a vir do plano vigente (`user_plan`); hoje sempre o gratuito. Com as assinaturas (5.2/5.4), o plano vigente será o da assinatura ativa, e a assinatura guardará preço e periodicidade contratados, para que mudanças no catálogo não alterem contratos existentes (PRD 8.5).
+- Valores iniciais do Premium seguem o PRD 4.1 (R$ 9,90 / 49,90 / 89,90) com 3 motos e 500 MB, **provisórios** até a decisão P-1.
+- Contratação desligada (`billing_enabled = false`) até o Mercado Pago ser validado ponta a ponta (PRD 8.7).
+- As configurações antigas `free_plan_max_motorcycles` e `free_plan_storage_quota_mb` deixam de ser lidas (remoção pendente, KI-023).
+
 ### ADR-017 — Compartilhamento controlado e página básica desativável (PRD 11)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - Links de compartilhamento (`passport_shares`): código de 192 bits na URL `/c/<código>`, nome opcional, validade de 7, 30, 90 dias ou sem prazo, até 10 ativos por moto, revogáveis, contagem de acessos. Opções não mudam depois de criadas (crie outro link).

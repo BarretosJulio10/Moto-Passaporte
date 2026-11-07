@@ -1,31 +1,36 @@
 import { useQuery } from '@tanstack/react-query'
 import { getSupabase } from '@/lib/supabase'
 import { isSupabaseConfigured } from '@/core/config/env'
+import { fetchPublicPlans, type PublicPlan } from '@/modules/plans/api'
 
 export type PublicSettings = {
   freePlanMaxMotorcycles: number | null
+  plans: PublicPlan[]
+  billingEnabled: boolean
   supportEmail: string | null
   supportWhatsapp: string | null
 }
 
 const asText = (v: unknown) => (typeof v === 'string' && v.trim() !== '' ? v.trim() : null)
 
-/** Lê parâmetros públicos (limite do plano, canais de contato). Nunca fixar esses valores no código. */
+/** Lê parâmetros públicos (planos, canais de contato). Nunca fixar esses valores no código. */
 export function usePublicSettings() {
   return useQuery({
     queryKey: ['public-settings'],
     enabled: isSupabaseConfigured,
     staleTime: 5 * 60 * 1000,
     queryFn: async (): Promise<PublicSettings> => {
-      const { data, error } = await getSupabase()
-        .from('system_settings')
-        .select('key, value')
-        .eq('is_public', true)
+      const [{ data, error }, plans] = await Promise.all([
+        getSupabase().from('system_settings').select('key, value').eq('is_public', true),
+        fetchPublicPlans().catch(() => [] as PublicPlan[]),
+      ])
       if (error) throw error
       const map = new Map(data.map((row) => [row.key, row.value]))
-      const free = map.get('free_plan_max_motorcycles')
+      const free = plans.find((p) => p.kind === 'free')
       return {
-        freePlanMaxMotorcycles: typeof free === 'number' ? free : null,
+        freePlanMaxMotorcycles: free ? free.max_motorcycles : null,
+        plans,
+        billingEnabled: map.get('billing_enabled') === true,
         supportEmail: asText(map.get('support_email')),
         supportWhatsapp: asText(map.get('support_whatsapp'))?.replace(/\D/g, '') || null,
       }

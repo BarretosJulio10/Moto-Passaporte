@@ -29,6 +29,8 @@ import { InvitePage } from '@/modules/workshop/InvitePage'
 import { PublicWorkshopPage } from '@/modules/workshop/PublicWorkshopPage'
 import { RequireAdmin } from '@/modules/admin/RequireAdmin'
 import { AdminDashboardPage } from '@/modules/admin/AdminDashboardPage'
+import { AdminPlansPage } from '@/modules/admin/AdminPlansPage'
+import { MyPlanPage } from '@/modules/plans/MyPlanPage'
 import { RequireAuth } from '@/core/auth/RequireAuth'
 
 function Root() {
@@ -81,6 +83,7 @@ export const routes = [
         children: [
           { path: '/painel', element: <DashboardPage /> },
           { path: '/painel/motos/nova', element: <RegisterMotorcyclePage /> },
+          { path: '/painel/plano', element: <MyPlanPage /> },
           { path: '/painel/motos/:id', element: <MotorcyclePage /> },
           { path: '/painel/motos/:id/historico', element: <TimelinePage /> },
           { path: '/painel/motos/:id/historico/novo', element: <RecordFormPage /> },
@@ -101,6 +104,14 @@ export const routes = [
             element: (
               <RequireAdmin>
                 <AdminDashboardPage />
+              </RequireAdmin>
+            ),
+          },
+          {
+            path: '/admin/planos',
+            element: (
+              <RequireAdmin>
+                <AdminPlansPage />
               </RequireAdmin>
             ),
           },

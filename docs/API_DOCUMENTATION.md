@@ -261,4 +261,12 @@ Acesso anônimo. Retorna `{ public_id, brand, model, version, manufacturing_year
 ```ts
 supabase.from('system_settings').select('key, value').eq('is_public', true)
 ```
-Hoje: `free_plan_max_motorcycles` (usar na página de planos e no aviso de limite — nunca fixar o número no código).
+Hoje: `support_email`, `support_whatsapp`, `billing_enabled` (contratação liberada no site). Limites e preços vêm dos planos (abaixo) — nunca fixar no código.
+
+## Planos (Fase 5.1, ADR-018)
+
+Implementação em `src/modules/plans/api.ts`.
+
+- Público: `rpc('get_public_plans')` → lista de planos ativos e visíveis (`code`, `kind`, `billing_period`, `name`, `description`, `price_cents`, `price_note`, `max_motorcycles`, `storage_quota_mb`, `features`, `trial_days`, `cancellation_text`), gratuito primeiro.
+- Usuário: `rpc('get_my_plan')` → plano vigente, limites e `motorcycles_used`.
+- Admin: `admin_list_plans()`, `admin_save_plan({ p_id?, p_code?, p_kind?, p_billing_period?, p_name, p_description, p_price_cents, p_price_note, p_max_motorcycles, p_storage_quota_mb, p_features, p_trial_days, p_cancellation_text, p_is_public, p_sort_order })` (com `p_id` só edita; código, tipo e periodicidade são ignorados), `admin_set_plan_active({ p_id, p_active })`, `admin_get_plan_history({ p_id })`.

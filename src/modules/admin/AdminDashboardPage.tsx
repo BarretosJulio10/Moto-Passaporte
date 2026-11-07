@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getSupabase } from '@/lib/supabase'
 import { Notice } from '@/components/Notice'
@@ -32,6 +33,7 @@ const ENTITY_LABEL: Record<string, string> = {
   workshops: 'perfil de oficina',
   user_roles: 'papel de usuário',
   system_settings: 'configuração',
+  subscription_plans: 'plano',
 }
 
 /** Painel administrativo base (PRD 7.1). Indicadores financeiros entram com a Fase 5. */
@@ -104,10 +106,18 @@ export function AdminDashboardPage() {
         )}
       </section>
 
-      <section className="mt-10" aria-labelledby="next-title">
-        <h2 id="next-title" className="heading text-2xl text-ink">Próximas ferramentas</h2>
-        <p className="mt-1 text-muted">
-          Gestão de usuários e oficinas, resolução de pedidos de verificação de placa, planos, pagamentos e armazenamento chegam nas próximas fases.
+      <section className="mt-10" aria-labelledby="tools-title">
+        <h2 id="tools-title" className="heading text-2xl text-ink">Ferramentas</h2>
+        <ul className="mt-4 divide-y divide-rule border-y border-rule">
+          <li>
+            <Link to="/admin/planos" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
+              <span className="font-semibold text-ink">Planos e preços</span>
+              <span className="block text-sm text-muted">Preço, periodicidade, limites, benefícios e visibilidade no site, com histórico.</span>
+            </Link>
+          </li>
+        </ul>
+        <p className="mt-3 text-muted">
+          Gestão de usuários e oficinas, verificação de placa, pagamentos e armazenamento chegam nas próximas etapas.
         </p>
       </section>
     </div>

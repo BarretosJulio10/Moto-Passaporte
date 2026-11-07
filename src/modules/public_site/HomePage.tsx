@@ -1,6 +1,7 @@
 import { ButtonLink } from '@/components/Button'
 import { PassportSpecimen } from './PassportSpecimen'
 import { usePublicSettings } from './usePublicSettings'
+import { PlansGrid } from '@/modules/plans/PlansGrid'
 
 const STEPS = [
   {
@@ -57,6 +58,7 @@ function PointList({ items }: { items: string[][] }) {
 export function HomePage() {
   const { data: settings } = usePublicSettings()
   const freeLimit = settings?.freePlanMaxMotorcycles ?? null
+  const plans = settings?.plans ?? []
 
   return (
     <>
@@ -165,6 +167,9 @@ export function HomePage() {
       <section id="planos" className="scroll-mt-20 border-t border-rule bg-sheet">
         <div className="mx-auto max-w-6xl px-5 py-16">
           <h2 className="heading text-3xl text-ink">Planos</h2>
+          {plans.length > 0 ? (
+            <PlansGrid plans={plans} billingEnabled={settings?.billingEnabled ?? false} />
+          ) : (
           <div className="mt-10 grid gap-8 md:grid-cols-3">
             <div className="border-t-2 border-ink pt-4">
               <h3 className="font-semibold text-ink">Gratuito</h3>
@@ -188,6 +193,7 @@ export function HomePage() {
               </p>
             </div>
           </div>
+          )}
         </div>
       </section>
     </>

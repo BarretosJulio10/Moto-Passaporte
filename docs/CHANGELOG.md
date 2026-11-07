@@ -9,6 +9,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.16.0] — 07/11/2026 — Fase 5.1: planos e preços configuráveis
+
+### Adicionado
+- Migração `subscription_plans` (ADR-018): catálogo de planos com histórico imutável de versões e auditoria; `get_public_plans` (site), `get_my_plan` (painel), `admin_list_plans`, `admin_save_plan`, `admin_set_plan_active`, `admin_get_plan_history`; configuração pública `billing_enabled` (desligada).
+- Administração: página "Planos e preços" (`/admin/planos`) para editar preço, limites, benefícios, teste grátis, regras de cancelamento e visibilidade, criar planos Premium, ativar/desativar e ver o histórico com o que mudou.
+- Site: seção de planos lê preços e limites do cadastro ("Contratação em breve" enquanto o pagamento não estiver liberado).
+- Painel: resumo do plano ("1 de 1 moto") e página "Meu plano" (`/painel/plano`) com uso de motos e espaço.
+- Testes: banco 35 (local) + 19 (Supabase, transação desfeita); interface 130 no total (10 novos).
+
+### Alterado
+- Cadastro de moto, aceite de transferência e cota de anexos usam os limites do plano vigente em vez de configurações soltas.
+
 ## [0.15.0] — 07/11/2026 — Fase 4 concluída: compartilhamento controlado
 
 ### Adicionado

@@ -781,6 +781,59 @@ export type Database = {
         Returns: string
       }
       get_storage_usage: { Args: never; Returns: Json }
+      get_public_plans: { Args: never; Returns: Json }
+      get_my_plan: { Args: never; Returns: Json }
+      admin_list_plans: {
+        Args: never
+        Returns: {
+            id: string
+            code: string
+            kind: string
+            billing_period: string
+            name: string
+            description: string | null
+            price_cents: number
+            currency: string
+            price_note: string | null
+            max_motorcycles: number
+            storage_quota_mb: number
+            features: string[]
+            trial_days: number
+            cancellation_text: string | null
+            is_active: boolean
+            is_public: boolean
+            sort_order: number
+            version: number
+            created_at: string
+            updated_at: string
+            updated_by: string | null
+          }[]
+      }
+      admin_save_plan: {
+        Args: {
+          p_billing_period: string | null
+          p_cancellation_text: string | null
+          p_code: string | null
+          p_description: string | null
+          p_features: string[]
+          p_id: string | null
+          p_is_public: boolean
+          p_kind: string | null
+          p_max_motorcycles: number
+          p_name: string
+          p_price_cents: number
+          p_price_note: string | null
+          p_sort_order: number
+          p_storage_quota_mb: number
+          p_trial_days: number
+        }
+        Returns: string
+      }
+      admin_set_plan_active: { Args: { p_active: boolean; p_id: string }; Returns: undefined }
+      admin_get_plan_history: {
+        Args: { p_id: string }
+        Returns: { changed_at: string; changed_by_name: string; snapshot: Json; version: number }[]
+      }
       create_diary_entry: {
         Args: {
           p_body?: string

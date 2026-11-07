@@ -39,14 +39,14 @@ select tests.must_fail($$insert into storage.objects (bucket_id, name, metadata)
 reset role;
 
 -- Cota: reduz para 1 MB e tenta passar do limite
-update public.system_settings set value = '1' where key = 'free_plan_storage_quota_mb';
+update public.subscription_plans set storage_quota_mb = 1 where kind = 'free';
 select set_config('request.jwt.claim.sub', :'A', false);
 set role authenticated;
 select :'moto_a' || '/aaaaaaaa-0000-0000-0000-000000000003.jpg' as path3 \gset
 insert into storage.objects (bucket_id, name, metadata) values ('attachments', :'path3', '{"size": 900000, "mimetype": "image/jpeg"}');
 select tests.must_fail(format($$select public.register_attachment(%L, %L, 'grande.jpg', 'photo')$$, :'moto_a', :'path3'), 'cota do plano é respeitada');
 reset role;
-update public.system_settings set value = '100' where key = 'free_plan_storage_quota_mb';
+update public.subscription_plans set storage_quota_mb = 100 where kind = 'free';
 
 -- ===== Isolamento
 select set_config('request.jwt.claim.sub', :'B', false);

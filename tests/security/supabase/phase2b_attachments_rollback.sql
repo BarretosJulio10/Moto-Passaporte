@@ -66,7 +66,7 @@ begin
   perform tests.must_fail($$insert into storage.objects (bucket_id, name, metadata) values ('attachments', 'nao-e-uuid/x.jpg', '{}')$$, 'pasta fora do padrão');
 
   perform tests.act_as(null, null);
-  update public.system_settings set value = '1' where key = 'free_plan_storage_quota_mb';
+  update public.subscription_plans set storage_quota_mb = 1 where kind = 'free';
   perform tests.act_as(A, 'authenticated');
   insert into storage.objects (bucket_id, name, owner_id, metadata) values ('attachments', p3, A::text, '{"size": 900000, "mimetype": "image/jpeg"}');
   perform tests.must_fail(format($$select public.register_attachment(%L, %L, 'grande.jpg', 'photo')$$, moto, p3), 'cota respeitada');

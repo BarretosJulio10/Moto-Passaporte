@@ -8,6 +8,7 @@ import { fetchMyMotorcycles } from '@/modules/motorcycles/api'
 import { fetchPendingRequests } from '@/modules/workshop_access/api'
 import { PendingRequestsNotice } from '@/modules/workshop_access/OwnerAccessSection'
 import { IncomingTransfers, PreviousMotorcycles } from '@/modules/transfers/IncomingTransfers'
+import { PlanSummary } from '@/modules/plans/MyPlanPage'
 
 export function DashboardPage() {
   const { user } = useAuth()
@@ -38,6 +39,9 @@ export function DashboardPage() {
       <div className="mt-10 flex flex-wrap items-baseline justify-between gap-3">
         <h2 className="font-semibold text-ink">Minhas motos</h2>
         {hasMotos && <ButtonLink to="/painel/motos/nova" variant="secondary" size="sm">Cadastrar moto</ButtonLink>}
+      </div>
+      <div className="mt-1">
+        <PlanSummary />
       </div>
 
       <div className="mt-4">

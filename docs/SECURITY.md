@@ -54,6 +54,8 @@
 | Supabase real — transferência, em transação desfeita | `tests/security/supabase/phase4a_transfer_rollback.sql` | 19 aprovadas |
 | PostgreSQL 16 local — compartilhamento | `tests/security/phase4b_shares_test.sql` | 36 aprovadas |
 | Supabase real — compartilhamento, em transação desfeita | `tests/security/supabase/phase4b_shares_rollback.sql` | 17 aprovadas |
+| PostgreSQL 16 local — planos | `tests/security/phase5a_plans_test.sql` | 35 aprovadas |
+| Supabase real — planos, em transação desfeita | `tests/security/supabase/phase5a_plans_rollback.sql` | 19 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
@@ -110,6 +112,12 @@ Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalad
 - Lista branca de campos: nunca dados pessoais, contatos, chassi, observações, nomes de funcionários, ids internos ou diário privado; valores e comprovantes só se o titular escolher.
 - Arquivos não são expostos a visitantes (KI-022). Sem limite de requisições na borda ainda (KI-003).
 - Página fora dos buscadores (`noindex`). Criação e revogação auditadas.
+
+## Planos (Fase 5.1, ADR-018)
+
+- Tabelas sem acesso direto; leitura pública só pela lista de planos ativos e visíveis, sem campos internos.
+- Gestão só para administradores (`is_admin`), com histórico imutável e auditoria de cada mudança.
+- Funções internas de limite (`user_plan`, `user_max_motorcycles`, `user_storage_quota_mb`) não são chamáveis por usuários.
 
 ## Advisors do Supabase (06/11/2026, após o reforço)
 
