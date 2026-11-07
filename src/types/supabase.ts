@@ -26,6 +26,7 @@ export type Database = {
           kind: Database["public"]["Enums"]["attachment_kind"]
           maintenance_record_id: string | null
           diary_entry_id: string | null
+          organization_id: string | null
           mime_type: string
           motorcycle_id: string
           storage_path: string
@@ -702,6 +703,7 @@ export type Database = {
         Row: {
           attachments: Json | null
           evidence_level: Database["public"]["Enums"]["record_source"] | null
+          recorded_by_name: string | null
           category: Database["public"]["Enums"]["maintenance_category"] | null
           correction_reason: string | null
           corrects_record_id: string | null
@@ -905,6 +907,59 @@ export type Database = {
       }
       remove_org_member: { Args: { p_member_id: string }; Returns: undefined }
       leave_organization: { Args: { p_organization_id: string }; Returns: undefined }
+      create_workshop_service: {
+        Args: {
+          p_category: Database["public"]["Enums"]["maintenance_category"]
+          p_correction_reason?: string
+          p_corrects_record_id?: string
+          p_description?: string
+          p_items?: Json
+          p_mileage?: number
+          p_motorcycle_id: string
+          p_notes?: string
+          p_organization_id: string
+          p_service_date: string
+          p_service_value_cents?: number
+          p_title: string
+        }
+        Returns: Json
+      }
+      get_workshop_timeline: {
+        Args: { p_motorcycle_id: string; p_organization_id: string }
+        Returns: {
+          attachments: Json
+          category: Database["public"]["Enums"]["maintenance_category"]
+          correction_reason: string | null
+          corrects_record_id: string | null
+          created_at: string
+          description: string | null
+          evidence_level: Database["public"]["Enums"]["record_source"]
+          id: string
+          is_own: boolean
+          is_void: boolean
+          items: Json
+          mileage: number | null
+          notes: string | null
+          recorded_by_name: string | null
+          service_date: string
+          service_value_cents: number | null
+          source_type: Database["public"]["Enums"]["record_source"]
+          status: string
+          title: string
+          workshop_name: string | null
+        }[]
+      }
+      register_workshop_attachment: {
+        Args: {
+          p_file_name: string
+          p_kind: Database["public"]["Enums"]["attachment_kind"]
+          p_maintenance_record_id: string
+          p_organization_id: string
+          p_storage_path: string
+        }
+        Returns: string
+      }
+      get_workshop_storage_usage: { Args: { p_organization_id: string }; Returns: Json }
       delete_diary_entry: { Args: { p_entry_id: string }; Returns: string[] }
       delete_diary_photo: { Args: { p_attachment_id: string }; Returns: string }
       can_access_attachment_object: { Args: { p_name: string }; Returns: boolean }

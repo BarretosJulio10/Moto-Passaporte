@@ -29,7 +29,7 @@ export function WorkshopIndexPage() {
       <div className="max-w-2xl">
         <h1 className="heading text-3xl text-ink">Você tem uma oficina?</h1>
         <p className="mt-3 text-muted">
-          Cadastre sua oficina de graça. Ela ganha um perfil público na rede Moto Passaporte e, em breve, poderá registrar os serviços direto no passaporte das motos dos clientes, com autorização de cada dono.
+          Cadastre sua oficina de graça. Ela ganha um perfil público na rede Moto Passaporte e registra os serviços direto no passaporte das motos dos clientes, com autorização de cada dono.
         </p>
         <ButtonLink to="/oficina/nova" className="mt-6">Cadastrar oficina</ButtonLink>
       </div>

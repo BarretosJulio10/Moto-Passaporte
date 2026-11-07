@@ -48,6 +48,8 @@
 | Supabase real — Oficina de Origem, em transação desfeita | `tests/security/supabase/phase3b_origin_rollback.sql` | 13 aprovadas |
 | PostgreSQL 16 local — equipe da oficina | `tests/security/phase3c_team_test.sql` | 44 aprovadas |
 | Supabase real — equipe da oficina, em transação desfeita | `tests/security/supabase/phase3c_team_rollback.sql` | 19 aprovadas |
+| PostgreSQL 16 local — serviços da oficina | `tests/security/phase3d_workshop_services_test.sql` | 32 aprovadas |
+| Supabase real — serviços da oficina, em transação desfeita | `tests/security/supabase/phase3d_workshop_services_rollback.sql` | 15 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
@@ -83,6 +85,13 @@ Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalad
 - Só o responsável convida, altera e remove; ninguém altera o próprio papel ou permissões; a oficina sempre mantém pelo menos um responsável (trigger).
 - Funcionário sem a permissão `can_request_access` não pesquisa placas nem pede acesso (verificado no banco).
 - E-mails da equipe visíveis só ao responsável. Convites e mudanças na equipe são auditados.
+
+## Serviços da oficina (Fase 3, ADR-015)
+
+- Só membro com permissão de oficina com autorização ativa registra; verificado a cada chamada.
+- A oficina não lê as tabelas de histórico diretamente; vê pela função `get_workshop_timeline`, que oculta valor, observações, comprovantes e funcionário dos registros de terceiros.
+- Arquivos: a oficina envia para a pasta da moto autorizada e lê só os próprios comprovantes; comprovantes do titular continuam invisíveis para ela.
+- Revogação corta o acesso ao histórico e aos arquivos imediatamente; registros da oficina permanecem (imutáveis).
 
 ## Advisors do Supabase (06/11/2026, após o reforço)
 

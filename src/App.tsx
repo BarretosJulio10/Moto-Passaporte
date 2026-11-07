@@ -22,6 +22,7 @@ import { CreateWorkshopPage } from '@/modules/workshop/CreateWorkshopPage'
 import { WorkshopDashboardPage } from '@/modules/workshop/WorkshopDashboardPage'
 import { WorkshopProfilePage } from '@/modules/workshop/WorkshopProfilePage'
 import { TeamPage } from '@/modules/workshop/TeamPage'
+import { WorkshopMotoPage, WorkshopServiceFormPage } from '@/modules/workshop_service/WorkshopMotoPage'
 import { InvitePage } from '@/modules/workshop/InvitePage'
 import { PublicWorkshopPage } from '@/modules/workshop/PublicWorkshopPage'
 import { RequireAdmin } from '@/modules/admin/RequireAdmin'
@@ -88,6 +89,8 @@ export const routes = [
           { path: '/oficina/:orgId', element: <WorkshopDashboardPage /> },
           { path: '/oficina/:orgId/perfil', element: <WorkshopProfilePage /> },
           { path: '/oficina/:orgId/equipe', element: <TeamPage /> },
+          { path: '/oficina/:orgId/motos/:motoId', element: <WorkshopMotoPage /> },
+          { path: '/oficina/:orgId/motos/:motoId/servico', element: <WorkshopServiceFormPage /> },
           { path: '/convite/:token', element: <InvitePage /> },
           {
             path: '/admin',

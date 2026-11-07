@@ -79,7 +79,7 @@ Ainda por criar: `transfer_requests` (F4; ao concluir deve encerrar `motorcycle_
 | Pesquisa por placa e autorizações | 3 | `implementado` |
 | Oficina de Origem | 3 | `implementado` (ADR-014) |
 | Membros da oficina e permissões | 3 | `implementado` |
-| Registro de serviço pela oficina | 3 | `planejado` |
+| Registro de serviço pela oficina | 3 | `implementado` (ADR-015) |
 | Transferência e compartilhamento público | 4 | `planejado` |
 | Planos, Mercado Pago, assinaturas, cotas | 5 | `planejado` |
 | Painel administrativo, testes de segurança, lançamento | 6 | `planejado` |
@@ -94,11 +94,11 @@ Ainda por criar: `transfer_requests` (F4; ao concluir deve encerrar `motorcycle_
 
 ## 7. Pendências imediatas
 
-- Próximo item: Fase 3 — registro de serviço pela oficina (3.7), usando `workshop_has_access()` e `has_org_permission(org, 'register_services')`. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
+- Próximo item: Fase 4 — transferência (4.1 a 4.3): solicitação e aceite, encerramento de todas as autorizações (inclusive Origem, `end_reason = 'transfer'`), tela de motos anteriores (KI-019). Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 
-Decisões já fechadas: Git direto na `main` (ADR-005), 1 moto no gratuito (ADR-006), duplicidade por placa (ADR-007), campos públicos padrão (ADR-008), Supabase em us-east-1 (ADR-009), nomes de migração = versão do Supabase (ADR-010), diário privado nunca muda de dono (ADR-013), Oficina de Origem como tipo de autorização (ADR-014).
+Decisões já fechadas: Git direto na `main` (ADR-005), 1 moto no gratuito (ADR-006), duplicidade por placa (ADR-007), campos públicos padrão (ADR-008), Supabase em us-east-1 (ADR-009), nomes de migração = versão do Supabase (ADR-010), diário privado nunca muda de dono (ADR-013), Oficina de Origem como tipo de autorização (ADR-014), visão e registro da oficina autorizada (ADR-015).
 
 ## 8. Protocolo de trabalho (obrigatório — pedido do responsável pelo produto)
 

@@ -9,6 +9,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.13.0] — 07/11/2026 — Fase 3 concluída: serviços registrados pela oficina
+
+### Adicionado
+- Migração `workshop_services` (ADR-015): `create_workshop_service` (origem "Confirmado por oficina", oficina e funcionário identificados, km como leitura da oficina, correção só pela própria oficina), `get_workshop_timeline` (histórico técnico; valor, observações, comprovantes e funcionário só dos próprios registros), `register_workshop_attachment` e `get_workshop_storage_usage` (cota de 500 MB por oficina), `maintenance_records.recorded_by_name`, `attachments.organization_id`. Envio e leitura de arquivos pela oficina autorizada; cota do titular não conta comprovantes da oficina.
+- Interface da oficina: página da moto autorizada (`/oficina/:orgId/motos/:motoId`) com placa, última leitura e histórico; formulário "Registrar serviço" e correção; anexar comprovante nos próprios registros. Link "Abrir histórico" nas motos autorizadas.
+- Titular vê "Registrado por" nos serviços da oficina.
+- Textos do site atualizados (perguntas frequentes e painel da oficina) para o que já existe.
+
+### Alterado
+- Formulário de registro reaproveitado para a oficina (sem o campo de oficina em texto livre).
+- Painel da oficina: seção "Chegando em breve" removida (tudo já disponível).
+- Testes: banco 32 (local) + 15 (Supabase, transação desfeita); interface 105 no total (5 novos).
+
 ## [0.12.0] — 07/11/2026 — Fase 3: equipe da oficina
 
 ### Adicionado

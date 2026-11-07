@@ -35,6 +35,10 @@ export type TimelineEntry = {
   attachments: AttachmentSummary[]
   /** Nível de evidência mostrado no carimbo: oficina > comprovante > dono (PRD 5.5). */
   evidence_level: RecordSource
+  /** Quem registrou pela oficina (PRD 6.7). */
+  recorded_by_name?: string | null
+  /** Visão da oficina: registro feito por ela mesma (ADR-015). */
+  is_own?: boolean
 }
 
 export async function fetchTimeline(motorcycleId: string): Promise<TimelineEntry[]> {

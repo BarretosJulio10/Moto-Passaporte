@@ -77,6 +77,8 @@ export async function uploadAttachment(params: {
   kind: AttachmentKind
   maintenanceRecordId?: string
   diaryEntryId?: string
+  /** Envio feito por oficina autorizada: registra como comprovante da oficina. */
+  organizationId?: string
 }): Promise<string> {
   const supabase = getSupabase()
   const path = buildStoragePath(params.motorcycleId, params.file.mime)
@@ -91,14 +93,22 @@ export async function uploadAttachment(params: {
     if (/mime|content type/i.test(msg)) throw new AttachmentError('Formato não aceito.')
     throw new AttachmentError('Não foi possível enviar o arquivo. Tente de novo.')
   }
-  const { data, error } = await supabase.rpc('register_attachment', {
-    p_motorcycle_id: params.motorcycleId,
-    p_storage_path: path,
-    p_file_name: params.file.name,
-    p_kind: params.kind,
-    p_maintenance_record_id: params.maintenanceRecordId,
-    p_diary_entry_id: params.diaryEntryId,
-  })
+  const { data, error } = params.organizationId
+    ? await supabase.rpc('register_workshop_attachment', {
+        p_organization_id: params.organizationId,
+        p_storage_path: path,
+        p_file_name: params.file.name,
+        p_kind: params.kind,
+        p_maintenance_record_id: params.maintenanceRecordId ?? '',
+      })
+    : await supabase.rpc('register_attachment', {
+        p_motorcycle_id: params.motorcycleId,
+        p_storage_path: path,
+        p_file_name: params.file.name,
+        p_kind: params.kind,
+        p_maintenance_record_id: params.maintenanceRecordId,
+        p_diary_entry_id: params.diaryEntryId,
+      })
   if (error) throw new AttachmentError(translateDbError(error))
   return data as string
 }
@@ -116,7 +126,7 @@ export async function signedUrls(paths: string[]): Promise<Record<string, string
 /** Envia vários arquivos para um registro. Devolve as mensagens de quem falhou. */
 export async function uploadAll(
   motorcycleId: string,
-  target: { maintenanceRecordId?: string; diaryEntryId?: string },
+  target: { maintenanceRecordId?: string; diaryEntryId?: string; organizationId?: string },
   pending: Array<{ file: PreparedFile; kind: AttachmentKind }>,
 ): Promise<string[]> {
   const failures: string[] = []

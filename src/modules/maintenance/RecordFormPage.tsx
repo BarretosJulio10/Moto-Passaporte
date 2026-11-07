@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/Button'
@@ -9,10 +9,11 @@ import { translateDbError } from '@/core/shared/dbErrors'
 import { formatDate, todayISO } from '@/core/shared/format'
 import { MotoHeader } from '@/modules/motorcycles/MotoHeader'
 import { CATEGORIES, CATEGORY_LABEL, CATEGORY_TITLE_SUGGESTION, type MaintenanceCategory } from './labels'
-import { itemSchema, maintenanceSchema, type ItemInput } from './schemas'
+import { itemSchema, maintenanceSchema, type ItemInput, type MaintenanceInput } from './schemas'
 import { createMaintenanceRecord, fetchTimeline } from './api'
 import { getStorageUsage, uploadAll } from '@/modules/attachments/api'
 import { AttachmentPicker, type PendingAttachment } from '@/modules/attachments/AttachmentPicker'
+import type { StorageUsage } from '@/modules/attachments/files'
 
 type ItemRow = { key: number; item_name: string; brand: string; part_number: string; quantity: string }
 let rowKey = 0
@@ -57,17 +58,25 @@ export function RecordFormPage() {
 
 type FormProps = {
   motorcycleId: string
-  original?: Awaited<ReturnType<typeof fetchTimeline>>[number]
+  original?: Pick<Awaited<ReturnType<typeof fetchTimeline>>[number], 'id' | 'title' | 'service_date' | 'category' | 'items' | 'mileage' | 'workshop_name' | 'service_value_cents' | 'description' | 'notes' | 'attachments'>
   onDone: (state: { saved: 'created' | 'corrected'; below: boolean; attachFailures: string[] }) => Promise<void>
+  /** Variações para a oficina (PRD 6.7). Sem elas, o formulário é o do titular. */
+  header?: ReactNode
+  intro?: ReactNode
+  submit?: (input: MaintenanceInput, items: ItemInput[]) => Promise<{ id: string; below_previous: boolean }>
+  upload?: (recordId: string, pending: PendingAttachment[]) => Promise<string[]>
+  usage?: { key: unknown[]; fn: () => Promise<StorageUsage> }
+  hideWorkshopName?: boolean
+  newTitle?: string
 }
 
-function RecordForm({ motorcycleId, original, onDone }: FormProps) {
+export function RecordForm({ motorcycleId, original, onDone, header, intro, submit, upload, usage: usageSource, hideWorkshopName, newTitle = 'Novo registro' }: FormProps) {
   const [errors, setErrors] = useState<FieldErrors>({})
   const [itemErrors, setItemErrors] = useState<Record<number, string>>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [pending, setPending] = useState<PendingAttachment[]>([])
-  const usage = useQuery({ queryKey: ['storage-usage'], queryFn: getStorageUsage, retry: false })
+  const usage = useQuery({ queryKey: usageSource?.key ?? ['storage-usage'], queryFn: usageSource?.fn ?? getStorageUsage, retry: false })
   const [category, setCategory] = useState<string>(original?.category ?? '')
   const [title, setTitle] = useState(original?.title ?? '')
   const [titleTouched, setTitleTouched] = useState(Boolean(original))
@@ -108,8 +117,12 @@ function RecordForm({ motorcycleId, original, onDone }: FormProps) {
     setErrors({})
     setLoading(true)
     try {
-      const result = await createMaintenanceRecord(motorcycleId, parsed.data, items)
-      const attachFailures = pending.length ? await uploadAll(motorcycleId, { maintenanceRecordId: result.id }, pending) : []
+      const result = submit ? await submit(parsed.data, items) : await createMaintenanceRecord(motorcycleId, parsed.data, items)
+      const attachFailures = !pending.length
+        ? []
+        : upload
+          ? await upload(result.id, pending)
+          : await uploadAll(motorcycleId, { maintenanceRecordId: result.id }, pending)
       await onDone({ saved: original ? 'corrected' : 'created', below: result.below_previous, attachFailures })
     } catch (error) {
       setFormError(translateDbError(error as { code?: string; message?: string }))
@@ -119,9 +132,9 @@ function RecordForm({ motorcycleId, original, onDone }: FormProps) {
 
   return (
     <div>
-      <MotoHeader motorcycleId={motorcycleId} />
+      {header ?? <MotoHeader motorcycleId={motorcycleId} />}
       <div className="mt-8 max-w-3xl">
-        <h2 className="heading text-2xl text-ink">{original ? 'Corrigir registro' : 'Novo registro'}</h2>
+        <h2 className="heading text-2xl text-ink">{original ? 'Corrigir registro' : newTitle}</h2>
         {original ? (
           <div className="mt-3">
             <Notice tone="info" title={`Corrigindo: ${original.title} (${formatDate(original.service_date, 'short')})`}>
@@ -129,9 +142,11 @@ function RecordForm({ motorcycleId, original, onDone }: FormProps) {
             </Notice>
           </div>
         ) : (
-          <p className="mt-2 text-muted">
-            Sem anexo, o registro aparece como "informado pelo dono". Com nota fiscal, ordem de serviço ou recibo, aparece como "com comprovante".
-          </p>
+          intro ?? (
+            <p className="mt-2 text-muted">
+              Sem anexo, o registro aparece como "informado pelo dono". Com nota fiscal, ordem de serviço ou recibo, aparece como "com comprovante".
+            </p>
+          )
         )}
 
         <form onSubmit={onSubmit} noValidate className="mt-6 flex flex-col gap-6">
@@ -192,14 +207,16 @@ function RecordForm({ motorcycleId, original, onDone }: FormProps) {
               hint="Também entra no histórico de quilometragem."
               error={errors.mileage}
             />
-            <TextField
-              label="Oficina (opcional)"
-              name="workshopName"
-              defaultValue={original?.workshop_name ?? ''}
-              maxLength={120}
-              placeholder="Ex.: Oficina do Zé"
-              error={errors.workshopName}
-            />
+            {!hideWorkshopName && (
+              <TextField
+                label="Oficina (opcional)"
+                name="workshopName"
+                defaultValue={original?.workshop_name ?? ''}
+                maxLength={120}
+                placeholder="Ex.: Oficina do Zé"
+                error={errors.workshopName}
+              />
+            )}
             <TextField
               label="Valor em R$ (opcional)"
               name="value"

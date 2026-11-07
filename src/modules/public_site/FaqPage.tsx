@@ -85,7 +85,11 @@ export function FaqPage() {
         },
         {
           q: 'Como a oficina acessa a moto de um cliente?',
-          a: 'Em breve a oficina poderá pedir acesso pela placa; o dono aprova ou recusa, e pode tirar o acesso quando quiser. Hoje a oficina já pode criar o cadastro gratuito e o perfil público.',
+          a: 'A oficina pesquisa a placa e pede acesso. Antes da aprovação, vê só marca, modelo e ano. O dono aprova ou recusa, e pode tirar o acesso quando quiser. Com acesso, a oficina registra os serviços, que aparecem no histórico como "Confirmado por oficina", com o nome de quem registrou.',
+        },
+        {
+          q: 'A oficina vê tudo do histórico?',
+          a: 'Vê o histórico técnico da moto: datas, serviços, quilometragem e peças. Valores, observações e notas fiscais do dono e de outras oficinas continuam privados.',
         },
       ],
     },

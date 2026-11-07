@@ -4,8 +4,8 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 07/11/2026 — v0.12.0
-**Item atual na ordem:** Fase 3 → registro de serviço pela oficina (3.7)
+**Última conferência:** 07/11/2026 — v0.13.0
+**Item atual na ordem:** Fase 4 → solicitação e aceite de transferência (4.1)
 
 ## Progresso
 
@@ -15,14 +15,14 @@ Conta: item concluído = 1, parcial = 0,5, planejado = 0. Total de 40 itens nas 
 | Fase | Itens | Feito | % |
 |---|---|---|---|
 | 1 — Fundação SaaS e site | 11 | 11 | 100% |
-| 2 — Histórico e arquivos | 6 | 5,5 | 92% |
-| 3 — Oficinas e autorizações | 7 | 6 | 86% |
+| 2 — Histórico e arquivos | 6 | 6 | 100% |
+| 3 — Oficinas e autorizações | 7 | 7 | 100% |
 | 4 — Transferência e compartilhamento | 5 | 1 | 20% |
 | 5 — Monetização e Mercado Pago | 5 | 0 | 0% |
 | 6 — Administração, segurança e lançamento | 6 | 0 | 0% |
-| **Total** | **40** | **23,5** | **58,8%** |
+| **Total** | **40** | **25** | **62,5%** |
 
-Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0.11.0 = 56,3% · 0.12.0 = 58,8%.
+Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0.11.0 = 56,3% · 0.12.0 = 58,8% · 0.13.0 = 62,5%.
 
 **Fase 1: concluída (base)** em 06/11/2026. Pendências que não bloqueiam a Fase 2: ambientes de homologação/produção (KI-007), revisão jurídica de termos/privacidade, MFA para administradores (KI-014), criptografia do chassi (KI-002).
 
@@ -52,10 +52,10 @@ Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0
 | 2.2 | Registros de manutenção (`maintenance_records`, `maintenance_items`) | 5.4, 14.3 | `implementado` — banco testado (local 29, Supabase 26); tela de registro com peças, correção e anulação |
 | 2.3 | Quilometragem | 5.6 | `implementado` — banco testado; tela com registro, alerta de leitura menor e correção documentada (antecipado na Fase 1) |
 | 2.4 | Anexos e cotas (`attachments`, Storage privado) | 13 | `implementado` — bucket privado, cota de 100 MB e 10 MB por arquivo (configuráveis), registro só por RPC, links temporários; banco testado (local 22, Supabase 21); tela de envio no formulário e no cartão, com conferência do tipo real e redução de fotos |
-| 2.5 | Origem dos registros | 5.5 | `implementado` (parcial) — "informado pelo dono" e "com comprovante" prontos (nível de evidência); "confirmado por oficina" depende da Fase 3 |
+| 2.5 | Origem dos registros | 5.5 | `implementado` — "informado pelo dono", "com comprovante" e "confirmado por oficina" (serviço registrado pela oficina autorizada, item 3.7) |
 | 2.6 | Auditoria e diário básico (`motorcycle_diary`) | 5.7, 15.5 | `implementado` — auditoria `testado`; diário com privado/compartilhável, fotos, edição e exclusão pelo autor (ADR-013); banco testado (local 44, Supabase 27) e aba Diário |
 
-**Fase 2: concluída** em 07/11/2026, exceto o selo "confirmado por oficina" (2.5), que depende da Fase 3.
+**Fase 2: concluída** em 07/11/2026 (selo "confirmado por oficina" entregue com o item 3.7).
 
 ## Fase 3 — Oficinas e autorizações
 
@@ -67,7 +67,9 @@ Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0
 | 3.4 | Solicitação, aprovação e revogação (`motorcycle_workshop_access`) | 6.4, 6.6 | `implementado` — pedido pela placa, aprovação/recusa/revogação pelo titular, cancelamento pela oficina, histórico imutável, revogação imediata; aviso de pedido no painel do dono (notificação por e-mail e central: KI-020); banco testado (local 46, Supabase 22) |
 | 3.5 | Oficina de Origem | 6.5 | `implementado` — pedido pela oficina ou definição pelo titular nos primeiros 30 dias, só com consentimento, uma por moto, revogável, título removível sem cortar acesso (ADR-014); banco testado (local 20, Supabase 13) |
 | 3.6 | Membros da oficina e permissões | 6.2 | `implementado` — convite por link de uso único para o e-mail convidado (7 dias, só hash guardado), permissões por funcionário (pedir acesso; registrar serviços), promoção, remoção, saída; ninguém altera o próprio acesso; sempre um responsável; banco testado (local 44, Supabase 19) |
-| 3.7 | Registro de serviços pela oficina | 6.7 | `planejado` |
+| 3.7 | Registro de serviços pela oficina | 6.7 | `implementado` — oficina autorizada com permissão registra serviço com peças, km, valor, observações e comprovantes; oficina e funcionário identificados; correção só pela própria oficina; histórico técnico visível à oficina, dados privados só dos próprios registros (ADR-015); banco testado (local 32, Supabase 15) |
+
+**Fase 3: concluída** em 07/11/2026.
 
 ## Fase 4 — Transferência e compartilhamento
 

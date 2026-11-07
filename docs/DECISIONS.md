@@ -92,6 +92,15 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Uma Oficina de Origem ativa por moto. O titular pode tirar o título sem cortar o acesso, ou revogar tudo.
 - A transferência (Fase 4) encerra também a Oficina de Origem (PRD 10). Exibir a Origem no passaporte público fica para o compartilhamento controlado (Fase 4).
 
+### ADR-015 — O que a oficina autorizada vê e registra (PRD 6.4 passo 7, 6.7)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- A oficina autorizada vê o **histórico técnico** da moto: data, categoria, título, descrição, quilometragem, peças, origem e nome da oficina de cada registro.
+- **Valor, observações, comprovantes e nome do funcionário** aparecem só nos registros da própria oficina. Os do titular e de outras oficinas ficam privados (notas fiscais e preços são dados do dono). Diário nunca.
+- Registro pela oficina: membro com a permissão `can_register_services` (ou responsável); origem `workshop` ("Confirmado por oficina"), com oficina e funcionário (nome guardado no momento do registro). A km entra como leitura da oficina.
+- Correções só pela própria oficina, como novo registro; o titular não corrige registro de oficina; a oficina não anula (pode corrigir).
+- Comprovantes enviados pela oficina contam na cota da oficina (`workshop_storage_quota_mb`, 500 MB), não do titular. O titular vê todos os comprovantes dos registros da moto.
+- Revogação corta na hora o acesso ao histórico e aos arquivos; os registros da oficina continuam no histórico da moto.
+
 ---
 
 ## Pendentes — técnicas

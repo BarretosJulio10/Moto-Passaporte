@@ -196,6 +196,15 @@ Implementação em `src/modules/workshop/teamApi.ts`.
 - Convidado: `get_invite_preview({ p_token })` → `{ status: open|accepted|revoked|expired|inactive|invalid, workshop_name, email_matches, email_hint, can_* , expires_at }`; `accept_org_invite({ p_token })` → id da oficina.
 - Membro: `get_org_members({ p_organization_id })`, `leave_organization`, `has_org_permission`.
 
+## Serviços registrados pela oficina (Fase 3, ADR-015)
+
+Implementação em `src/modules/workshop_service/api.ts`.
+
+- `rpc('get_workshop_timeline', { p_organization_id, p_motorcycle_id })` → registros com `is_own`; `service_value_cents`, `notes`, `recorded_by_name` e `attachments` vêm nulos/vazios quando `is_own = false`.
+- `rpc('create_workshop_service', { p_organization_id, p_motorcycle_id, p_category, p_title, p_service_date, p_description?, p_mileage?, p_service_value_cents?, p_notes?, p_items?, p_corrects_record_id?, p_correction_reason? })` → `{ id, below_previous }`.
+- Comprovantes: enviar para `<motorcycle_id>/<uuid>.<ext>` e `rpc('register_workshop_attachment', { p_organization_id, p_storage_path, p_file_name, p_kind, p_maintenance_record_id })`; cota em `rpc('get_workshop_storage_usage', { p_organization_id })`.
+- `maintenance_timeline` (titular) passa a ter `recorded_by_name`.
+
 ## Duplicidade
 
 ```ts

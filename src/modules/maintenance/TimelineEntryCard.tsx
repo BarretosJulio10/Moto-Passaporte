@@ -19,9 +19,11 @@ type Props = {
   /** Envia comprovantes para o registro; devolve mensagens de falha. */
   onAttach?: (id: string, pending: PendingAttachment[]) => Promise<string[]>
   usage?: StorageUsage
+  /** Visão da oficina autorizada: corrige só os próprios registros; não anula. */
+  workshop?: { organizationId: string }
 }
 
-export function TimelineEntryCard({ entry: e, successor, original, onVoid, onAttach, usage }: Props) {
+export function TimelineEntryCard({ entry: e, successor, original, onVoid, onAttach, usage, workshop }: Props) {
   const [voiding, setVoiding] = useState(false)
   const [reasonError, setReasonError] = useState<string | undefined>()
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -32,7 +34,12 @@ export function TimelineEntryCard({ entry: e, successor, original, onVoid, onAtt
   const [attachErrors, setAttachErrors] = useState<string[]>([])
 
   const superseded = e.status === 'superseded'
-  const canChange = !superseded && !e.is_void && e.source_type !== 'workshop'
+  const canChange = workshop
+    ? Boolean(e.is_own) && !superseded && !e.is_void
+    : !superseded && !e.is_void && e.source_type !== 'workshop'
+  const correctHref = workshop
+    ? `/oficina/${workshop.organizationId}/motos/${e.motorcycle_id}/servico?corrigir=${e.id}`
+    : `/painel/motos/${e.motorcycle_id}/historico/novo?corrigir=${e.id}`
   const evidence = e.evidence_level ?? e.source_type
   const color = SOURCE_COLOR[evidence]
   const attachments = e.attachments ?? []
@@ -108,6 +115,9 @@ export function TimelineEntryCard({ entry: e, successor, original, onVoid, onAtt
         {e.workshop_name && (
           <div className="flex gap-1.5"><dt className="text-muted">Oficina</dt><dd className="font-semibold text-graphite">{e.workshop_name}</dd></div>
         )}
+        {e.recorded_by_name && (
+          <div className="flex gap-1.5"><dt className="text-muted">Registrado por</dt><dd className="font-semibold text-graphite">{e.recorded_by_name}</dd></div>
+        )}
         {e.service_value_cents !== null && (
           <div className="flex gap-1.5"><dt className="text-muted">Valor</dt><dd className="font-semibold text-graphite">{formatBRL(e.service_value_cents)}</dd></div>
         )}
@@ -160,12 +170,12 @@ export function TimelineEntryCard({ entry: e, successor, original, onVoid, onAtt
           {canChange && (
             <>
           <Link
-            to={`/painel/motos/${e.motorcycle_id}/historico/novo?corrigir=${e.id}`}
+            to={correctHref}
             className="px-2 py-2 text-sm font-semibold text-ink underline-offset-4 hover:underline sm:text-[0.95rem]"
           >
             Corrigir
           </Link>
-          <Button variant="quiet" type="button" onClick={() => setVoiding(true)}>Anular</Button>
+          {!workshop && <Button variant="quiet" type="button" onClick={() => setVoiding(true)}>Anular</Button>}
             </>
           )}
         </div>

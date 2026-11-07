@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/Button'
 import { Notice } from '@/components/Notice'
@@ -54,7 +55,18 @@ export function WorkshopAccessList({ organizationId }: { organizationId: string 
                     <dd className="font-semibold text-ink">{formatKm(a.latest_mileage)}</dd>
                   </div>
                 </dl>
-                <p className="mt-2 text-xs text-muted">Autorizada em {formatDate(a.decided_at, 'short')}</p>
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-xs text-muted">Autorizada em {formatDate(a.decided_at, 'short')}</p>
+                  {a.motorcycle_id && (
+                    <Link
+                      to={`/oficina/${organizationId}/motos/${a.motorcycle_id}`}
+                      className="text-sm font-semibold text-ink underline underline-offset-4"
+                      aria-label={`Abrir ${label(a)}`}
+                    >
+                      Abrir histórico
+                    </Link>
+                  )}
+                </div>
               </li>
             ))}
           </ul>

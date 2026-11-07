@@ -5,10 +5,6 @@ import { useMyWorkshops } from './WorkshopIndexPage'
 import { PlateSearchPanel } from '@/modules/workshop_access/PlateSearchPanel'
 import { WorkshopAccessList } from '@/modules/workshop_access/WorkshopAccessList'
 
-const COMING = [
-  ['Registro de serviços', 'Lançar serviço, peças, quilometragem e fotos da nota no histórico da moto.'],
-]
-
 export function WorkshopDashboardPage() {
   const { orgId = '' } = useParams()
   const location = useLocation()
@@ -82,18 +78,6 @@ export function WorkshopDashboardPage() {
         <WorkshopAccessList organizationId={shop.organization_id} />
       </div>
 
-      <section className="mt-10" aria-labelledby="coming-title">
-        <h2 id="coming-title" className="heading text-2xl text-ink">Chegando em breve</h2>
-        <p className="mt-1 text-muted">Estas ferramentas estão em desenvolvimento e aparecerão aqui.</p>
-        <ul className="mt-4 divide-y divide-rule border-y border-rule">
-          {COMING.map(([title, text]) => (
-            <li key={title} className="grid gap-1 py-4 sm:grid-cols-[13rem_1fr] sm:gap-6">
-              <p className="font-semibold text-graphite">{title}</p>
-              <p className="text-muted">{text}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
     </div>
   )
 }
