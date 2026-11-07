@@ -48,7 +48,7 @@ const GROUPS: Group[] = [
   {
     title: 'Armazenamento',
     items: [
-      { label: 'Espaço usado', value: (m) => formatBytes(m.storage_bytes) },
+      { label: 'Espaço usado', value: (m) => formatBytes(m.storage_bytes), to: '/admin/armazenamento' },
       { label: 'Arquivos', value: (m) => n(m.files_total) },
     ],
   },
@@ -141,6 +141,12 @@ export function AdminDashboardPage() {
             <Link to="/admin/verificacoes" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
               <span className="font-semibold text-ink">Verificação de placas</span>
               <span className="block text-sm text-muted">Pedidos de quem tentou cadastrar uma placa que já tem passaporte.</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/armazenamento" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
+              <span className="font-semibold text-ink">Armazenamento</span>
+              <span className="block text-sm text-muted">Consumo por categoria, conta, moto e oficina; alertas de limite; limpeza de envios sem registro.</span>
             </Link>
           </li>
           <li>

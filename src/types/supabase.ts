@@ -823,6 +823,65 @@ export type Database = {
           status: string
         }[]
       }
+      admin_storage_overview: { Args: Record<PropertyKey, never>; Returns: Json }
+      admin_storage_top_users: {
+        Args: { p_limit?: number }
+        Returns: {
+          user_id: string
+          full_name: string | null
+          email_masked: string | null
+          motorcycles: number
+          used_bytes: number
+          quota_bytes: number
+          used_percent: number | null
+          in_alert: boolean
+        }[]
+      }
+      admin_storage_top_motorcycles: {
+        Args: { p_limit?: number }
+        Returns: {
+          motorcycle_id: string
+          motorcycle_name: string
+          owner_name: string | null
+          files: number
+          bytes: number
+          workshop_bytes: number
+          diary_bytes: number
+        }[]
+      }
+      admin_storage_top_workshops: {
+        Args: { p_limit?: number }
+        Returns: {
+          organization_id: string
+          organization_name: string
+          files: number
+          used_bytes: number
+          quota_bytes: number
+          used_percent: number | null
+          in_alert: boolean
+        }[]
+      }
+      admin_list_unlinked_files: {
+        Args: { p_limit?: number }
+        Returns: { storage_path: string; size_bytes: number; created_at: string; is_orphan: boolean }[]
+      }
+      admin_list_storage_cleanups: {
+        Args: { p_limit?: number }
+        Returns: {
+          id: string
+          requested_by_name: string | null
+          reason: string
+          status: string
+          planned_files: number
+          planned_bytes: number
+          deleted_files: number | null
+          deleted_bytes: number | null
+          failed_files: number | null
+          created_at: string
+          finished_at: string | null
+        }[]
+      }
+      admin_plan_storage_cleanup: { Args: { p_reason: string; p_limit?: number }; Returns: Json }
       admin_resolve_claim: {
         Args: { p_claim_id: string; p_notify_owner: boolean; p_reason: string; p_reply: string; p_status: string }
         Returns: undefined

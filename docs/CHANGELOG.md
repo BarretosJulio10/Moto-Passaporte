@@ -9,6 +9,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.24.0] — 07/11/2026 — Fase 6.3: monitoramento de armazenamento
+
+### Adicionado
+- `/admin/armazenamento`: espaço total, por categoria e por origem; contas, motos e oficinas que mais usam espaço, com alerta de limite; arquivos sem registro (em andamento × sem vínculo); limpeza com motivo e histórico.
+- Edge Function `storage-cleanup` (login de admin) e funções `admin_storage_overview`, `admin_storage_top_users`, `admin_storage_top_motorcycles`, `admin_storage_top_workshops`, `admin_list_unlinked_files`, `admin_plan_storage_cleanup`, `admin_list_storage_cleanups`, `storage_cleanup_finish`; tabela `storage_cleanups`.
+- Configurações `storage_orphan_retention_hours` (24 h) e `storage_alert_percent` (80%), editáveis em Configurações.
+
+### Testes
+- Banco local: 22 verificações novas (19 suítes). Supabase real (transação desfeita): 10. Frontend: 174.
+
 ## [0.23.0] — 07/11/2026 — Fase 6.2: verificação de placa
 
 ### Adicionado

@@ -109,6 +109,13 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-026 — Armazenamento: o banco decide, a Edge Function apaga (PRD 7.6)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- Consumo vem dos metadados do bucket privado e de `attachments`. Espaço do titular segue a mesma regra da cota (motos atuais, sem arquivos de oficinas, diário só do próprio autor). Alerta a partir de `storage_alert_percent` (padrão 80%).
+- "Sem registro" = objeto no bucket sem linha em `attachments`. Dentro de `storage_orphan_retention_hours` (padrão 24 h) é envio em andamento e nunca é apagado; depois disso é "sem vínculo". Arquivo ligado a registro nunca é apagado (o histórico é imutável).
+- O Supabase bloqueia apagar objetos pelo SQL. A limpeza é em duas etapas: `admin_plan_storage_cleanup` (com o token do admin: valida, exige motivo, grava o plano e a auditoria; uma limpeza por vez) e a Edge Function `storage-cleanup`, que apaga só os caminhos do plano pela API de Storage e conclui com `storage_cleanup_finish` (service_role), que só conta o que estava no plano.
+- Limpeza é manual por enquanto; agendamento automático fica para depois (KI-029).
+
 ### ADR-025 — Pedidos de verificação de placa: análise humana, aviso anônimo, sem transferência forçada (ADR-007)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - Quem tenta cadastrar uma placa já ativa vê só o próprio pedido (placa, situação, resposta); nunca a moto, o titular ou o histórico existentes. Pode complementar a explicação e cancelar enquanto pendente.

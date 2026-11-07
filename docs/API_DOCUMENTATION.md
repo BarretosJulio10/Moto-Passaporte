@@ -219,6 +219,11 @@ Implementação em `src/modules/admin/paymentsApi.ts`.
 
 - Admin: `rpc('admin_get_payment_settings')` → ambiente, chave pública, `access_token_configured`/`access_token_hint`, `webhook_secret_configured`/`webhook_secret_hint`, conta conectada e último teste (nunca os segredos). `rpc('admin_save_payment_settings', { p_environment, p_public_key, p_access_token?, p_webhook_secret? })` — vazio mantém o segredo atual.
 - Edge Function `POST /functions/v1/mercadopago-check` (login de admin) → `{ ok, message, account_id, nickname, site_id }`.
+
+### Armazenamento (ADR-026)
+- `admin_storage_overview()` → totais, `by_kind`, `by_context`, temporários e sem vínculo, alertas, última limpeza.
+- `admin_storage_top_users`, `admin_storage_top_motorcycles`, `admin_storage_top_workshops({ p_limit? })`; `admin_list_unlinked_files({ p_limit? })`; `admin_list_storage_cleanups({ p_limit? })`.
+- Edge Function `POST /functions/v1/storage-cleanup` `{ reason }` (login de admin) → `{ ok, deleted_files, deleted_bytes, failed_files }`.
 - Público: `rpc('get_payment_public_config')` → `{ billing_enabled, environment, public_key }` (chave só com a contratação liberada).
 - Servidor (`service_role`): `payment_access_token()`, `payment_webhook_secret()`, `record_payment_check(...)`.
 

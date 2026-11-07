@@ -1,6 +1,6 @@
 # PROJECT_STATUS — Moto Passaporte
 
-**Versão atual:** 0.23.0
+**Versão atual:** 0.24.0
 **Data:** 07/11/2026
 **Fase:** Fases 1 a 4 concluídas. Fases 1 a 5 concluídas (Mercado Pago aguardando teste ponta a ponta). Fase 6 em andamento: painel administrativo
 **Progresso geral:** 87,5% (35 de 40 itens do PRD — quadro em `PRD_CHECKLIST.md`)
@@ -9,7 +9,7 @@
 
 | Ambiente | URL | Banco | Situação |
 |---|---|---|---|
-| Desenvolvimento | https://moto-passaporte.vercel.app (Vercel, deploy automático da `main`) | Supabase `ripgenhykaajcnzdxoid` (MOTO_Passaporte, us-east-1, PG 17) | migrações até `plate_claims_notice_fix` aplicadas; Edge Functions `mercadopago-check`, `mercadopago-billing` e `mercadopago-webhook` publicadas |
+| Desenvolvimento | https://moto-passaporte.vercel.app (Vercel, deploy automático da `main`) | Supabase `ripgenhykaajcnzdxoid` (MOTO_Passaporte, us-east-1, PG 17) | migrações até `storage_monitoring` aplicadas; Edge Functions `mercadopago-check`, `mercadopago-billing`, `mercadopago-webhook` e `storage-cleanup` publicadas |
 | Homologação | — | — | não configurado |
 | Produção | — | — | não configurado |
 
@@ -22,13 +22,13 @@
 | 3 — Oficinas e autorizações | concluída: cadastro, perfil, pesquisa por placa, autorizações, Oficina de Origem, equipe e serviços da oficina |
 | 4 — Transferência e compartilhamento | concluída: transferência, motos anteriores, compartilhamento controlado e revogável |
 | 5 — Monetização | concluída: planos, conta do Mercado Pago, assinaturas, Webhook, conciliação, atraso, cancelamento, benefícios Premium e faturas (falta teste real com o Mercado Pago, KI-026) |
-| 6 — Administração e lançamento | em andamento: painel administrativo completo e verificação de placa; faltam armazenamento, testes, backup, homologação |
+| 6 — Administração e lançamento | em andamento: painel administrativo completo, verificação de placa e armazenamento; faltam testes, backup, homologação |
 
 ## Próximos passos (em ordem)
 
-Concluído em 0.23.0: verificação de placa (ADR-025). Item 6.2 concluído.
+Concluído em 0.24.0: monitoramento de armazenamento (ADR-026). Item 6.3 concluído.
 
-1. Fase 6.3 — monitoramento de armazenamento.
+1. Fase 6.4 — testes de segurança, integração, regressão e E2E.
 2. Fase 6 — testes de segurança, backup, homologação e lançamento.
 2. Validação ponta a ponta com credenciais de teste (KI-026) assim que o responsável cadastrar a conta de teste.
 2. Fase 5.3 a 5.5 — faturas, cotas Premium, atraso, cancelamento e reativação.

@@ -14,6 +14,8 @@ export const ACTION_LABEL: Record<string, string> = {
   admin_viewed_audit: 'consultou o conteúdo do evento',
   report_generated: 'gerou relatório de',
   admin_resolve_claim: 'decidiu o',
+  admin_storage_cleanup_planned: 'pediu a',
+  admin_storage_cleanup_done: 'concluiu a',
 }
 
 export const ENTITY_LABEL: Record<string, string> = {
@@ -23,6 +25,7 @@ export const ENTITY_LABEL: Record<string, string> = {
   motorcycle_private: 'moto',
   mileage_records: 'leitura de km',
   motorcycle_claim_requests: 'pedido de verificação',
+  storage_cleanup: 'limpeza de arquivos sem vínculo',
   organizations: 'organização',
   organization_members: 'membro de oficina',
   workshops: 'perfil de oficina',

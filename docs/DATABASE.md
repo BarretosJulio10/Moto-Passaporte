@@ -19,6 +19,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 | `20261107205649_admin_audit_settings.sql` | Configurações por catálogo (sem escrita direta), busca e consulta de auditoria (ADR-024) |
 | `20261107211016_plate_claims.sql` | Pedidos de verificação de placa: acompanhamento pelo solicitante, fila e decisão do admin, aviso anônimo ao titular (ADR-025) |
 | `20261107211152_plate_claims_notice_fix.sql` | Aviso ao titular aparece também quando titularidade e aviso têm o mesmo instante |
+| `20261107212126_storage_monitoring.sql` | Consumo de armazenamento, arquivos sem registro, alertas e limpeza planejada/auditada (`storage_cleanups`, ADR-026) |
 | `20261107204757_admin_management.sql` | Administração (ADR-023): situação da conta, indicadores, usuários e oficinas com motivo |
 | `20261107203742_invoices.sql` | Faturas (ADR-022): `invoices`, numeração, manutenção pelas funções de cobrança, recibo |
 | `20261107194520_premium_benefits.sql` | Benefícios Premium (ADR-021): recursos e links por plano, lembretes, relatórios |

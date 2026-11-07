@@ -70,6 +70,8 @@
 | Supabase real — auditoria e configurações, em transação desfeita | `tests/security/supabase/phase6b_audit_settings_rollback.sql` | 9 aprovadas |
 | PostgreSQL 16 local — verificação de placa | `tests/security/phase6c_claims_test.sql` | 23 aprovadas |
 | Supabase real — verificação de placa, em transação desfeita | `tests/security/supabase/phase6c_claims_rollback.sql` | 10 aprovadas |
+| PostgreSQL 16 local — armazenamento | `tests/security/phase6d_storage_test.sql` | 22 aprovadas |
+| Supabase real — armazenamento, em transação desfeita | `tests/security/supabase/phase6d_storage_rollback.sql` | 10 aprovadas |
 | Tipos das Edge Functions | `scripts/validation/check_edge_functions.sh` | OK |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
@@ -139,6 +141,7 @@ Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalad
 - Token de acesso e assinatura do Webhook ficam criptografados no Supabase Vault (teste confirma que o valor gravado não é o texto puro).
 - Nenhuma função devolve os segredos ao navegador, nem ao administrador; só os 4 últimos caracteres.
 - Leitura dos segredos apenas por `service_role` (Edge Functions). A Edge Function `mercadopago-check` exige login de administrador e não registra o token em logs.
+- Limpeza de armazenamento (ADR-026): a Edge Function `storage-cleanup` só apaga caminhos que o banco planejou com o token do admin (sem registro e fora da retenção). Arquivos ligados a registros nunca entram no plano; `storage_cleanups` e `storage_cleanup_finish` são fechados para o navegador.
 - Gravações auditadas sem os valores.
 
 ## Assinaturas e Webhook (ADR-020)
