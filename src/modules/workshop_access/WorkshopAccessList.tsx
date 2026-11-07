@@ -4,7 +4,7 @@ import { Button } from '@/components/Button'
 import { Notice } from '@/components/Notice'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { formatDate, formatKm, formatPlate } from '@/core/shared/format'
-import { cancelRequest, fetchWorkshopAccess, splitWorkshopAccess, STATUS_LABEL, type WorkshopAccess } from './api'
+import { cancelRequest, fetchWorkshopAccess, ORIGIN_LABEL, splitWorkshopAccess, STATUS_LABEL, type WorkshopAccess } from './api'
 
 /** Motos autorizadas, pedidos pendentes e histórico da oficina (PRD 6.3). */
 export function WorkshopAccessList({ organizationId }: { organizationId: string }) {
@@ -43,6 +43,7 @@ export function WorkshopAccessList({ organizationId }: { organizationId: string 
             {approved.map((a) => (
               <li key={a.id} className="rounded-doc border border-rule bg-sheet p-4">
                 <p className="heading text-lg text-ink">{label(a)}</p>
+                {a.access_type === 'origin' && <OriginBadge />}
                 <dl className="mt-2 grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <dt className="text-muted">Placa</dt>
@@ -68,6 +69,7 @@ export function WorkshopAccessList({ organizationId }: { organizationId: string 
               <li key={a.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                 <div>
                   <p className="font-semibold text-ink">{label(a)}</p>
+                  {a.access_type === 'origin' && <p className="text-sm text-stamp">Com pedido de reconhecimento como {ORIGIN_LABEL}</p>}
                   <p className="text-sm text-muted">Pedido em {formatDate(a.requested_at, 'short')}</p>
                 </div>
                 <Button type="button" variant="quiet" size="sm" loading={busy === a.id} onClick={() => onCancel(a.id)}>
@@ -95,5 +97,13 @@ export function WorkshopAccessList({ organizationId }: { organizationId: string 
         </details>
       )}
     </div>
+  )
+}
+
+export function OriginBadge() {
+  return (
+    <span className="mt-1 inline-block rounded-[0.35rem] border border-stamp px-2 py-0.5 text-xs font-semibold text-stamp">
+      {ORIGIN_LABEL}
+    </span>
   )
 }

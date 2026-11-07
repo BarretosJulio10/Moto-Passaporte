@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/Button'
-import { TextAreaField, TextField } from '@/components/Field'
+import { CheckboxField, TextAreaField, TextField } from '@/components/Field'
 import { Notice } from '@/components/Notice'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { formatPlate, isValidPlate, normalizePlate } from '@/core/shared/format'
@@ -16,6 +16,7 @@ export function PlateSearchPanel({ organizationId }: { organizationId: string })
   const [fieldError, setFieldError] = useState<string>()
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
+  const [origin, setOrigin] = useState(false)
   const [busy, setBusy] = useState<'search' | 'request' | 'cancel' | null>(null)
 
   async function refreshList() {
@@ -36,6 +37,7 @@ export function PlateSearchPanel({ organizationId }: { organizationId: string })
       setResult(await searchPlate(organizationId, normalized))
       setSearched(normalized)
       setMessage('')
+      setOrigin(false)
     } catch (err) {
       setResult(null)
       setError(translateDbError(err as { code?: string; message?: string }))
@@ -48,8 +50,8 @@ export function PlateSearchPanel({ organizationId }: { organizationId: string })
     setBusy('request')
     setError('')
     try {
-      const r = await requestAccess(organizationId, searched, message)
-      setResult({ ...result, access_id: r.id, access_status: r.status })
+      const r = await requestAccess(organizationId, searched, message, origin && result.origin_available)
+      setResult({ ...result, access_id: r.id, access_status: r.status, access_type: r.access_type })
       await refreshList()
     } catch (err) {
       setError(translateDbError(err as { code?: string; message?: string }))
@@ -118,11 +120,17 @@ export function PlateSearchPanel({ organizationId }: { organizationId: string })
 
           {status === 'pending' && (
             <div className="mt-3 flex flex-wrap items-center gap-3">
-              <p className="text-graphite">Pedido enviado. Aguardando a resposta do titular.</p>
+              <p className="text-graphite">
+                Pedido enviado{result.access_type === 'origin' ? ', com reconhecimento como Oficina de Origem' : ''}. Aguardando a resposta do titular.
+              </p>
               <Button type="button" variant="quiet" size="sm" loading={busy === 'cancel'} onClick={onCancel}>Cancelar pedido</Button>
             </div>
           )}
-          {status === 'approved' && <p className="mt-3 font-semibold text-ink">Acesso autorizado. A moto está na lista abaixo.</p>}
+          {status === 'approved' && (
+            <p className="mt-3 font-semibold text-ink">
+              Acesso autorizado{result.access_type === 'origin' ? ' como Oficina de Origem' : ''}. A moto está na lista abaixo.
+            </p>
+          )}
           {status === 'rejected' && <p className="mt-3 text-graphite">O titular recusou o último pedido.</p>}
 
           {canRequest && (
@@ -135,6 +143,18 @@ export function PlateSearchPanel({ organizationId }: { organizationId: string })
                 onChange={(e) => setMessage(e.target.value)}
                 hint="Ex.: revisão agendada para sábado."
               />
+              {result.origin_available && (
+                <CheckboxField
+                  label={
+                    <>
+                      <strong className="text-ink">Ajudamos a criar este passaporte.</strong> Pedir reconhecimento como
+                      Oficina de Origem. O titular decide; o título não dá propriedade sobre a moto.
+                    </>
+                  }
+                  checked={origin}
+                  onChange={(e) => setOrigin(e.target.checked)}
+                />
+              )}
               <div>
                 <Button type="button" loading={busy === 'request'} onClick={onRequest}>
                   {busy === 'request' ? 'Enviando…' : status === 'rejected' ? 'Pedir de novo' : 'Pedir acesso'}

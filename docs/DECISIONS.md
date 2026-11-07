@@ -84,6 +84,14 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Auditoria só com metadados (categoria, data, visibilidade); título, texto e local não vão para o log.
 - Fotos do diário reaproveitam `attachments` (`diary_entry_id`), só imagens, até 10 por entrada, contam na cota de quem enviou.
 
+### ADR-014 — Oficina de Origem como tipo de autorização (PRD 6.5)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- O PRD não define o que é "participar do cadastro inicial". Regra adotada: o reconhecimento só pode ser pedido ou definido nos primeiros **30 dias** do passaporte (`origin_workshop_window_days`, configurável).
+- A Oficina de Origem é uma autorização com `access_type = 'origin'`: mesmo acesso de uma oficina autorizada, ativo até ser revogado. Não dá propriedade.
+- Consentimento do titular sempre: a oficina pede (marcando "ajudamos a criar este passaporte") e o titular escolhe entre autorizar como Origem, autorizar só o acesso ou recusar. O titular também pode marcar uma oficina já autorizada.
+- Uma Oficina de Origem ativa por moto. O titular pode tirar o título sem cortar o acesso, ou revogar tudo.
+- A transferência (Fase 4) encerra também a Oficina de Origem (PRD 10). Exibir a Origem no passaporte público fica para o compartilhamento controlado (Fase 4).
+
 ---
 
 ## Pendentes — técnicas

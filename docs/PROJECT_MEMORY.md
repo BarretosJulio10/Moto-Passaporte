@@ -77,7 +77,8 @@ Ainda por criar: `transfer_requests` (F4; ao concluir deve encerrar `motorcycle_
 | Anexos e cotas | 2 | `implementado` |
 | Diário da moto | 2 | `implementado` |
 | Pesquisa por placa e autorizações | 3 | `implementado` |
-| Oficina de Origem, membros, registro de serviço pela oficina | 3 | `planejado` |
+| Oficina de Origem | 3 | `implementado` (ADR-014) |
+| Membros da oficina, registro de serviço pela oficina | 3 | `planejado` |
 | Transferência e compartilhamento público | 4 | `planejado` |
 | Planos, Mercado Pago, assinaturas, cotas | 5 | `planejado` |
 | Painel administrativo, testes de segurança, lançamento | 6 | `planejado` |
@@ -92,11 +93,11 @@ Ainda por criar: `transfer_requests` (F4; ao concluir deve encerrar `motorcycle_
 
 ## 7. Pendências imediatas
 
-- Próximo item: Fase 3 — Oficina de Origem (3.5), depois membros (3.6) e registro de serviço pela oficina (3.7). Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
+- Próximo item: Fase 3 — membros da oficina (3.6), depois registro de serviço pela oficina (3.7). Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 
-Decisões já fechadas: Git direto na `main` (ADR-005), 1 moto no gratuito (ADR-006), duplicidade por placa (ADR-007), campos públicos padrão (ADR-008), Supabase em us-east-1 (ADR-009), nomes de migração = versão do Supabase (ADR-010), diário privado nunca muda de dono (ADR-013).
+Decisões já fechadas: Git direto na `main` (ADR-005), 1 moto no gratuito (ADR-006), duplicidade por placa (ADR-007), campos públicos padrão (ADR-008), Supabase em us-east-1 (ADR-009), nomes de migração = versão do Supabase (ADR-010), diário privado nunca muda de dono (ADR-013), Oficina de Origem como tipo de autorização (ADR-014).
 
 ## 8. Protocolo de trabalho (obrigatório — pedido do responsável pelo produto)
 

@@ -44,6 +44,8 @@
 | Supabase real — diário, em transação desfeita | `tests/security/supabase/phase2c_diary_rollback.sql` | 27 aprovadas |
 | PostgreSQL 16 local — pesquisa por placa e autorizações | `tests/security/phase3a_workshop_access_test.sql` | 46 aprovadas |
 | Supabase real — pesquisa por placa e autorizações, em transação desfeita | `tests/security/supabase/phase3a_workshop_access_rollback.sql` | 22 aprovadas |
+| PostgreSQL 16 local — Oficina de Origem | `tests/security/phase3b_origin_test.sql` | 20 aprovadas |
+| Supabase real — Oficina de Origem, em transação desfeita | `tests/security/supabase/phase3b_origin_rollback.sql` | 13 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
@@ -71,6 +73,7 @@ Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalad
 - Revogação e suspensão da oficina cortam o acesso na hora (todas as funções conferem a situação atual).
 - Autorizações não podem ser apagadas nem ter dados alterados; mudanças de situação seguem transições fixas e são auditadas.
 - Ainda sem CAPTCHA ou detecção de automação além do limite (KI-020).
+- Oficina de Origem: só o titular concede ou tira o título; a oficina não se autodeclara; uma por moto (índice único); fora do prazo é recusado no banco.
 
 ## Advisors do Supabase (06/11/2026, após o reforço)
 

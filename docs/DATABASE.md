@@ -16,6 +16,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 | `20261107014505_maintenance.sql` | Fase 2: `maintenance_records`, `maintenance_items`, categorias, `create_maintenance_record`, `void_maintenance_record`, view `maintenance_timeline` |
 | `20261107101141_workshop_access.sql` | Fase 3: `plate_search_log`, `motorcycle_workshop_access`, pesquisa por placa, pedido, decisão, revogação e leituras por papel |
 | `20261107101234_workshop_access_indexes.sql` | Índices de `decided_by` e `ended_by` |
+| `20261107102312_origin_workshop.sql` | Oficina de Origem (ADR-014): índice de uma Origem ativa por moto, `origin_available`, `set_origin_workshop`, parâmetros de Origem em pedido e decisão |
 | `20261107095618_diary.sql` | Fase 2: `motorcycle_diary`, fotos do diário em `attachments.diary_entry_id`, RPCs do diário, view `motorcycle_diary_feed`, políticas do Storage separadas (envio, leitura, exclusão de arquivo próprio sem registro) |
 | `20261107015821_attachments.sql` | Fase 2: bucket privado `attachments`, tabela `attachments`, políticas do Storage, `register_attachment`, `get_storage_usage`, cota em `system_settings`; `maintenance_timeline` com anexos e `evidence_level` |
 
@@ -82,7 +83,8 @@ Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limi
 | `delete_diary_entry(id)` / `delete_diary_photo(id)` | Autor | Exclui e devolve os caminhos dos arquivos para o app apagar no Storage |
 | `search_motorcycle_by_plate(org, placa)` | Membro ativo de oficina ativa | `{found, brand, model, manufacturing_year, access_status, motorcycle_id só se autorizada}`; limita e registra |
 | `request_workshop_access(org, placa, msg?)` / `cancel_workshop_access_request(id)` | Membro da oficina | Pede (ou devolve o pedido aberto) / cancela pendente |
-| `decide_workshop_access(id, aprovar)` / `revoke_workshop_access(id)` | Titular atual | Autoriza ou recusa pendente / revoga autorizada |
+| `decide_workshop_access(id, aprovar, como_origem?)` / `revoke_workshop_access(id)` | Titular atual | Autoriza (como Origem ou só acesso) ou recusa pendente / revoga autorizada |
+| `set_origin_workshop(id, origem)` | Titular atual | Define (no prazo, se não houver outra) ou tira o título de Oficina de Origem de uma autorização ativa |
 | `get_motorcycle_workshop_access(moto)` / `get_my_pending_access_requests()` | Titular atual | Autorizações da moto com dados públicos da oficina / pendências em todas as motos |
 | `get_workshop_access_list(org)` | Membro da oficina | Pedidos da oficina; placa, km e id só quando autorizada |
 | `workshop_has_access(moto, org?)` | Autenticado | Verdadeiro se o usuário é membro ativo de oficina ativa com autorização aprovada |

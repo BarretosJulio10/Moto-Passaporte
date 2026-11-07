@@ -802,9 +802,10 @@ export type Database = {
         Returns: undefined
       }
       search_motorcycle_by_plate: { Args: { p_organization_id: string; p_plate: string }; Returns: Json }
-      request_workshop_access: { Args: { p_message?: string; p_organization_id: string; p_plate: string }; Returns: Json }
+      request_workshop_access: { Args: { p_message?: string; p_organization_id: string; p_origin?: boolean; p_plate: string }; Returns: Json }
       cancel_workshop_access_request: { Args: { p_access_id: string }; Returns: undefined }
-      decide_workshop_access: { Args: { p_access_id: string; p_approve: boolean }; Returns: undefined }
+      decide_workshop_access: { Args: { p_access_id: string; p_approve: boolean; p_as_origin?: boolean }; Returns: undefined }
+      set_origin_workshop: { Args: { p_access_id: string; p_origin: boolean }; Returns: undefined }
       revoke_workshop_access: { Args: { p_access_id: string }; Returns: undefined }
       workshop_has_access: { Args: { p_motorcycle: string; p_organization?: string }; Returns: boolean }
       get_motorcycle_workshop_access: {
@@ -816,6 +817,7 @@ export type Database = {
           ended_at: string | null
           id: string
           message: string | null
+          origin_available: boolean
           requested_at: string
           status: Database["public"]["Enums"]["workshop_access_status"]
           workshop_active: boolean

@@ -9,6 +9,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.11.0] — 07/11/2026 — Fase 3: Oficina de Origem
+
+### Adicionado
+- Migração `origin_workshop` (ADR-014): Oficina de Origem como autorização `origin`, uma ativa por moto, só nos primeiros 30 dias do passaporte (configurável); `request_workshop_access(..., p_origin)`, `decide_workshop_access(..., p_as_origin)`, `set_origin_workshop`; pesquisa e leitura do titular informam se a moto ainda aceita Origem.
+- Oficina: opção "Ajudamos a criar este passaporte" ao pedir acesso; selo "Oficina de Origem" nas motos autorizadas.
+- Titular: autorizar como Oficina de Origem, autorizar só o acesso ou recusar; definir ou tirar o título de uma oficina autorizada.
+- Testes: banco 20 (local) + 13 (Supabase, transação desfeita); interface 92 no total (6 novos).
+
 ## [0.10.0] — 07/11/2026 — Fase 3: pesquisa por placa e autorizações
 
 ### Adicionado

@@ -5,7 +5,8 @@ import { Button } from '@/components/Button'
 import { Notice } from '@/components/Notice'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { formatDate } from '@/core/shared/format'
-import { decideAccess, fetchMotorcycleAccess, revokeAccess, STATUS_LABEL, type OwnerAccess } from './api'
+import { decideAccess, fetchMotorcycleAccess, ORIGIN_LABEL, revokeAccess, setOrigin, STATUS_LABEL, type OwnerAccess } from './api'
+import { OriginBadge } from './WorkshopAccessList'
 
 /** Titular aprova, recusa e revoga oficinas (PRD 6.4 passo 6 e 6.6). */
 export function OwnerAccessSection({ motorcycleId }: { motorcycleId: string }) {
@@ -57,15 +58,34 @@ export function OwnerAccessSection({ motorcycleId }: { motorcycleId: string }) {
 
       {pending.map((a) => (
         <div key={a.id} className="mt-4 rounded-doc border border-stamp/60 bg-sheet p-4">
-          <p className="text-sm font-semibold text-stamp">Pedido de acesso</p>
+          <p className="text-sm font-semibold text-stamp">
+            {a.access_type === 'origin' ? `Pedido de acesso e reconhecimento como ${ORIGIN_LABEL}` : 'Pedido de acesso'}
+          </p>
           <p className="mt-1">{name(a)}{place(a) && <span className="text-muted">, {place(a)}</span>}</p>
+          {a.access_type === 'origin' && (
+            <p className="mt-1 max-w-prose text-sm text-muted">
+              A oficina diz que ajudou a criar este passaporte. O título aparece na página da moto, continua ativo até você
+              revogar e não dá à oficina nenhuma propriedade sobre a moto ou o passaporte.
+            </p>
+          )}
           {a.workshop_verified && <p className="text-sm text-muted">Cadastro verificado pela equipe</p>}
           {a.message && <p className="mt-2 text-graphite">“{a.message}”</p>}
           <p className="mt-1 text-xs text-muted">Pedido em {formatDate(a.requested_at, 'short')}</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Button type="button" size="sm" loading={busy === a.id} disabled={!a.workshop_active} onClick={() => run(a.id, () => decideAccess(a.id, true))}>
-              Autorizar
-            </Button>
+            {a.access_type === 'origin' && a.origin_available ? (
+              <>
+                <Button type="button" size="sm" loading={busy === a.id} disabled={!a.workshop_active} onClick={() => run(a.id, () => decideAccess(a.id, true, true))}>
+                  Autorizar como {ORIGIN_LABEL}
+                </Button>
+                <Button type="button" size="sm" variant="secondary" disabled={busy === a.id || !a.workshop_active} onClick={() => run(a.id, () => decideAccess(a.id, true, false))}>
+                  Autorizar só o acesso
+                </Button>
+              </>
+            ) : (
+              <Button type="button" size="sm" loading={busy === a.id} disabled={!a.workshop_active} onClick={() => run(a.id, () => decideAccess(a.id, true, false))}>
+                {a.access_type === 'origin' ? 'Autorizar só o acesso' : 'Autorizar'}
+              </Button>
+            )}
             <Button type="button" size="sm" variant="secondary" disabled={busy === a.id} onClick={() => run(a.id, () => decideAccess(a.id, false))}>
               Recusar
             </Button>
@@ -80,7 +100,19 @@ export function OwnerAccessSection({ motorcycleId }: { motorcycleId: string }) {
             <li key={a.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
               <div>
                 <p>{name(a)}{place(a) && <span className="text-muted">, {place(a)}</span>}</p>
+                {a.access_type === 'origin' && <OriginBadge />}
                 <p className="text-sm text-muted">Autorizada em {formatDate(a.decided_at, 'short')}</p>
+                {a.access_type === 'origin' ? (
+                  <button type="button" disabled={busy === a.id} onClick={() => run(a.id, () => setOrigin(a.id, false))} className="mt-1 text-sm font-semibold text-ink underline-offset-4 hover:underline">
+                    Tirar título de Origem
+                  </button>
+                ) : (
+                  a.origin_available && (
+                    <button type="button" disabled={busy === a.id} onClick={() => run(a.id, () => setOrigin(a.id, true))} className="mt-1 text-sm font-semibold text-ink underline-offset-4 hover:underline">
+                      Definir como {ORIGIN_LABEL}
+                    </button>
+                  )
+                )}
               </div>
               {confirmRevoke === a.id ? (
                 <div className="flex flex-wrap items-center gap-2">
