@@ -4,8 +4,8 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 06/11/2026 — v0.3.1
-**Item atual na ordem:** Fase 1 → interface (site público, autenticação, painéis base, QR Code)
+**Última conferência:** 06/11/2026 — v0.4.0
+**Item atual na ordem:** Fase 1 → painel do proprietário (cadastro de moto na tela, detalhe da moto, QR Code, passaporte público)
 
 ---
 
@@ -19,9 +19,10 @@ Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `te
 | 1.4 | Papéis, organizações e controle de acesso | 2.3, 15.2 | `testado` (banco) | `user_roles`, `organizations`, `organization_members` |
 | 1.5 | Cadastro de motocicleta, ID permanente | 5.2, 9 | `testado` (banco) | `register_motorcycle` |
 | 1.6 | QR Code | 9 | `em desenvolvimento` | `public_id` e `get_public_passport` prontos; geração do QR na interface pendente |
-| 1.7 | Cadastro, login e recuperação de senha | 5.1, 15.1 | `em desenvolvimento` | Perfil/papel automáticos no cadastro prontos; telas e configuração do Auth pendentes |
-| 1.8 | Identidade visual e site público | 3 | `planejado` | — |
-| 1.9 | Painéis base: proprietário, oficina, admin | 5.3, 6.3, 7.1 | `planejado` | — |
+| 1.7 | Cadastro, login e recuperação de senha | 5.1, 15.1 | `implementado` (testes unitários e de tela OK) | Telas `/criar-conta`, `/entrar`, `/recuperar-senha`, `/redefinir-senha`. Falta: teste ponta a ponta com o Supabase real (KI-009) e URLs do Auth no Supabase (KI-012) |
+| 1.8a | Identidade visual | 3.2 | `implementado` | `docs/DESIGN.md`, `src/index.css` |
+| 1.8b | Site público: início (como funciona, motociclistas, oficinas, o que não é, planos), termos e privacidade (rascunho) | 3.3 | `implementado` (parcial) | Faltam páginas dedicadas: FAQ, contato/suporte. Termos/privacidade aguardam revisão jurídica |
+| 1.9 | Painéis base: proprietário, oficina, admin | 5.3, 6.3, 7.1 | `em desenvolvimento` | Proprietário: painel com "Minhas motos" (leitura). Faltam cadastro de moto na tela, QR Code, painéis de oficina e admin |
 
 ## Fase 2 — Histórico e arquivos
 
@@ -81,7 +82,8 @@ Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `te
 
 | Item | Referência |
 |---|---|
-| Interface direto no repositório — aguardando liberação de rede | ADR-011 / KI-008 |
+| Teste ponta a ponta com Supabase real a partir do ambiente do Claude | KI-009 |
+| URLs de autenticação no Supabase (Site URL / Redirect URLs) | KI-012 |
 | Criptografia do chassi | D-T3 / KI-002 |
 | Ambientes de homologação e produção | KI-007 |
 | Decisões de produto P-1 a P-11 (restantes) | `DECISIONS.md` |

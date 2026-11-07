@@ -1,0 +1,112 @@
+@import "@fontsource-variable/archivo/wdth.css";
+@import "tailwindcss";
+
+/*
+  Identidade visual — Moto Passaporte
+  Base: o próprio documento. Azul de passaporte, papel de segurança,
+  dourado do brasão (somente decorativo) e tinta de carimbo.
+  Ver docs/DESIGN.md.
+*/
+@theme {
+  --color-ink: #1c2b4a;
+  --color-ink-soft: #2e4170;
+  --color-paper: #eef1ea;
+  --color-paper-deep: #e2e7dd;
+  --color-sheet: #f8faf5;
+  --color-brass: #b8902f;
+  --color-stamp: #5b3c8c;
+  --color-graphite: #24262b;
+  --color-muted: #555a52;
+  --color-rule: #cdd3ca;
+  --color-danger: #9b2c2c;
+  --color-ok: #2f6b45;
+
+  /* Origem dos registros (PRD 5.5) */
+  --color-origin-owner: #24262b;
+  --color-origin-document: #2e4170;
+  --color-origin-workshop: #5b3c8c;
+
+  --font-sans: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
+
+  --radius-doc: 0.375rem;
+  --radius-sheet: 0.875rem;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-paper text-graphite font-sans antialiased;
+    font-variation-settings: "wdth" 100;
+    line-height: 1.55;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-brass);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--color-brass) 35%, transparent);
+  }
+}
+
+@layer components {
+  /* Títulos em Archivo larga: lembra o letreiro estampado de placas e chassis. */
+  .display {
+    font-variation-settings: "wdth" 125;
+    font-weight: 780;
+    letter-spacing: -0.015em;
+    line-height: 1.04;
+  }
+  .heading {
+    font-variation-settings: "wdth" 115;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+  /* Fundo de segurança sutil, como o papel do passaporte. */
+  .guilloche {
+    background-color: var(--color-sheet);
+    background-image:
+      repeating-radial-gradient(circle at 100% 0%, transparent 0 9px, color-mix(in srgb, var(--color-ink) 5%, transparent) 9px 10px),
+      repeating-radial-gradient(circle at 0% 100%, transparent 0 13px, color-mix(in srgb, var(--color-stamp) 4%, transparent) 13px 14px);
+  }
+  /* Único movimento automático do site: os carimbos "batem" na página. */
+  .stamp-in {
+    animation: stamp-in 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  }
+  .mrz {
+    font-family: var(--font-mono);
+    letter-spacing: 0.18em;
+    font-size: 0.72rem;
+    line-height: 1.6;
+    white-space: pre;
+  }
+}
+
+@keyframes stamp-in {
+  from {
+    opacity: 0;
+    scale: 1.25;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stamp-in {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

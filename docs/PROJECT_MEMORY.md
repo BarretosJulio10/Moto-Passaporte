@@ -5,8 +5,8 @@
 > Nunca registrar aqui senhas, tokens, chaves, dados pessoais ou segredos operacionais.
 
 **Última atualização:** 06/11/2026
-**Versão do projeto:** 0.3.1
-**Situação geral:** banco da Fase 1 aplicado e `testado` no Supabase dev; frontend `planejado`.
+**Versão do projeto:** 0.4.0
+**Situação geral:** banco da Fase 1 testado no Supabase dev; frontend base, site público e autenticação implementados (v0.4.0).
 
 Legenda de estados (seção 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 
@@ -28,7 +28,7 @@ Documento de referência: [`docs/PRD.md`](./PRD.md) (v2.0). As regras da v1.0 co
 
 | Camada | Tecnologia | Situação |
 |---|---|---|
-| Frontend | Vite + React + TypeScript, Tailwind, React Router, supabase-js, TanStack Query (ADR-011) — desenvolvido direto no repositório | `planejado` — bloqueado por KI-008 |
+| Frontend | Vite + React 19 + TypeScript, Tailwind 4, React Router 7, supabase-js, TanStack Query (ADR-011); hospedagem Vercel (ADR-012) | `implementado` — base, site público, autenticação, painel inicial |
 | Backend | Supabase: PostgreSQL 17, Auth, Storage, RLS, Edge Functions | Projeto dev `ripgenhykaajcnzdxoid` (us-east-1) com banco da Fase 1 aplicado |
 | Pagamentos | Mercado Pago (API de Assinaturas + Webhooks) | `planejado` — Fase 5 |
 | Versionamento | Git / GitHub `BarretosJulio10/Moto-Passaporte` | `implementado` |
@@ -85,7 +85,8 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access`, `mainte
 
 ## 7. Pendências imediatas
 
-- Interface: será construída direto neste repositório (ADR-011). **Bloqueada** até liberar instalação de pacotes no ambiente do Claude e abrir nova conversa (KI-008). Próximos passos detalhados em `PROJECT_STATUS.md`.
+- Interface: em construção direto neste repositório (ADR-011). Próximo: painel do proprietário (cadastro de moto, QR Code, passaporte público). Ver `PROJECT_STATUS.md`.
+- Configurar URLs de autenticação no Supabase (KI-012) e variáveis na Vercel.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 

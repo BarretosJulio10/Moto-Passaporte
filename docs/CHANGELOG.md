@@ -4,9 +4,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 
 ## [Não publicado]
 
+## [0.4.0] — 06/11/2026
+
 ### Adicionado
-- ADR-011: interface construída direto no repositório; stack do frontend definida.
-- ADR-012: hospedagem do frontend na Vercel (configuração prevista).
+- Frontend (Fase 1): Vite + React 19 + TypeScript strict, Tailwind 4, React Router 7, TanStack Query, supabase-js tipado.
+- Identidade visual (`docs/DESIGN.md`): paleta de passaporte, Archivo variável, peça central "passaporte de exemplo" com carimbos por origem do registro.
+- Site público: página inicial, termos de uso e política de privacidade (rascunhos v0.1, revisão jurídica pendente), página 404.
+- Autenticação: criar conta (com aceite de termos e metadados do banco), entrar, recuperar e redefinir senha; mensagens de erro em português; rota protegida.
+- Painel do proprietário (base): saudação e lista "Minhas motos" a partir da view `my_motorcycles`.
+- `vercel.json` (SPA, cabeçalhos de segurança).
+- Testes: 16 (Vitest + Testing Library) — validações, tradução de erros, cadastro com Supabase simulado, página inicial. Verificação visual com Playwright em 360, 390 e 1366 px.
+- ADR-011 (interface no repositório) e ADR-012 (Vercel).
+
+### Corrigido
+- KI-008 resolvido (instalação de pacotes liberada).
 - Plano ordenado da interface da Fase 1 em `PROJECT_STATUS.md`.
 
 ## [0.3.1] — 06/11/2026

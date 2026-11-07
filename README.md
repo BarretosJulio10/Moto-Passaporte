@@ -8,7 +8,7 @@ SaaS brasileiro que cria um passaporte digital permanente para cada moto — man
 
 ## Situação
 
-Versão **0.3.0** — banco de dados da Fase 1 aplicado e testado no Supabase de desenvolvimento. Interface não iniciada.
+Versão **0.4.0** — banco da Fase 1 no Supabase; site público, autenticação e painel inicial do proprietário.
 
 ## Documentação
 
@@ -24,10 +24,23 @@ Versão **0.3.0** — banco de dados da Fase 1 aplicado e testado no Supabase de
 | [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md) | Problemas conhecidos |
 | [`docs/DATABASE.md`](docs/DATABASE.md) | Tabelas, operações e regras do banco |
 | [`docs/SECURITY.md`](docs/SECURITY.md) | Papéis, matriz de acesso e testes de segurança |
+| [`docs/DESIGN.md`](docs/DESIGN.md) | Identidade visual: cores, tipografia, princípios |
 
-## Stack prevista
+## Stack
 
-React + TypeScript · Supabase (PostgreSQL, Auth, Storage, RLS, Edge Functions) · Mercado Pago
+Vite + React + TypeScript · Tailwind CSS · Supabase (PostgreSQL, Auth, Storage, RLS, Edge Functions) · Vercel · Mercado Pago (Fase 5)
+
+## Rodar localmente
+
+```bash
+npm install
+cp .env.example .env      # preencha VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY
+npm run dev               # http://localhost:5173
+npm test                  # testes unitários e de tela
+npm run build             # verificação de tipos + build de produção
+```
+
+Testes do banco: `scripts/validation/run_db_tests.sh` (ver `docs/DATABASE.md`).
 
 ## Regras para contribuir
 
