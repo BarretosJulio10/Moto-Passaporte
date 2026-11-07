@@ -1,0 +1,32 @@
+# Dependências
+node_modules/
+
+# Builds
+dist/
+build/
+.vite/
+
+# Variáveis de ambiente — nunca versionar valores reais
+.env
+.env.*
+!.env.example
+
+# Supabase local
+supabase/.temp/
+supabase/.branches/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Dumps e backups — nunca versionar dados de produção
+*.dump
+*.sql.gz
+backups/
