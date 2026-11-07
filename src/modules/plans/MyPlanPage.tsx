@@ -10,7 +10,9 @@ import { usePublicSettings } from '@/modules/public_site/usePublicSettings'
 import { fetchMyPlan, formatPlanPrice, formatQuota, PERIOD_LABEL } from './api'
 import {
   cancelSubscription,
+  fetchMyInvoices,
   fetchMyPayments,
+  INVOICE_STATUS_LABEL,
   fetchMySubscription,
   PAYMENT_STATUS_LABEL,
   startSubscription,
@@ -108,10 +110,11 @@ export function MyPlanPage() {
   const usage = useQuery({ queryKey: ['storage-usage', user?.id], enabled: Boolean(user), queryFn: getStorageUsage })
   const sub = useQuery({ queryKey: ['my-subscription', user?.id], enabled: Boolean(user), queryFn: fetchMySubscription })
   const payments = useQuery({ queryKey: ['my-payments', user?.id], enabled: Boolean(user), queryFn: fetchMyPayments })
+  const invoices = useQuery({ queryKey: ['my-invoices', user?.id], enabled: Boolean(user), queryFn: fetchMyInvoices })
   const { data: settings } = usePublicSettings()
 
   const refreshAll = () =>
-    Promise.all(['my-plan', 'my-subscription', 'my-payments', 'storage-usage'].map((k) => qc.invalidateQueries({ queryKey: [k] })))
+    Promise.all(['my-plan', 'my-subscription', 'my-payments', 'my-invoices', 'storage-usage'].map((k) => qc.invalidateQueries({ queryKey: [k] })))
 
   const synced = useRef(false)
   useEffect(() => {
@@ -180,9 +183,36 @@ export function MyPlanPage() {
 
       {s && <SubscriptionCard sub={s} onCancel={() => cancel.mutate()} canceling={cancel.isPending} />}
 
+      {invoices.data && invoices.data.length > 0 && (
+        <section className="mt-8 max-w-xl" aria-labelledby="invoices-title">
+          <h2 id="invoices-title" className="heading text-xl text-ink">Faturas</h2>
+          <ul className="mt-3 divide-y divide-rule border-y border-rule text-sm">
+            {invoices.data.map((i) => (
+              <li key={i.id} className="flex flex-wrap items-baseline justify-between gap-2 py-2.5">
+                <span className="text-graphite">
+                  {date(i.period_start)} a {date(i.period_end)}
+                  <span className="block text-xs text-muted">
+                    Nº {i.number}
+                    {i.status === 'open' ? ` · vence em ${new Date(`${i.due_date}T12:00:00`).toLocaleDateString('pt-BR')}` : ''}
+                    {i.attempts > 0 && i.status !== 'paid' ? ` · ${i.attempts} tentativa(s) não aprovada(s)` : ''}
+                  </span>
+                </span>
+                <span className="text-right">
+                  <span className="font-semibold text-ink">{formatPlanPrice(i.amount_cents)}</span>{' '}
+                  <span className={i.status === 'failed' ? 'text-danger' : 'text-muted'}>{INVOICE_STATUS_LABEL[i.status] ?? i.status}</span>
+                  {['paid', 'refunded', 'charged_back'].includes(i.status) && (
+                    <Link to={`/painel/plano/recibo/${i.id}`} className="ml-2 font-semibold text-ink underline underline-offset-4">Recibo</Link>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {payments.data && payments.data.length > 0 && (
         <section className="mt-8 max-w-xl" aria-labelledby="payments-title">
-          <h2 id="payments-title" className="heading text-xl text-ink">Pagamentos</h2>
+          <h2 id="payments-title" className="heading text-xl text-ink">Tentativas de pagamento</h2>
           <ul className="mt-3 divide-y divide-rule border-y border-rule text-sm">
             {payments.data.map((p) => (
               <li key={p.id} className="flex flex-wrap justify-between gap-2 py-2.5">

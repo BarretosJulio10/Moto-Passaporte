@@ -222,6 +222,11 @@ Implementação em `src/modules/admin/paymentsApi.ts`.
 - Público: `rpc('get_payment_public_config')` → `{ billing_enabled, environment, public_key }` (chave só com a contratação liberada).
 - Servidor (`service_role`): `payment_access_token()`, `payment_webhook_secret()`, `record_payment_check(...)`.
 
+## Faturas (Fase 5.3, ADR-022)
+
+- Usuário: `get_my_invoices()` → `number`, `period_start/end`, `amount_cents`, `due_date`, `status` (`open`, `failed`, `paid`, `refunded`, `charged_back`, `canceled`), `attempts`; `get_invoice_receipt({ p_invoice_id })` → dados do recibo (só faturas pagas/reembolsadas/contestadas, só do próprio usuário).
+- Admin: `admin_list_invoices({ p_limit? })`.
+
 ## Benefícios Premium (Fase 5.4, ADR-021)
 
 - Plano: `get_my_plan()` e `get_public_plans()` trazem `entitlements` (`pdf_reports`, `maintenance_reminders`) e `max_share_links`. Admin: `admin_set_plan_benefits({ p_id, p_entitlements, p_max_share_links })`.

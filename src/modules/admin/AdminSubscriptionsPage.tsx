@@ -5,7 +5,8 @@ import { Button } from '@/components/Button'
 import { Notice } from '@/components/Notice'
 import { formatPlanPrice, PERIOD_LABEL, type BillingPeriod } from '@/modules/plans/api'
 import { reconcileSubscriptions, STATUS_LABEL, type SubscriptionStatus } from '@/modules/plans/billingApi'
-import { adminListPaymentEvents, adminListSubscriptions } from './paymentsApi'
+import { INVOICE_STATUS_LABEL } from '@/modules/plans/billingApi'
+import { adminListInvoices, adminListPaymentEvents, adminListSubscriptions } from './paymentsApi'
 
 const RESULT_LABEL: Record<string, string> = {
   received: 'Recebido',
@@ -22,6 +23,7 @@ export function AdminSubscriptionsPage() {
   const qc = useQueryClient()
   const subs = useQuery({ queryKey: ['admin-subscriptions'], queryFn: adminListSubscriptions })
   const events = useQuery({ queryKey: ['admin-payment-events'], queryFn: adminListPaymentEvents })
+  const invoices = useQuery({ queryKey: ['admin-invoices'], queryFn: adminListInvoices })
   const [summary, setSummary] = useState<{ tone: 'success' | 'error'; text: string } | null>(null)
 
   const reconcile = useMutation({
@@ -35,6 +37,7 @@ export function AdminSubscriptionsPage() {
       })
       qc.invalidateQueries({ queryKey: ['admin-subscriptions'] })
       qc.invalidateQueries({ queryKey: ['admin-payment-events'] })
+      qc.invalidateQueries({ queryKey: ['admin-invoices'] })
     },
     onError: (e) => setSummary({ tone: 'error', text: e instanceof Error ? e.message : 'Não foi possível conciliar agora.' }),
   })
@@ -74,6 +77,29 @@ export function AdminSubscriptionsPage() {
                   {dt(s.last_synced_at)}
                 </p>
               </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mt-10" aria-labelledby="invoices-title">
+        <h2 id="invoices-title" className="heading text-2xl text-ink">Faturas</h2>
+        {invoices.data?.length === 0 && <p className="mt-3 text-muted">Nenhuma fatura ainda.</p>}
+        <ul className="mt-3 divide-y divide-rule border-y border-rule text-sm">
+          {invoices.data?.map((i) => (
+            <li key={i.id} className="flex flex-wrap justify-between gap-2 py-2.5">
+              <span className="text-graphite">
+                Nº {i.number} · {i.user_name} · {i.plan_name}
+                <span className="block text-xs text-muted">
+                  {new Date(i.period_start).toLocaleDateString('pt-BR')} a {new Date(i.period_end).toLocaleDateString('pt-BR')}
+                  {i.environment === 'test' ? ' · teste' : ''}
+                  {i.attempts > 0 ? ` · ${i.attempts} tentativa(s) não aprovada(s)` : ''}
+                </span>
+              </span>
+              <span>
+                <span className="font-semibold text-ink">{formatPlanPrice(i.amount_cents)}</span>{' '}
+                <span className={i.status === 'failed' ? 'text-danger' : 'text-muted'}>{INVOICE_STATUS_LABEL[i.status] ?? i.status}</span>
+              </span>
             </li>
           ))}
         </ul>

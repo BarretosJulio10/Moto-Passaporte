@@ -109,6 +109,13 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-022 — Faturas por ciclo e recibo interno (PRD 8.6)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- `invoices` registra cada ciclo: ao aprovar um pagamento, a fatura mais antiga em aberto é quitada (ou criada já paga) com o período concedido, e abre-se a fatura do ciclo seguinte com vencimento no fim do período pago. Cobrança recusada marca a fatura como "cobrança não aprovada" e conta tentativas (um aviso repetido não conta duas vezes). Reembolso/contestação mudam a fatura paga; assinatura cancelada ou encerrada cancela as faturas em aberto (gatilho).
+- Número legível sequencial `MP-AAAA-000001`. A sequência não volta atrás em transações desfeitas, então pode haver números pulados (aceitável; não é numeração fiscal).
+- Recibo do usuário (`/painel/plano/recibo/:id`): comprovante interno, imprimível, com aviso "não é nota fiscal". Emissão de NFS-e fica fora do escopo até decisão contábil (KI-027).
+- Faturas não são editadas nem excluídas; admin só consulta.
+
 ### ADR-021 — Benefícios Premium configuráveis, lembretes e relatório imprimível (PRD 4.3, 5.8, 5.9)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - Cada plano tem **recursos** (`entitlements`: `pdf_reports`, `maintenance_reminders`) e um **limite de links de compartilhamento ativos por moto** (`max_share_links`), editáveis no admin (função própria `admin_set_plan_benefits`, com versão e auditoria). A assinatura guarda os recursos contratados. Valores iniciais: gratuito 3 links e nenhum recurso; Premium 10 links, relatórios e lembretes (provisório, P-1). "Compartilhamento avançado" = mais links simultâneos.

@@ -82,3 +82,42 @@ export const syncSubscription = () => billing<{ ok: boolean }>({ action: 'sync' 
 export const cancelSubscription = () => billing<{ ok: boolean }>({ action: 'cancel' })
 export const reconcileSubscriptions = () =>
   billing<{ ok: boolean; checked: number; synced: number; failures: string[] }>({ action: 'reconcile' })
+
+export type MyInvoice = Database['public']['Functions']['get_my_invoices']['Returns'][number]
+
+export type InvoiceReceipt = {
+  number: string
+  status: 'paid' | 'refunded' | 'charged_back'
+  plan_name: string
+  billing_period: Exclude<BillingPeriod, 'none'>
+  period_start: string
+  period_end: string
+  amount_cents: number
+  currency: string
+  paid_at: string | null
+  environment: 'test' | 'production'
+  payment_reference: string | null
+  customer_name: string | null
+  customer_email: string | null
+}
+
+export const INVOICE_STATUS_LABEL: Record<string, string> = {
+  open: 'Em aberto',
+  failed: 'Cobrança não aprovada',
+  paid: 'Paga',
+  refunded: 'Reembolsada',
+  charged_back: 'Contestada',
+  canceled: 'Cancelada',
+}
+
+export async function fetchMyInvoices(): Promise<MyInvoice[]> {
+  const { data, error } = await getSupabase().rpc('get_my_invoices')
+  if (error) throw error
+  return data ?? []
+}
+
+export async function fetchInvoiceReceipt(id: string): Promise<InvoiceReceipt> {
+  const { data, error } = await getSupabase().rpc('get_invoice_receipt', { p_invoice_id: id })
+  if (error) throw error
+  return data as unknown as InvoiceReceipt
+}

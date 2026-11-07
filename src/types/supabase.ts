@@ -784,6 +784,40 @@ export type Database = {
       get_public_plans: { Args: never; Returns: Json }
       get_payment_public_config: { Args: never; Returns: Json }
       get_my_subscription: { Args: never; Returns: Json }
+      get_my_invoices: {
+        Args: never
+        Returns: {
+          amount_cents: number
+          attempts: number
+          currency: string
+          due_date: string
+          id: string
+          number: string
+          paid_at: string | null
+          period_end: string
+          period_start: string
+          plan_name: string
+          status: string
+        }[]
+      }
+      get_invoice_receipt: { Args: { p_invoice_id: string }; Returns: Json }
+      admin_list_invoices: {
+        Args: { p_limit?: number }
+        Returns: {
+          amount_cents: number
+          attempts: number
+          due_date: string
+          environment: string
+          id: string
+          number: string
+          paid_at: string | null
+          period_end: string
+          period_start: string
+          plan_name: string
+          status: string
+          user_name: string
+        }[]
+      }
       get_motorcycle_reminders: { Args: { p_motorcycle_id: string }; Returns: Json }
       get_my_due_reminders: { Args: never; Returns: Json }
       create_reminder: {

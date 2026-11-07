@@ -9,6 +9,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.20.0] — 07/11/2026 — Fase 5 concluída: faturas por ciclo e recibo
+
+### Adicionado
+- Migração `invoices` (ADR-022): faturas por ciclo com número legível, vínculo com o pagamento, tentativas e estados; `billing_apply_payment` mantém as faturas; gatilho cancela faturas em aberto quando a assinatura termina; `get_my_invoices`, `get_invoice_receipt`, `admin_list_invoices`.
+- "Meu plano": faturas com vencimento, falhas e link para o recibo; pagamentos renomeados para "Tentativas de pagamento".
+- Recibo imprimível (`/painel/plano/recibo/:id`), sem valor fiscal.
+- Admin: faturas na página "Assinaturas e avisos".
+- Testes: banco 20 (local) + 11 (Supabase, transação desfeita); interface 158 no total.
+
 ## [0.19.0] — 07/11/2026 — Fase 5.4: benefícios Premium
 
 ### Adicionado

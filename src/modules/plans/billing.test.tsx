@@ -17,6 +17,18 @@ vi.mock('./billingApi', async () => {
     fetchMySubscription: async () => sub,
     fetchMyPayments: async () =>
       sub ? [{ id: 'p1', status: 'approved', amount_cents: 990, currency: 'BRL', paid_at: '2026-11-07T12:00:00Z', created_at: '2026-11-07T12:00:00Z', plan_name: 'Premium mensal' }] : [],
+    fetchMyInvoices: async () =>
+      sub
+        ? [
+            { id: 'i2', number: 'MP-2026-000002', plan_name: 'Premium mensal', period_start: '2026-12-07T12:00:00Z', period_end: '2027-01-07T12:00:00Z', amount_cents: 990, currency: 'BRL', due_date: '2026-12-07', status: 'failed', attempts: 1, paid_at: null },
+            { id: 'i1', number: 'MP-2026-000001', plan_name: 'Premium mensal', period_start: '2026-11-07T12:00:00Z', period_end: '2026-12-07T12:00:00Z', amount_cents: 990, currency: 'BRL', due_date: '2026-11-07', status: 'paid', attempts: 0, paid_at: '2026-11-07T12:00:00Z' },
+          ]
+        : [],
+    fetchInvoiceReceipt: async () => ({
+      number: 'MP-2026-000001', status: 'paid', plan_name: 'Premium mensal', billing_period: 'monthly', period_start: '2026-11-07T12:00:00Z',
+      period_end: '2026-12-07T12:00:00Z', amount_cents: 990, currency: 'BRL', paid_at: '2026-11-07T12:00:00Z', environment: 'test',
+      payment_reference: 'ap:123', customer_name: 'Ana Souza', customer_email: 'ana@exemplo.com',
+    }),
     startSubscription: async (code: string) => {
       calls.push(`subscribe:${code}`)
       return 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_id=x'
@@ -56,6 +68,7 @@ vi.mock('@/modules/admin/paymentsApi', async () => {
   return {
     ...actual,
     adminListSubscriptions: async () => [{ id: 's1', user_name: 'Ana Souza', plan_name: 'Premium mensal', billing_period: 'monthly', price_cents: 990, status: 'active', provider_status: 'authorized', environment: 'test', current_period_end: '2026-12-07T12:00:00Z', created_at: '', last_synced_at: null, payments_approved: 1 }],
+    adminListInvoices: async () => [{ id: 'i1', number: 'MP-2026-000001', user_name: 'Ana Souza', plan_name: 'Premium mensal', period_start: '2026-11-07T12:00:00Z', period_end: '2026-12-07T12:00:00Z', amount_cents: 990, due_date: '2026-11-07', status: 'paid', attempts: 0, paid_at: '2026-11-07T12:00:00Z', environment: 'test' }],
     adminListPaymentEvents: async () => [{ id: 1, provider: 'mercadopago', event_type: 'payment', action: null, resource_id: '123', request_id: 'r', signature_valid: false, result: 'invalid_signature', detail: null, received_at: '2026-11-07T12:00:00Z', processed_at: null }],
   }
 })
@@ -63,6 +76,8 @@ vi.mock('@/modules/admin/paymentsApi', async () => {
 import { MyPlanPage } from './MyPlanPage'
 import { PlansGrid } from './PlansGrid'
 import { AdminSubscriptionsPage } from '@/modules/admin/AdminSubscriptionsPage'
+import { ReceiptPage } from './ReceiptPage'
+import { Route, Routes } from 'react-router-dom'
 
 function wrap(node: React.ReactNode, path = '/painel/plano') {
   render(
@@ -138,6 +153,34 @@ describe('Meu plano — assinatura', () => {
   })
 })
 
+describe('faturas e recibo', () => {
+  it('lista faturas com situação e recibo só das pagas', async () => {
+    sub = active()
+    wrap(<MyPlanPage />)
+    expect(await screen.findByText('Cobrança não aprovada')).toBeVisible()
+    expect(screen.getByText(/1 tentativa\(s\) não aprovada/)).toBeVisible()
+    const links = screen.getAllByRole('link', { name: 'Recibo' })
+    expect(links).toHaveLength(1)
+    expect(links[0]).toHaveAttribute('href', '/painel/plano/recibo/i1')
+  })
+
+  it('recibo mostra número, período, valor e aviso de que não é nota fiscal', async () => {
+    render(
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <MemoryRouter initialEntries={['/painel/plano/recibo/i1']}>
+          <Routes><Route path="/painel/plano/recibo/:id" element={<ReceiptPage />} /></Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    )
+    const r = await screen.findByRole('article', { name: 'Recibo' })
+    expect(r).toHaveTextContent('MP-2026-000001')
+    expect(r).toHaveTextContent('07/11/2026 a 07/12/2026')
+    expect(r).toHaveTextContent('R$ 9,90')
+    expect(r).toHaveTextContent('Não é nota fiscal')
+    expect(r).toHaveTextContent('Ambiente de teste')
+  })
+})
+
 describe('planos no site com contratação liberada', () => {
   it('leva ao painel para assinar', () => {
     wrap(<PlansGrid plans={PLANS} billingEnabled />, '/')
@@ -152,6 +195,7 @@ describe('admin — assinaturas e avisos', () => {
     wrap(<AdminSubscriptionsPage />, '/admin/assinaturas')
     expect(await screen.findByText('Ana Souza')).toBeVisible()
     expect(await screen.findByText(/Assinatura inválida/)).toBeVisible()
+    expect(await screen.findByText(/Nº MP-2026-000001 · Ana Souza/)).toBeVisible()
     await user.click(screen.getByRole('button', { name: 'Conciliar agora' }))
     expect(await screen.findByText(/2 de 2 assinatura/)).toBeVisible()
   })

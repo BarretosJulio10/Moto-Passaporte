@@ -16,6 +16,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 | `20261107014505_maintenance.sql` | Fase 2: `maintenance_records`, `maintenance_items`, categorias, `create_maintenance_record`, `void_maintenance_record`, view `maintenance_timeline` |
 | `20261107101141_workshop_access.sql` | Fase 3: `plate_search_log`, `motorcycle_workshop_access`, pesquisa por placa, pedido, decisão, revogação e leituras por papel |
 | `20261107101234_workshop_access_indexes.sql` | Índices de `decided_by` e `ended_by` |
+| `20261107203742_invoices.sql` | Faturas (ADR-022): `invoices`, numeração, manutenção pelas funções de cobrança, recibo |
 | `20261107194520_premium_benefits.sql` | Benefícios Premium (ADR-021): recursos e links por plano, lembretes, relatórios |
 | `20261107153512_subscriptions.sql` | Assinaturas (ADR-020): `subscriptions`, `payments`, `payment_events`, funções `billing_*` do servidor, leitura do usuário e do admin, `user_plan` pela assinatura vigente |
 | `20261107151926_payment_settings.sql` | Mercado Pago (ADR-019): `payment_gateway_settings`, segredos no Vault, funções do admin e do servidor |
@@ -71,6 +72,7 @@ Configurações existentes: `registration_rate_limit_per_hour`, `support_email`,
 | Tabela | Conteúdo | Regras |
 |---|---|---|
 | `plate_search_log` | Pesquisas por placa: oficina, usuário, hash sha256 da placa, encontrou ou não | Imutável; só admin lê; base do limite de tentativas |
+| `invoices` | Faturas por ciclo: número, período, valor, vencimento, estado, tentativas, pagamento | Sem acesso direto; usuário vê as suas por função; não é editada à mão nem excluída |
 | `maintenance_reminders` | Lembretes do titular: gatilhos (km, meses, data), base da contagem, pausa, conclusão | Sem acesso direto; só o titular atual, por funções; criar/editar exige o recurso Premium |
 | `motorcycle_reports` | Relatórios gerados (referência e métrica) | Sem acesso direto |
 | `subscriptions` | Assinaturas: plano, preço/periodicidade/limites contratados, estado, período pago, vínculo com o Mercado Pago | Sem acesso direto; muda só pelas funções do servidor; não é excluída |

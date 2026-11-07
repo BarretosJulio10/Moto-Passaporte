@@ -92,3 +92,11 @@ export async function adminListPaymentEvents(): Promise<PaymentEvent[]> {
   if (error) throw error
   return data ?? []
 }
+
+export type AdminInvoice = import('@/types/supabase').Database['public']['Functions']['admin_list_invoices']['Returns'][number]
+
+export async function adminListInvoices(): Promise<AdminInvoice[]> {
+  const { data, error } = await getSupabase().rpc('admin_list_invoices', { p_limit: 100 })
+  if (error) throw error
+  return data ?? []
+}

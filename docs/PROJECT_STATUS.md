@@ -1,15 +1,15 @@
 # PROJECT_STATUS — Moto Passaporte
 
-**Versão atual:** 0.19.0
+**Versão atual:** 0.20.0
 **Data:** 07/11/2026
-**Fase:** Fases 1 a 4 concluídas. Fase 5 em andamento (90%): planos, Mercado Pago, assinaturas e benefícios Premium prontos; faltam faturas por ciclo
-**Progresso geral:** 83,8% (33,5 de 40 itens do PRD — quadro em `PRD_CHECKLIST.md`)
+**Fase:** Fases 1 a 4 concluídas. Fases 1 a 5 concluídas (Mercado Pago aguardando teste ponta a ponta). Próxima: Fase 6
+**Progresso geral:** 85% (34 de 40 itens do PRD — quadro em `PRD_CHECKLIST.md`)
 
 ## Ambientes
 
 | Ambiente | URL | Banco | Situação |
 |---|---|---|---|
-| Desenvolvimento | https://moto-passaporte.vercel.app (Vercel, deploy automático da `main`) | Supabase `ripgenhykaajcnzdxoid` (MOTO_Passaporte, us-east-1, PG 17) | migrações até `premium_benefits` aplicadas; Edge Functions `mercadopago-check`, `mercadopago-billing` e `mercadopago-webhook` publicadas |
+| Desenvolvimento | https://moto-passaporte.vercel.app (Vercel, deploy automático da `main`) | Supabase `ripgenhykaajcnzdxoid` (MOTO_Passaporte, us-east-1, PG 17) | migrações até `invoices` aplicadas; Edge Functions `mercadopago-check`, `mercadopago-billing` e `mercadopago-webhook` publicadas |
 | Homologação | — | — | não configurado |
 | Produção | — | — | não configurado |
 
@@ -21,15 +21,15 @@
 | 2 — Histórico e arquivos | concluída |
 | 3 — Oficinas e autorizações | concluída: cadastro, perfil, pesquisa por placa, autorizações, Oficina de Origem, equipe e serviços da oficina |
 | 4 — Transferência e compartilhamento | concluída: transferência, motos anteriores, compartilhamento controlado e revogável |
-| 5 — Monetização | em andamento: planos, conta do Mercado Pago, assinaturas, Webhook, conciliação, atraso e cancelamento prontos; benefícios Premium (lembretes, relatório em PDF, mais links) prontos; faltam faturas por ciclo |
+| 5 — Monetização | concluída: planos, conta do Mercado Pago, assinaturas, Webhook, conciliação, atraso, cancelamento, benefícios Premium e faturas (falta teste real com o Mercado Pago, KI-026) |
 | 6 — Administração e lançamento | planejado |
 
 ## Próximos passos (em ordem)
 
-Concluído em 0.19.0: benefícios Premium (ADR-021).
+Concluído em 0.20.0: faturas por ciclo (ADR-022). Fase 5 concluída.
 
-1. Fase 5.3 — faturas por ciclo e recibo próprio.
-2. Fase 6 — administração, segurança, backup, homologação.
+1. Fase 6.1 — painel administrativo (usuários, oficinas, pedidos de verificação de placa, armazenamento).
+2. Fase 6 — testes de segurança, backup, homologação e lançamento.
 2. Validação ponta a ponta com credenciais de teste (KI-026) assim que o responsável cadastrar a conta de teste.
 2. Fase 5.3 a 5.5 — faturas, cotas Premium, atraso, cancelamento e reativação.
 3. **Responsável pelo produto:** ligar a proteção contra senhas vazadas no Supabase (KI-021); falta o e-mail de atendimento (KI-015).

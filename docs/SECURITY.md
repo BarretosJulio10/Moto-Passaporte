@@ -62,6 +62,8 @@
 | Supabase real — assinaturas e pagamentos, em transação desfeita | `tests/security/supabase/phase5c_subscriptions_rollback.sql` | 17 aprovadas |
 | PostgreSQL 16 local — benefícios Premium | `tests/security/phase5d_premium_test.sql` | 48 aprovadas |
 | Supabase real — benefícios Premium, em transação desfeita | `tests/security/supabase/phase5d_premium_rollback.sql` | 13 aprovadas |
+| PostgreSQL 16 local — faturas | `tests/security/phase5e_invoices_test.sql` | 20 aprovadas |
+| Supabase real — faturas, em transação desfeita | `tests/security/supabase/phase5e_invoices_rollback.sql` | 11 aprovadas |
 | Tipos das Edge Functions | `scripts/validation/check_edge_functions.sh` | OK |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.

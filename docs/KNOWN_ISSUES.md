@@ -30,3 +30,4 @@ Problemas conhecidos e sua situação.
 | KI-024 | Conciliação com o Mercado Pago só roda pelo botão do admin; falta execução automática periódica (pg_cron + Edge Function) | Média | Aberto — antes do lançamento (PRD 8.3) |
 | KI-025 | Direito de arrependimento (7 dias, CDC art. 49) e reembolsos são feitos manualmente pelo suporte no Mercado Pago; o sistema registra o reembolso quando o Mercado Pago informa | Média | Aberto — depende da decisão P-4 |
 | KI-026 | Fluxo de assinatura ainda não testado ponta a ponta com o Mercado Pago (só respostas simuladas). Em ambiente de teste, o e-mail do pagador precisa ser de um usuário de teste do Mercado Pago | Alta | Aberto — homologação (PRD 8.7) com credenciais de teste |
+| KI-027 | Recibo é comprovante interno; não há emissão de nota fiscal de serviço (NFS-e) | Média | Aberto — depende de decisão contábil antes da cobrança real |
