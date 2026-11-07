@@ -13,6 +13,7 @@ export const ACTION_LABEL: Record<string, string> = {
   admin_update_setting: 'alterou a configuração',
   admin_viewed_audit: 'consultou o conteúdo do evento',
   report_generated: 'gerou relatório de',
+  admin_resolve_claim: 'decidiu o',
 }
 
 export const ENTITY_LABEL: Record<string, string> = {

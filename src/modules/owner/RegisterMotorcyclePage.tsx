@@ -61,7 +61,7 @@ export function RegisterMotorcyclePage() {
         <h1 className="heading text-3xl text-ink">Placa já cadastrada</h1>
         <div className="mt-6">
           <Notice tone="info" title="Abrimos uma solicitação de verificação">
-            Esta placa já possui um passaporte no Moto Passaporte. Nossa equipe vai analisar o caso e você será avisado pelo painel.
+            Esta placa já possui um passaporte no Moto Passaporte. Nossa equipe vai analisar o caso; acompanhe e explique a situação pelo painel, em “Pedidos de verificação de placa”.
           </Notice>
         </div>
         <p className="mt-4 text-muted">

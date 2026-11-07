@@ -109,6 +109,13 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-025 — Pedidos de verificação de placa: análise humana, aviso anônimo, sem transferência forçada (ADR-007)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- Quem tenta cadastrar uma placa já ativa vê só o próprio pedido (placa, situação, resposta); nunca a moto, o titular ou o histórico existentes. Pode complementar a explicação e cancelar enquanto pendente.
+- O admin vê a fila com o contexto necessário (moto, titular atual, idade da conta do solicitante, e-mail mascarado), responde ao solicitante (texto obrigatório) e decide aprovar ou recusar com motivo de 10 a 500 caracteres, auditado. Pedido encerrado não é decidido de novo.
+- "Aprovado" não move a moto: a transferência continua sendo feita pelo titular (ADR-018). O admin pode avisar o titular atual; o aviso aparece no painel dele, sem nome nem contato do solicitante, e pode ser dispensado. Aviso só vale para quem é titular desde antes do aviso (troca posterior de dono não herda avisos antigos).
+- Transferência sem a participação do dono anterior segue pendente de decisão do responsável (P-7).
+
 ### ADR-024 — Configurações por catálogo e auditoria em duas camadas (PRD 7.7, 7.8)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - **Correção de segurança:** o admin podia alterar `system_settings` direto pela API (política de RLS), inclusive ligar `billing_enabled` sem as checagens do ADR-020. A escrita direta foi revogada; configurações mudam só por `admin_update_setting`.

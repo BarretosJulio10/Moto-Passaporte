@@ -231,6 +231,11 @@ Implementação em `src/modules/admin/adminApi.ts`. Todas exigem administrador.
 - `admin_list_workshops({ p_search?, p_limit? })`; `admin_set_workshop_status({ p_organization_id, p_status, p_reason })`; `admin_set_workshop_verification({ p_organization_id, p_verification: 'unverified'|'verified'|'rejected', p_reason })`.
 - `admin_list_settings()` → configurações editáveis com `spec` (`kind`, `min`, `max`, `group`, `label`); `admin_update_setting({ p_key, p_value, p_reason })`.
 - `admin_search_audit({ p_entity_type?, p_action?, p_actor?, p_motorcycle_id?, p_organization_id?, p_from?, p_to?, p_limit?, p_before_id? })` (sem conteúdo); `admin_get_audit_entry({ p_id, p_reason })`; `admin_audit_facets()`.
+
+### Verificação de placa (ADR-025)
+- Solicitante: `get_my_claims()` (sem dados da moto existente); `update_my_claim_note({ p_claim_id, p_note })`; `cancel_my_claim({ p_claim_id })` — só pendentes e próprios.
+- Titular atual: `get_my_ownership_notices()` (aviso anônimo: moto e data); `dismiss_ownership_notice({ p_claim_id })`.
+- Admin: `admin_list_claims({ p_status?, p_limit? })`; `admin_resolve_claim({ p_claim_id, p_status: 'approved'|'rejected', p_reply, p_notify_owner, p_reason })` — aviso ao titular só se aprovado.
 - Motivo: 10 a 500 caracteres.
 
 ## Faturas (Fase 5.3, ADR-022)

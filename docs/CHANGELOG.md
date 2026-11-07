@@ -9,6 +9,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.23.0] — 07/11/2026 — Fase 6.2: verificação de placa
+
+### Adicionado
+- "Meus pedidos de verificação" no painel: situação, resposta da equipe, complemento e cancelamento do pedido.
+- Aviso anônimo ao titular atual quando a equipe confirma um pedido procedente, com opção de dispensar.
+- `/admin/verificacoes`: fila por situação, contexto da moto e do titular, resposta ao solicitante, decisão com motivo e aviso opcional ao titular.
+- Funções `get_my_claims`, `update_my_claim_note`, `cancel_my_claim`, `get_my_ownership_notices`, `dismiss_ownership_notice`, `admin_list_claims`, `admin_resolve_claim`; colunas `owner_notified_at` e `owner_notice_dismissed_at`; auditoria em `motorcycle_claim_requests`.
+
+### Corrigido
+- Aviso ao titular não aparecia quando a titularidade e o aviso tinham o mesmo instante (migração `plate_claims_notice_fix`).
+
+### Testes
+- Banco local: 23 verificações novas (18 suítes). Supabase real (transação desfeita): 10. Frontend: 172.
+
 ## [0.22.0] — 07/11/2026 — Fase 6.1 concluída: auditoria e configurações
 
 ### Segurança

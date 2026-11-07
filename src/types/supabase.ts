@@ -785,6 +785,48 @@ export type Database = {
       get_payment_public_config: { Args: never; Returns: Json }
       get_my_subscription: { Args: never; Returns: Json }
       admin_get_metrics: { Args: never; Returns: Json }
+      get_my_claims: {
+        Args: never
+        Returns: { created_at: string; id: string; plate: string; requester_note: string | null; resolution_note: string | null; resolved_at: string | null; status: string }[]
+      }
+      update_my_claim_note: { Args: { p_claim_id: string; p_note: string }; Returns: undefined }
+      cancel_my_claim: { Args: { p_claim_id: string }; Returns: undefined }
+      get_my_ownership_notices: {
+        Args: never
+        Returns: { claim_id: string; motorcycle_id: string; motorcycle_name: string; notified_at: string }[]
+      }
+      dismiss_ownership_notice: { Args: { p_claim_id: string }; Returns: undefined }
+      admin_list_claims: {
+        Args: { p_limit?: number; p_status?: string | null }
+        Returns: {
+          created_at: string
+          current_owner_id: string | null
+          current_owner_name: string | null
+          id: string
+          motorcycle_id: string | null
+          motorcycle_name: string | null
+          owner_notified_at: string | null
+          owner_since: string | null
+          passport_created_at: string | null
+          pending_transfer: boolean
+          plate: string
+          plate_since: string | null
+          requester_account_age_days: number | null
+          requester_email_masked: string | null
+          requester_id: string
+          requester_name: string | null
+          requester_note: string | null
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by_name: string | null
+          same_moto_claims: number
+          status: string
+        }[]
+      }
+      admin_resolve_claim: {
+        Args: { p_claim_id: string; p_notify_owner: boolean; p_reason: string; p_reply: string; p_status: string }
+        Returns: undefined
+      }
       admin_list_settings: {
         Args: never
         Returns: { description: string | null; is_public: boolean; key: string; spec: Json; updated_at: string; updated_by_name: string | null; value: Json }[]

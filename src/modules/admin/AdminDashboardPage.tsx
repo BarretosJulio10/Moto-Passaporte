@@ -37,7 +37,7 @@ const GROUPS: Group[] = [
   {
     title: 'Pendências',
     items: [
-      { label: 'Verificações de placa', value: (m) => n(m.claims_pending), alert: (m) => m.claims_pending > 0 },
+      { label: 'Verificações de placa', value: (m) => n(m.claims_pending), alert: (m) => m.claims_pending > 0, to: '/admin/verificacoes' },
       { label: 'Oficinas não verificadas', value: (m) => n(m.workshops_unverified), to: '/admin/oficinas' },
       { label: 'Contas suspensas/bloqueadas', value: (m) => n(m.users_restricted) },
       { label: 'Faturas com falha', value: (m) => n(m.invoices_failed), alert: (m) => m.invoices_failed > 0 },
@@ -138,6 +138,12 @@ export function AdminDashboardPage() {
             </Link>
           </li>
           <li>
+            <Link to="/admin/verificacoes" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
+              <span className="font-semibold text-ink">Verificação de placas</span>
+              <span className="block text-sm text-muted">Pedidos de quem tentou cadastrar uma placa que já tem passaporte.</span>
+            </Link>
+          </li>
+          <li>
             <Link to="/admin/auditoria" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
               <span className="font-semibold text-ink">Auditoria</span>
               <span className="block text-sm text-muted">Buscar quem fez o quê e quando, com filtros; conteúdo dos eventos com motivo.</span>
@@ -163,7 +169,7 @@ export function AdminDashboardPage() {
           </li>
         </ul>
         <p className="mt-3 text-muted">
-          Verificação de placas duplicadas e gestão de armazenamento chegam nas próximas etapas.
+          Gestão de armazenamento chega na próxima etapa.
         </p>
       </section>
     </div>

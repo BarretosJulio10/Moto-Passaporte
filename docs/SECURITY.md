@@ -68,6 +68,8 @@
 | Supabase real — administração, em transação desfeita | `tests/security/supabase/phase6a_admin_rollback.sql` | 11 aprovadas |
 | PostgreSQL 16 local — auditoria e configurações | `tests/security/phase6b_audit_settings_test.sql` | 26 aprovadas |
 | Supabase real — auditoria e configurações, em transação desfeita | `tests/security/supabase/phase6b_audit_settings_rollback.sql` | 9 aprovadas |
+| PostgreSQL 16 local — verificação de placa | `tests/security/phase6c_claims_test.sql` | 23 aprovadas |
+| Supabase real — verificação de placa, em transação desfeita | `tests/security/supabase/phase6c_claims_rollback.sql` | 10 aprovadas |
 | Tipos das Edge Functions | `scripts/validation/check_edge_functions.sh` | OK |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.

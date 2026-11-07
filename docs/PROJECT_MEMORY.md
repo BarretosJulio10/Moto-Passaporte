@@ -103,7 +103,7 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 - Faturas (ADR-022) mantidas dentro de `billing_apply_payment`; recibo interno sem valor fiscal.
 - Administração (ADR-023): ações com motivo (`require_admin_reason`), auditadas; suspensão usa `auth.users.banned_until`.
 - Configurações só por `admin_update_setting` (catálogo `setting_spec`); nova chave editável = adicionar ao catálogo (ADR-024).
-- Próximo item: 6.2 (placas duplicadas), depois 6.3 (armazenamento). Limites já vêm de `user_plan()` (ADR-018): a 5.4 só troca a regra para a assinatura ativa. Antes de cobrar: decisões P-1, P-3, P-4, P-5 e credenciais de teste do Mercado Pago. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
+- v0.23.0: 6.2 concluído (ADR-025). Próximo item: 6.3 (armazenamento), depois 6.4 (testes). Limites já vêm de `user_plan()` (ADR-018): a 5.4 só troca a regra para a assinatura ativa. Antes de cobrar: decisões P-1, P-3, P-4, P-5 e credenciais de teste do Mercado Pago. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 
