@@ -70,7 +70,7 @@ begin
   perform tests.ok(r->>'status' = 'created', 'A cadastra a moto');
   perform tests.ok((select count(*) = 1 from public.my_motorcycles), 'moto em my_motorcycles');
   perform tests.ok((select current_plate = 'ABC1D23' and latest_mileage = 12000 from public.my_motorcycles), 'placa normalizada e km inicial');
-  perform tests.ok((select chassis = '9C2PC4500NR000001' from public.motorcycle_private where motorcycle_id = moto_a), 'A vê o próprio chassi');
+  perform tests.ok(public.get_my_chassis(moto_a) = '9C2PC4500NR000001', 'A vê o próprio chassi (decifrado)');
   perform tests.must_fail($$select public.register_motorcycle('Yamaha','MT-03',2021,'XYZ1234',5000)$$, 'limite do plano gratuito');
   perform tests.must_fail(format($$update public.motorcycles set public_id = 'x' where id = %L$$, moto_a), 'public_id imutável');
   perform tests.must_fail(format($$delete from public.motorcycles where id = %L$$, moto_a), 'moto não excluível');
@@ -89,14 +89,14 @@ begin
   perform public.change_motorcycle_plate(moto_a, 'ABC1234');
   perform tests.ok((select count(*) = 2 from public.motorcycle_plates where motorcycle_id = moto_a), 'troca de placa preserva histórico');
   perform tests.ok((select count(*) = 1 from public.motorcycles), 'troca de placa não cria moto');
-  update public.motorcycle_private set chassis = '9C2PC4500NR000002' where motorcycle_id = moto_a;
+  perform public.set_my_chassis(moto_a, '9C2PC4500NR000002');
   perform tests.ok((select count(*) = 0 from public.audit_logs), 'comum não lê auditoria');
 
   -- ===== Usuário B
   perform tests.act_as(B, 'authenticated');
   perform tests.ok((select count(*) = 0 from public.motorcycles), 'B não vê moto de A');
   perform tests.ok((select count(*) = 0 from public.motorcycle_plates), 'B não vê placas');
-  perform tests.ok((select count(*) = 0 from public.motorcycle_private), 'B não vê chassi');
+  perform tests.must_fail(format('select public.get_my_chassis(%L)', moto_a), 'B não vê chassi');
   perform tests.ok((select count(*) = 0 from public.mileage_records), 'B não vê km');
   perform tests.ok((select count(*) = 0 from public.motorcycle_ownerships), 'B não vê titularidade');
   perform tests.ok((select count(*) = 1 from public.profiles), 'B vê só o próprio perfil');
@@ -107,8 +107,7 @@ begin
   perform tests.ok((public.register_motorcycle('Yamaha','Fazer 250',2019,'ABC1D23',30000)->>'status') = 'created', 'placa antiga reutilizável');
   update public.motorcycles set color = 'Hackeada' where id = moto_a;
   perform tests.ok(not found, 'B não edita moto de A');
-  update public.motorcycle_private set chassis = 'XXXXX' where motorcycle_id = moto_a;
-  perform tests.ok(not found, 'B não altera chassi de A');
+  perform tests.must_fail(format('select public.set_my_chassis(%L, %L)', moto_a, 'XXXXX'), 'B não altera chassi de A');
   perform tests.must_fail(format($$select public.change_motorcycle_plate(%L, 'QWE1234')$$, moto_a), 'B não troca placa de A');
   perform tests.must_fail(format($$select public.record_mileage(%L, 99999)$$, moto_a), 'B não registra km de A');
 
@@ -148,7 +147,7 @@ begin
   perform tests.act_as(D, 'authenticated');
   perform tests.ok((select count(*) > 0 from public.audit_logs), 'admin lê auditoria');
   perform tests.ok((select count(*) >= 2 from public.motorcycles), 'admin vê dados básicos');
-  perform tests.ok((select count(*) = 0 from public.motorcycle_private), 'admin não vê chassi');
+  perform tests.must_fail(format('select public.get_my_chassis(%L)', moto_a), 'admin não vê chassi');
   perform tests.ok((select count(*) = 0 from public.motorcycle_plates), 'admin não vê placas');
   perform tests.must_fail($$update public.audit_logs set action = 'x'$$, 'admin não altera auditoria');
 

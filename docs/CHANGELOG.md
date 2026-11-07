@@ -9,6 +9,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.30.0] — 07/11/2026 — Chassi cifrado
+
+### Segurança
+- Chassi guardado cifrado (AES-256, chave no Vault); nenhum chassi em texto aberto no banco nem nos backups. O chassi já cadastrado em produção foi convertido (ADR-032; KI-002).
+- Leitura e alteração do chassi só pelo titular atual, por função; acesso direto à tabela revogado.
+- Varredura de segurança: nova regra para escrita por coluna fora da lista permitida.
+
+### Testes
+- Banco local: suíte da Fase 1 atualizada (+8 verificações de criptografia); 23 suítes. Supabase real: chassi 9 (inclui transferência) e Fase 1 completa 71. Varredura com a regra nova: 0 violações.
+
+### Rollback desta versão
+- `supabase/rollback/20261107230107_chassis_encryption.down.sql` (só em emergência: volta o chassi para texto aberto) e publicar o site anterior.
+
 ## [0.29.0] — 07/11/2026 — Central de notificações
 
 ### Adicionado

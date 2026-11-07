@@ -333,3 +333,6 @@ Implementação em `src/modules/plans/api.ts`.
 - `get_my_notifications({ p_limit?, p_before? })`, `count_my_unread_notifications()`, `mark_my_notifications_read({ p_ids? })` (sem ids = todas).
 - `get_my_notification_preferences()` → `{ kind, optional, in_app, email }[]`; `set_my_notification_preference({ p_kind, p_in_app, p_email })` (essenciais não podem ter `in_app = false`).
 - Admin: `admin_send_notice({ p_user_id, p_title, p_body, p_reason })` (auditado).
+
+### Chassi (ADR-032)
+- `get_my_chassis({ p_motorcycle_id })` → texto ou null (só titular atual); `set_my_chassis({ p_motorcycle_id, p_chassis })` (vazio apaga; inválido recusado). A tabela `motorcycle_private` não é mais lida pelo navegador.

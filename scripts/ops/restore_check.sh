@@ -58,6 +58,9 @@ PGOPTIONS='-c session_replication_role=replica' "${PSQL[@]}" -d "$DST" -c "do \$
   for t in select format('%I.%I', schemaname, tablename) from pg_tables where schemaname = 'public' loop
     execute 'truncate ' || t || ' cascade'; end loop;
   delete from storage.objects; delete from storage.buckets; end \$\$;" >/dev/null
+# Passo do manual (OPERATIONS.md §3): recolocar a chave do chassi guardada junto com a do backup.
+CHASSIS_KEY=$("${PSQL[@]}" -d "$SRC" -c "select decrypted_secret from vault.decrypted_secrets where name = 'chassis_key'")
+"${PSQL[@]}" -d "$DST" -c "select vault.update_secret((select id from vault.secrets where name = 'chassis_key'), '$CHASSIS_KEY')" >/dev/null
 for f in auth_storage_data public_data; do
   PGOPTIONS='-c session_replication_role=replica' pg_restore -d "$DST" --data-only --exit-on-error "$WORK/rs/$f.dump"
 done
@@ -84,17 +87,21 @@ ok "bucket privado e varredura de segurança sem violações no banco restaurado
 [ "$(tail -1 "$WORK/a.txt")" = "$("${PSQL[@]}" -d "$SRC" -c "select count(*) from public.motorcycle_ownerships where owner_user_id = '11111111-1111-1111-1111-111111111111' and ended_at is null")" ] \
   || fail "titular não vê as próprias motos após restaurar"
 ok "titular vê as próprias motos no banco restaurado (RLS funcionando com os dados)"
+CH_SRC=$("${PSQL[@]}" -d "$SRC" -c "select string_agg(extensions.pgp_sym_decrypt(chassis_enc, public.chassis_key()), ',' order by motorcycle_id) from public.motorcycle_private where chassis_enc is not null")
+CH_DST=$("${PSQL[@]}" -d "$DST" -c "select string_agg(extensions.pgp_sym_decrypt(chassis_enc, public.chassis_key()), ',' order by motorcycle_id) from public.motorcycle_private where chassis_enc is not null")
+[ -n "$CH_SRC" ] && [ "$CH_SRC" = "$CH_DST" ] || fail "chassis não abrem no banco restaurado (chave do chassi)"
+ok "chassis cifrados abrem no banco restaurado com a chave guardada"
 
 # Rollback das migrações da Fase 6 (mais nova → mais antiga) e reaplicação
 for f in $(ls "$ROOT"/supabase/rollback/*.down.sql | sort -r); do
   "${PSQL[@]}" -d "$DST" -f "$f" >/dev/null
 done
-gone=$("${PSQL[@]}" -d "$DST" -c "select count(*) from (values ('admin_storage_overview'), ('admin_resolve_claim'), ('admin_update_setting'), ('admin_get_metrics'), ('mask_email'), ('admin_job_status'), ('my_admin_access'), ('get_my_notifications')) v(f)
+gone=$("${PSQL[@]}" -d "$DST" -c "select count(*) from (values ('admin_storage_overview'), ('admin_resolve_claim'), ('admin_update_setting'), ('admin_get_metrics'), ('mask_email'), ('admin_job_status'), ('my_admin_access'), ('get_my_notifications'), ('get_my_chassis')) v(f)
                                    where exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname = v.f)")
 [ "$gone" = 0 ] || fail "rollback deixou funções para trás"
 cols=$("${PSQL[@]}" -d "$DST" -c "select count(*) from information_schema.columns where table_schema = 'public' and column_name in ('account_status', 'owner_notified_at')")
 [ "$cols" = 0 ] || fail "rollback deixou colunas para trás"
-ok "rollback remove funções, colunas e tabelas das 7 migrações"
+ok "rollback remove funções, colunas e tabelas das 8 migrações"
 [ "$("${PSQL[@]}" -d "$DST" -c "select count(*) from public.motorcycles")" = "$("${PSQL[@]}" -d "$SRC" -c "select count(*) from public.motorcycles")" ] || fail "rollback mexeu em motos"
 [ "$("${PSQL[@]}" -d "$DST" -c "select count(*) from public.maintenance_records")" = "$("${PSQL[@]}" -d "$SRC" -c "select count(*) from public.maintenance_records")" ] || fail "rollback mexeu no histórico"
 ok "histórico e motos intactos após o rollback"
@@ -102,7 +109,7 @@ w=$("${PSQL[@]}" -d "$DST" -c "select count(*) from information_schema.role_tabl
 [ "$w" = 0 ] || fail "rollback reabriu escrita direta em system_settings"
 ok "rollback não reabre a falha de segurança corrigida (escrita direta em configurações)"
 
-for v in 20261107204757 20261107205649 20261107211016 20261107211152 20261107212126 20261107223027 20261107223918 20261107225331; do
+for v in 20261107204757 20261107205649 20261107211016 20261107211152 20261107212126 20261107223027 20261107223918 20261107225331 20261107230107; do
   "${PSQL[@]}" -d "$DST" -f "$(ls "$ROOT"/supabase/migrations/${v}_*.sql)" >/dev/null
 done
 [ "$(SWEEP_COUNT "$DST")" = 0 ] || fail "varredura com violações após reaplicar"
@@ -110,7 +117,7 @@ done
 ok "migrações reaplicadas: mesma estrutura e varredura sem violações"
 sed -n '/^create schema tests;/,/^grant execute on all functions in schema tests/p' "$ROOT/tests/security/phase1_rls_test.sql" | "${PSQL[@]}" -d "$DST" >/dev/null
 "${PSQL[@]}" -d "$DST" -f "$ROOT/tests/security/phase6e_security_sweep_test.sql" >/dev/null 2>&1 || fail "varredura (com brechas plantadas) após reaplicar"
-ok "teste da varredura (10 brechas plantadas) passa no banco restaurado e reaplicado"
+ok "teste da varredura (11 brechas plantadas) passa no banco restaurado e reaplicado"
 
 [ -n "${KEEP_RESTORE_DB:-}" ] || "${PSQL[@]}" -d postgres -c "drop database $DST"
 echo "=== TODOS OS TESTES DA FASE 6.5 (BACKUP, RESTAURAÇÃO E ROLLBACK) PASSARAM ==="

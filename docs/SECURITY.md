@@ -81,6 +81,7 @@
 | PostgreSQL 16 local — MFA de administradores | `tests/security/phase6g_admin_mfa_test.sql` | 15 aprovadas |
 | PostgreSQL 16 local — central de notificações | `tests/security/phase6h_notifications_test.sql` | 36 aprovadas |
 | Supabase real — central de notificações (transferência real), em transação desfeita | `tests/security/supabase/phase6h_notifications_rollback.sql` | 9 aprovadas |
+| Supabase real — chassi cifrado, em transação desfeita | `tests/security/supabase/phase6i_chassis_rollback.sql` | 9 aprovadas |
 | Supabase real — MFA de administradores, em transação desfeita | `tests/security/supabase/phase6g_admin_mfa_rollback.sql` | 8 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
@@ -202,6 +203,11 @@ Ver `KNOWN_ISSUES.md`.
 
 - `is_admin()` = papel admin **e** sessão `aal2`. Testado: sem a segunda etapa, indicadores, usuários, configurações, limpeza e auditoria ficam bloqueados (local 15, Supabase real 8).
 - Celular perdido: remover o fator em Supabase → Authentication → Users. Nunca desligar a regra para contornar.
+
+## Chassi cifrado (ADR-032)
+
+- `motorcycle_private.chassis_enc` (pgp_sym_encrypt, AES-256); chave `chassis_key` no Vault, lida só por funções internas. `chassis` sempre vazio (regra no banco).
+- Só o titular atual lê/altera (`get_my_chassis`/`set_my_chassis`); admin não lê. Testado local e no Supabase real (inclusive após transferência).
 
 ## Notificações (ADR-031)
 

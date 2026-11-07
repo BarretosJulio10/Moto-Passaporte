@@ -13,6 +13,7 @@ PRD 18.4 e 20 · ADR-028 · Responsável: o responsável pelo produto (dono das 
 | Estrutura do banco, funções, regras de acesso, Edge Functions, site | Git (`supabase/migrations`, `supabase/functions`, `src`) | GitHub | A cada commit | Permanente |
 | Configurações do sistema (`system_settings`) | Dentro dos dados do `public` | — | Diário | 30 dias |
 | Segredos (token e segredo do Mercado Pago, no Vault) | **Não entram no backup** | Só no Vault do Supabase | — | Recadastrar no painel admin após restaurar |
+| **Chave do chassi** (`chassis_key`, no Vault) | **Não entra no backup** — guardar uma cópia manual junto com a chave do backup (uma vez): SQL Editor → `select decrypted_secret from vault.decrypted_secrets where name = 'chassis_key';` | Mesmo lugar seguro da chave do backup | Uma vez (só muda se for trocada) | Permanente |
 
 **Criptografia:** [age](https://age-encryption.org) com chave pública. O GitHub só tem a chave **pública** (variável `BACKUP_AGE_RECIPIENT`); quem tem a **privada** é só o responsável. Sem ela, ninguém (nem o GitHub, nem o Claude) abre o backup. Perder a chave privada = perder os backups.
 
@@ -36,7 +37,8 @@ Princípio: **a estrutura vem das migrações do Git; os dados vêm do backup** 
 1. Baixar o artefato (*Actions → Backup → execução → Artifacts*) e abrir:
    `age -d -i moto-passaporte-backup.key db-AAAAMMDD.tar.age | tar -xf -` (o mesmo para `files-...`).
 2. Criar um projeto Supabase novo (ou usar o atual, se a perda for só de dados) e aplicar **todas** as migrações de `supabase/migrations` em ordem, no commit indicado em `GIT_COMMIT` (ou mais novo, se compatível).
-3. Limpar os dados semeados pelas migrações e carregar o backup com os gatilhos desligados (impede perfis duplicados e alterações na auditoria):
+3. Recolocar a chave do chassi guardada (as migrações geram uma nova, que não abre os chassis do backup): `select vault.update_secret((select id from vault.secrets where name = 'chassis_key'), '<valor guardado>');`
+4. Limpar os dados semeados pelas migrações e carregar o backup com os gatilhos desligados (impede perfis duplicados e alterações na auditoria):
    ```sql
    set session_replication_role = replica;
    -- truncar todas as tabelas de public (cascade) e: delete from storage.objects; delete from storage.buckets;
@@ -45,11 +47,11 @@ Princípio: **a estrutura vem das migrações do Git; os dados vêm do backup** 
    PGOPTIONS='-c session_replication_role=replica' pg_restore -d "$DB_URL" --data-only auth_storage_data.dump
    PGOPTIONS='-c session_replication_role=replica' pg_restore -d "$DB_URL" --data-only public_data.dump
    ```
-4. Enviar os arquivos para o bucket `attachments` nos mesmos caminhos (`MANIFEST.json` lista tudo).
-5. Republicar as Edge Functions (`supabase/functions`); se o projeto mudou, atualizar `functions_base_url` em `system_settings` (as rotinas agendadas usam esse endereço). Recadastrar no painel admin o token e o segredo do Mercado Pago (o Vault não vai no backup). Conferir o endereço do Webhook no Mercado Pago se o projeto mudou.
-6. Conferir: rodar `tests/security/supabase/phase6e_security_sweep.sql` (nenhuma linha), entrar com uma conta de teste e abrir uma moto, um arquivo e o painel admin.
+5. Enviar os arquivos para o bucket `attachments` nos mesmos caminhos (`MANIFEST.json` lista tudo).
+6. Republicar as Edge Functions (`supabase/functions`); se o projeto mudou, atualizar `functions_base_url` em `system_settings` (as rotinas agendadas usam esse endereço). Recadastrar no painel admin o token e o segredo do Mercado Pago (o Vault não vai no backup). Conferir o endereço do Webhook no Mercado Pago se o projeto mudou.
+7. Conferir: rodar `tests/security/supabase/phase6e_security_sweep.sql` (nenhuma linha), entrar com uma conta de teste e abrir uma moto, um arquivo e o painel admin.
 
-**Teste de restauração:** `scripts/ops/restore_check.sh` faz os passos 1–3 e 6 num banco de teste (dados → criptografia → restauração → mesmas linhas, funções, RLS, permissões, bucket privado, varredura e acesso do titular). Repetir com um backup real a cada 3 meses ou antes de mudanças grandes, num projeto Supabase separado.
+**Teste de restauração:** `scripts/ops/restore_check.sh` faz os passos 1–4 e 7 num banco de teste (dados → criptografia → restauração → mesmas linhas, funções, RLS, permissões, bucket privado, varredura e acesso do titular). Repetir com um backup real a cada 3 meses ou antes de mudanças grandes, num projeto Supabase separado.
 
 ## 4. Rollback por camada
 

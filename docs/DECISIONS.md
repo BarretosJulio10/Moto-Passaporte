@@ -109,6 +109,13 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-032 — Chassi cifrado em coluna (D-T3)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- Decisão D-T3: **cifrar**. `chassis_enc = pgp_sym_encrypt(chassi, chave, aes256)`; a chave (32 bytes aleatórios) é gerada no banco e guardada no Vault. Regra no banco impede chassi em texto aberto (`chassis is null` sempre); um gatilho cifra o valor recebido no cadastro.
+- Acesso só do titular atual, por `get_my_chassis` / `set_my_chassis`; leitura e escrita direta na tabela revogadas, inclusive para o próprio titular e para o admin. Transferência: o novo dono passa a ver, o anterior deixa de ver (testado).
+- Vazamento de banco ou backup não expõe chassis (o backup não leva o Vault). Em compensação, **a chave precisa ser guardada junto com a chave do backup**; sem ela, uma restauração em outro projeto perde os chassis (OPERATIONS.md §1 e §3).
+- A varredura de segurança passou a checar escrita por coluna, com lista permitida (perfil, dados da moto, perfil da oficina).
+
 ### ADR-031 — Central de notificações gerada no banco (PRD 12)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - Avisos internos no site para todos os eventos do PRD 12: pedido/decisão/revogação de oficina, novo serviço de oficina, transferência (recebida e respondida), lembretes, fim do Premium, pagamento confirmado, falha/atraso de pagamento, espaço quase cheio, respostas da verificação de placa e aviso administrativo (com motivo, auditado).
@@ -233,7 +240,7 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 
 | ID | Decisão | Impacto | Necessária antes de |
 |---|---|---|---|
-| D-T3 | Criptografia em coluna do chassi (Supabase Vault/pgsodium) vs. tabela isolada com RLS só do proprietário | Proteção extra do chassi em caso de vazamento do banco | Antes de produção |
+| D-T3 | ~~Criptografia em coluna do chassi~~ — **decidido: cifrar (ADR-032, v0.30.0)** | — | — |
 
 ## Pendentes — produto (PRD seção 27)
 
