@@ -5,8 +5,8 @@
 > Nunca registrar aqui senhas, tokens, chaves, dados pessoais ou segredos operacionais.
 
 **Última atualização:** 06/11/2026
-**Versão do projeto:** 0.1.0 (fundação documental)
-**Situação geral:** `planejado` — nenhum código de aplicação ou banco implementado ainda.
+**Versão do projeto:** 0.2.0
+**Situação geral:** banco da Fase 1 `testado` localmente (não aplicado no Supabase); frontend `planejado`.
 
 Legenda de estados (seção 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 
@@ -47,23 +47,28 @@ Documento de referência: [`docs/PRD.md`](./PRD.md) (v2.0). As regras da v1.0 co
 
 ## 4. Banco de dados
 
-Situação: `planejado`. Nenhuma migração criada.
+Situação: Fase 1 `testado` em PostgreSQL 16 local com simulação do Supabase (73 testes de segurança aprovados). **Não aplicado** no Supabase ainda. Detalhes completos em [`DATABASE.md`](./DATABASE.md) e [`SECURITY.md`](./SECURITY.md).
 
-Estratégia definida (ver DECISIONS.md, ADR-002): o banco é escrito como **migrações versionadas** em `supabase/migrations/` e aplicado no projeto Supabase quando ele for conectado. Mudanças futuras = nova migração, nunca edição das antigas.
+Estratégia (ADR-002): migrações versionadas em `supabase/migrations/`, aplicadas quando o Supabase for conectado. Mudanças futuras = **nova** migração, nunca edição das antigas (exceto enquanto nenhuma tiver sido aplicada em ambiente algum).
 
-Tabelas previstas (PRD seção 14) — a validar no desenho do banco:
-- Identidade e acesso: `profiles`, `user_roles`, `organizations`, `organization_members`, `workshops`
-- Motos: `motorcycles`, `motorcycle_plates`, `motorcycle_ownerships`, `transfer_requests`
-- Histórico: `motorcycle_workshop_access`, `maintenance_records`, `maintenance_items`, `mileage_records`, `motorcycle_diary`, `attachments`, `passport_shares`
-- SaaS: `subscription_plans`, `subscriptions`, `billing_customers`, `invoices`, `payments`, `payment_events`, `notifications`, `audit_logs`, `system_settings`, `support_cases` (se aprovado)
+Já criadas (Fase 1): `audit_logs`, `profiles`, `user_roles`, `system_settings`, `organizations`, `organization_members`, `workshops`, `motorcycles`, `motorcycle_plates`, `motorcycle_ownerships`, `motorcycle_private`, `mileage_records`, `motorcycle_claim_requests`, view `my_motorcycles`.
+
+Padrões adotados:
+- Escritas estruturais só por funções `security definer` com `search_path = ''`; frontend chama via RPC.
+- Privilégios padrão do Supabase revogados e concedidos por tabela/coluna; RLS em todas as tabelas.
+- Históricos protegidos por triggers (valem até para o dono do banco).
+- Admin com acesso mínimo: não lê chassi nem placas por padrão.
+
+Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access`, `maintenance_records`, `maintenance_items` (F2/F3), `motorcycle_diary`, `attachments` (F2), `passport_shares` (F4), cobrança e `notifications` (F5), `support_cases` (F6).
 
 ## 5. Módulos
 
 | Módulo | Fase | Situação |
 |---|---|---|
-| Fundação SaaS, auth, papéis, organizações, RLS, auditoria | 1 | `planejado` |
+| Fundação SaaS, auth, papéis, organizações, RLS, auditoria (banco) | 1 | `testado` (local) |
 | Site público | 1 | `planejado` |
-| Cadastro de moto, ID permanente, QR Code | 1 | `planejado` |
+| Cadastro de moto, ID permanente (banco) | 1 | `testado` (local) |
+| QR Code e telas da Fase 1 | 1 | `planejado` |
 | Linha do tempo, manutenção, quilometragem, anexos, diário | 2 | `planejado` |
 | Oficinas, membros, pesquisa por placa, autorizações | 3 | `planejado` |
 | Transferência e compartilhamento público | 4 | `planejado` |
@@ -80,10 +85,11 @@ Tabelas previstas (PRD seção 14) — a validar no desenho do banco:
 
 ## 7. Pendências imediatas
 
-- Conectar o projeto Supabase novo (conta separada; região sugerida: São Paulo).
-- Decidir quem constrói a interface: Lovable ou desenvolvimento direto no repositório (ver DECISIONS.md, D-T1).
-- Decidir fluxo de Git: commits direto na `main` ou branches + pull request (D-T2).
-- Fechar as decisões de produto que afetam a Fase 1 (DECISIONS.md, itens P-1, P-6 e P-8).
+- Conectar o projeto Supabase novo (conta separada; região sugerida: São Paulo), aplicar migrações e rodar `scripts/validation/run_db_tests.sh` equivalente lá.
+- Decidir quem constrói a interface: Lovable ou desenvolvimento direto no repositório (D-T1).
+- Decidir criptografia do chassi (D-T3) antes de produção.
+
+Decisões já fechadas: Git direto na `main` (ADR-005), 1 moto no gratuito (ADR-006), duplicidade por placa (ADR-007), campos públicos padrão (ADR-008).
 
 ## 8. Como retomar o trabalho
 

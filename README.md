@@ -8,7 +8,7 @@ SaaS brasileiro que cria um passaporte digital permanente para cada moto — man
 
 ## Situação
 
-Versão **0.1.0** — fundação documental. Nenhum código de aplicação implementado ainda.
+Versão **0.2.0** — banco de dados da Fase 1 escrito e testado localmente (ainda não aplicado no Supabase). Interface não iniciada.
 
 ## Documentação
 
@@ -20,6 +20,8 @@ Versão **0.1.0** — fundação documental. Nenhum código de aplicação imple
 | [`docs/DECISIONS.md`](docs/DECISIONS.md) | Decisões tomadas e pendentes |
 | [`docs/CHANGELOG.md`](docs/CHANGELOG.md) | Histórico de mudanças |
 | [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md) | Problemas conhecidos |
+| [`docs/DATABASE.md`](docs/DATABASE.md) | Tabelas, operações e regras do banco |
+| [`docs/SECURITY.md`](docs/SECURITY.md) | Papéis, matriz de acesso e testes de segurança |
 
 ## Stack prevista
 
