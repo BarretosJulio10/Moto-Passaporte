@@ -4,8 +4,25 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 06/11/2026 — v0.7.0
-**Item atual na ordem:** Fase 2 → anexos e cotas (2.4): Storage privado, fotos e comprovantes
+**Última conferência:** 06/11/2026 — v0.8.0
+**Item atual na ordem:** Fase 2 → diário da moto (2.6)
+
+## Progresso
+
+Conta: item concluído = 1, parcial = 0,5, planejado = 0. Total de 40 itens nas 6 fases.
+**Informar este quadro ao responsável a cada entrega** (protocolo, `PROJECT_MEMORY.md` §8).
+
+| Fase | Itens | Feito | % |
+|---|---|---|---|
+| 1 — Fundação SaaS e site | 11 | 11 | 100% |
+| 2 — Histórico e arquivos | 6 | 5 | 83% |
+| 3 — Oficinas e autorizações | 7 | 2 | 29% |
+| 4 — Transferência e compartilhamento | 5 | 1 | 20% |
+| 5 — Monetização e Mercado Pago | 5 | 0 | 0% |
+| 6 — Administração, segurança e lançamento | 6 | 0 | 0% |
+| **Total** | **40** | **19** | **47,5%** |
+
+Histórico: 0.7.0 = 45% · 0.8.0 = 47,5%.
 
 **Fase 1: concluída (base)** em 06/11/2026. Pendências que não bloqueiam a Fase 2: ambientes de homologação/produção (KI-007), revisão jurídica de termos/privacidade, MFA para administradores (KI-014), criptografia do chassi (KI-002).
 
@@ -34,8 +51,8 @@ Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `te
 | 2.1 | Linha do tempo | 5.4 | `implementado` — aba Histórico com filtros por categoria, origem, oficina e período; agrupada por ano |
 | 2.2 | Registros de manutenção (`maintenance_records`, `maintenance_items`) | 5.4, 14.3 | `implementado` — banco testado (local 29, Supabase 26); tela de registro com peças, correção e anulação |
 | 2.3 | Quilometragem | 5.6 | `implementado` — banco testado; tela com registro, alerta de leitura menor e correção documentada (antecipado na Fase 1) |
-| 2.4 | Anexos e cotas (`attachments`, Storage privado) | 13 | `planejado` |
-| 2.5 | Origem dos registros | 5.5 | `implementado` (parcial) — selos por origem; "com comprovante" depende dos anexos (2.4); "confirmado por oficina" depende da Fase 3 |
+| 2.4 | Anexos e cotas (`attachments`, Storage privado) | 13 | `implementado` — bucket privado, cota de 100 MB e 10 MB por arquivo (configuráveis), registro só por RPC, links temporários; banco testado (local 22, Supabase 21); tela de envio no formulário e no cartão, com conferência do tipo real e redução de fotos |
+| 2.5 | Origem dos registros | 5.5 | `implementado` (parcial) — "informado pelo dono" e "com comprovante" prontos (nível de evidência); "confirmado por oficina" depende da Fase 3 |
 | 2.6 | Auditoria e diário básico (`motorcycle_diary`) | 5.7, 15.5 | auditoria `testado`; diário `planejado` |
 
 ## Fase 3 — Oficinas e autorizações

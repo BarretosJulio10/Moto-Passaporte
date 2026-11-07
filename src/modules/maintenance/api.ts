@@ -2,6 +2,7 @@
 import { getSupabase } from '@/lib/supabase'
 import type { MaintenanceCategory, RecordSource } from './labels'
 import type { ItemInput, MaintenanceInput } from './schemas'
+import type { AttachmentSummary } from '@/modules/attachments/AttachmentList'
 
 export type TimelineItem = {
   id: string
@@ -31,6 +32,9 @@ export type TimelineEntry = {
   created_at: string
   status: 'current' | 'superseded'
   items: TimelineItem[]
+  attachments: AttachmentSummary[]
+  /** Nível de evidência mostrado no carimbo: oficina > comprovante > dono (PRD 5.5). */
+  evidence_level: RecordSource
 }
 
 export async function fetchTimeline(motorcycleId: string): Promise<TimelineEntry[]> {
@@ -86,7 +90,7 @@ export function applyFilters(entries: TimelineEntry[], f: TimelineFilters): Time
     if (!f.showSuperseded && e.status === 'superseded') return false
     if (!f.showSuperseded && e.is_void) return false
     if (f.category && e.category !== f.category) return false
-    if (f.source && e.source_type !== f.source) return false
+    if (f.source && e.evidence_level !== f.source) return false
     if (f.workshop && (e.workshop_name ?? '') !== f.workshop) return false
     if (f.from && e.service_date < f.from) return false
     if (f.to && e.service_date > f.to) return false

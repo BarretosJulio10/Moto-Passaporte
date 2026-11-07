@@ -11,6 +11,8 @@ import { MotoHeader } from '@/modules/motorcycles/MotoHeader'
 import { CATEGORIES, CATEGORY_LABEL, CATEGORY_TITLE_SUGGESTION, type MaintenanceCategory } from './labels'
 import { itemSchema, maintenanceSchema, type ItemInput } from './schemas'
 import { createMaintenanceRecord, fetchTimeline } from './api'
+import { getStorageUsage, uploadAll } from '@/modules/attachments/api'
+import { AttachmentPicker, type PendingAttachment } from '@/modules/attachments/AttachmentPicker'
 
 type ItemRow = { key: number; item_name: string; brand: string; part_number: string; quantity: string }
 let rowKey = 0
@@ -47,6 +49,7 @@ export function RecordFormPage() {
       queryClient.invalidateQueries({ queryKey: ['mileage', id] }),
       queryClient.invalidateQueries({ queryKey: ['motorcycle', id] }),
       queryClient.invalidateQueries({ queryKey: ['my-motorcycles'] }),
+      queryClient.invalidateQueries({ queryKey: ['storage-usage'] }),
     ])
     navigate(`/painel/motos/${id}/historico`, { replace: true, state })
   }} />
@@ -55,7 +58,7 @@ export function RecordFormPage() {
 type FormProps = {
   motorcycleId: string
   original?: Awaited<ReturnType<typeof fetchTimeline>>[number]
-  onDone: (state: { saved: 'created' | 'corrected'; below: boolean }) => Promise<void>
+  onDone: (state: { saved: 'created' | 'corrected'; below: boolean; attachFailures: string[] }) => Promise<void>
 }
 
 function RecordForm({ motorcycleId, original, onDone }: FormProps) {
@@ -63,6 +66,8 @@ function RecordForm({ motorcycleId, original, onDone }: FormProps) {
   const [itemErrors, setItemErrors] = useState<Record<number, string>>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [pending, setPending] = useState<PendingAttachment[]>([])
+  const usage = useQuery({ queryKey: ['storage-usage'], queryFn: getStorageUsage, retry: false })
   const [category, setCategory] = useState<string>(original?.category ?? '')
   const [title, setTitle] = useState(original?.title ?? '')
   const [titleTouched, setTitleTouched] = useState(Boolean(original))
@@ -104,7 +109,8 @@ function RecordForm({ motorcycleId, original, onDone }: FormProps) {
     setLoading(true)
     try {
       const result = await createMaintenanceRecord(motorcycleId, parsed.data, items)
-      await onDone({ saved: original ? 'corrected' : 'created', below: result.below_previous })
+      const attachFailures = pending.length ? await uploadAll(motorcycleId, result.id, pending) : []
+      await onDone({ saved: original ? 'corrected' : 'created', below: result.below_previous, attachFailures })
     } catch (error) {
       setFormError(translateDbError(error as { code?: string; message?: string }))
       setLoading(false)
@@ -124,7 +130,7 @@ function RecordForm({ motorcycleId, original, onDone }: FormProps) {
           </div>
         ) : (
           <p className="mt-2 text-muted">
-            Este registro aparece como "informado pelo dono". Quando anexos e oficinas participantes estiverem disponíveis, ele poderá ganhar comprovante ou confirmação.
+            Sem anexo, o registro aparece como "informado pelo dono". Com nota fiscal, ordem de serviço ou recibo, aparece como "com comprovante".
           </p>
         )}
 
@@ -241,6 +247,18 @@ function RecordForm({ motorcycleId, original, onDone }: FormProps) {
             )}
           </fieldset>
 
+          <fieldset className="border-t border-rule pt-5">
+            <legend className="pr-3 font-semibold text-ink">Comprovantes (opcional)</legend>
+            {original && original.attachments.length > 0 && (
+              <p className="mt-2 text-sm text-muted">
+                Os {original.attachments.length} comprovantes da versão anterior continuam nela. Anexe aqui o que valer para a correção.
+              </p>
+            )}
+            <div className="mt-3">
+              <AttachmentPicker value={pending} onChange={setPending} usage={usage.data} disabled={loading} />
+            </div>
+          </fieldset>
+
           <TextAreaField
             label="Observações (opcional)"
             name="notes"
@@ -252,7 +270,7 @@ function RecordForm({ motorcycleId, original, onDone }: FormProps) {
 
           <div className="flex flex-wrap items-center gap-3 border-t border-rule pt-6">
             <Button type="submit" loading={loading}>
-              {loading ? 'Salvando…' : original ? 'Registrar correção' : 'Salvar registro'}
+              {loading ? (pending.length ? 'Salvando e enviando…' : 'Salvando…') : original ? 'Registrar correção' : 'Salvar registro'}
             </Button>
             <Link to={`/painel/motos/${motorcycleId}/historico`} className="px-2 py-2 font-semibold text-ink underline-offset-4 hover:underline">
               Cancelar

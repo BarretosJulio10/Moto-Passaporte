@@ -59,9 +59,9 @@ Padrões adotados:
 - Históricos protegidos por triggers (valem até para o dono do banco).
 - Admin com acesso mínimo: não lê chassi nem placas por padrão.
 
-Criadas na Fase 2: `maintenance_records`, `maintenance_items`, view `maintenance_timeline`.
+Criadas na Fase 2: `maintenance_records`, `maintenance_items`, view `maintenance_timeline` (com anexos e `evidence_level`), `attachments` + bucket privado `attachments` no Storage.
 
-Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access` (F3), `motorcycle_diary`, `attachments` (F2), `passport_shares` (F4), cobrança e `notifications` (F5), `support_cases` (F6).
+Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access` (F3), `motorcycle_diary` (F2), `passport_shares` (F4), cobrança e `notifications` (F5), `support_cases` (F6).
 
 ## 5. Módulos
 
@@ -72,7 +72,8 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access` (F3), `m
 | Cadastro de moto, ID permanente (banco) | 1 | `testado` (Supabase dev) |
 | QR Code, painéis do proprietário, oficina (base) e admin (base) | 1 | `implementado` |
 | Linha do tempo, manutenção e quilometragem | 2 | `implementado` |
-| Anexos, cotas e diário | 2 | `planejado` |
+| Anexos e cotas | 2 | `implementado` |
+| Diário da moto | 2 | `planejado` |
 | Oficinas, membros, pesquisa por placa, autorizações | 3 | `planejado` |
 | Transferência e compartilhamento público | 4 | `planejado` |
 | Planos, Mercado Pago, assinaturas, cotas | 5 | `planejado` |
@@ -82,13 +83,13 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access` (F3), `m
 
 | Ambiente | Situação |
 |---|---|
-| Desenvolvimento | Supabase `ripgenhykaajcnzdxoid` (banco da Fase 1); frontend não configurado |
+| Desenvolvimento | Supabase `ripgenhykaajcnzdxoid`; frontend na Vercel (https://moto-passaporte.vercel.app) |
 | Homologação | não configurado |
 | Produção | não configurado |
 
 ## 7. Pendências imediatas
 
-- Próximo item: Fase 2 — anexos e cotas (Storage privado). Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
+- Próximo item: Fase 2 — diário da moto (2.6). Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 
@@ -108,5 +109,6 @@ Seguir **sempre em ordem**, conferindo o que já foi feito antes de continuar, e
 
 **Ao terminar cada entrega:**
 1. Atualizar `PRD_CHECKLIST.md`, este arquivo, `PROJECT_STATUS.md` e `CHANGELOG.md` (e `DATABASE.md`/`SECURITY.md` quando aplicável).
-2. Commit descritivo e push na `main` (ADR-005).
-3. Informar o próximo item na ordem.
+2. Atualizar o quadro **Progresso** do `PRD_CHECKLIST.md`.
+3. Commit descritivo e push na `main` (ADR-005); conferir o deploy na Vercel.
+4. Informar ao responsável **a % concluída e o que falta** (pedido permanente: "me diga a % já feita e o que falta, sempre") e o próximo item na ordem.

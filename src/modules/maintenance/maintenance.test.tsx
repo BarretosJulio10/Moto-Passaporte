@@ -22,6 +22,11 @@ vi.mock('./api', async () => {
     voidMaintenanceRecord: async () => 'void',
   }
 })
+vi.mock('@/modules/attachments/api', () => ({
+  getStorageUsage: async () => ({ used_bytes: 0, quota_bytes: 104857600, max_file_bytes: 10485760 }),
+  uploadAll: async () => [],
+  signedUrls: async (paths: string[]) => Object.fromEntries(paths.map((p) => [p, `https://files.test/${p}`])),
+}))
 vi.mock('@/modules/motorcycles/api', () => ({
   fetchMotorcycle: async () => ({ id: 'm1', brand: 'Honda', model: 'CB 500F', version: null, passport_created_at: '2026-01-01T00:00:00Z' }),
 }))
@@ -49,6 +54,8 @@ const entry = (over: Partial<TimelineEntry>): TimelineEntry => ({
   created_at: '2026-10-01T10:00:00Z',
   status: 'current',
   items: [],
+  attachments: [],
+  evidence_level: over.source_type ?? 'owner',
   ...over,
 })
 
@@ -147,6 +154,28 @@ describe('TimelinePage', () => {
     expect(within(card).getByText('Confirmado por oficina')).toBeInTheDocument()
     expect(within(card).queryByRole('link', { name: 'Corrigir' })).not.toBeInTheDocument()
     expect(within(card).queryByRole('button', { name: 'Anular' })).not.toBeInTheDocument()
+  })
+})
+
+describe('comprovantes no histórico', () => {
+  it('registro com anexo mostra carimbo de comprovante e o arquivo', async () => {
+    timelineData = [
+      entry({
+        id: 'd1',
+        evidence_level: 'document',
+        attachments: [{ id: 'a1', storage_path: 'm1/x.jpg', file_name: 'nota.jpg', mime_type: 'image/jpeg', file_size: 300000, kind: 'invoice', created_at: '2026-10-01T10:00:00Z' }],
+      }),
+    ]
+    renderAt('/painel/motos/m1/historico')
+    const card = await screen.findByRole('article', { name: /Troca de óleo/ })
+    expect(within(card).getByText('Com comprovante')).toBeInTheDocument()
+    const link = await within(card).findByRole('link', { name: /Abrir Nota fiscal: nota.jpg/ })
+    expect(link).toHaveAttribute('href', 'https://files.test/m1/x.jpg')
+    expect(within(card).getByRole('button', { name: 'Anexar mais' })).toBeInTheDocument()
+  })
+  it('filtro de origem usa o nível de evidência', () => {
+    const data = [entry({ id: 'a' }), entry({ id: 'b', evidence_level: 'document' })]
+    expect(applyFilters(data, { ...EMPTY_FILTERS, source: 'document' }).map((e) => e.id)).toEqual(['b'])
   })
 })
 

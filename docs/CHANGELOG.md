@@ -9,6 +9,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.8.0] — 06/11/2026 — Fase 2: anexos e comprovantes
+
+### Adicionado
+- Migração `attachments`: bucket privado `attachments` (10 MB, JPG/PNG/WEBP/PDF), tabela `attachments` imutável e auditada, políticas do Storage por pasta da moto (só o dono atual envia e lê; sem troca nem exclusão), `register_attachment` (confere dono, pasta, arquivo enviado pelo próprio usuário, tipo, tamanho e cota), `get_storage_usage`. Cota gratuita de 100 MB e limite por arquivo em `system_settings`.
+- `maintenance_timeline` passa a trazer os anexos e o `evidence_level` (oficina > comprovante > dono). O filtro "Origem" usa esse nível.
+- Interface: comprovantes no formulário de registro e "Anexar comprovante" em cada registro; até 5 por registro; tipo sugerido pelo nome (nota fiscal, ordem de serviço, recibo, foto). Tipo real conferido pelos primeiros bytes; fotos reduzidas para até 2000 px em JPEG; espaço usado exibido. Miniaturas e abertura por links temporários de 10 minutos.
+- Testes: banco 22 (local) + 21 (Supabase, transação desfeita); interface 67 no total (9 novos). Verificação visual em 360 e 1280 px.
+
+### Alterado
+- Testes de segurança renomeados com prefixo de ordem (`phase2a_`, `phase2b_`).
+
 ## [0.7.0] — 06/11/2026 — Fase 2: linha do tempo e manutenção
 
 ### Adicionado

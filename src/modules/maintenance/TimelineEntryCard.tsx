@@ -7,23 +7,51 @@ import { formatDate, formatKm } from '@/core/shared/format'
 import { CATEGORY_LABEL, SOURCE_COLOR, SOURCE_LABEL } from './labels'
 import { formatBRL } from './schemas'
 import type { TimelineEntry } from './api'
+import { AttachmentList } from '@/modules/attachments/AttachmentList'
+import { AttachmentPicker, type PendingAttachment } from '@/modules/attachments/AttachmentPicker'
+import { MAX_FILES_PER_RECORD, type StorageUsage } from '@/modules/attachments/files'
 
 type Props = {
   entry: TimelineEntry
   successor?: TimelineEntry
   original?: TimelineEntry
   onVoid: (id: string, reason: string) => Promise<void>
+  /** Envia comprovantes para o registro; devolve mensagens de falha. */
+  onAttach?: (id: string, pending: PendingAttachment[]) => Promise<string[]>
+  usage?: StorageUsage
 }
 
-export function TimelineEntryCard({ entry: e, successor, original, onVoid }: Props) {
+export function TimelineEntryCard({ entry: e, successor, original, onVoid, onAttach, usage }: Props) {
   const [voiding, setVoiding] = useState(false)
   const [reasonError, setReasonError] = useState<string | undefined>()
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [attaching, setAttaching] = useState(false)
+  const [pending, setPending] = useState<PendingAttachment[]>([])
+  const [attachBusy, setAttachBusy] = useState(false)
+  const [attachErrors, setAttachErrors] = useState<string[]>([])
 
   const superseded = e.status === 'superseded'
   const canChange = !superseded && !e.is_void && e.source_type !== 'workshop'
-  const color = SOURCE_COLOR[e.source_type]
+  const evidence = e.evidence_level ?? e.source_type
+  const color = SOURCE_COLOR[evidence]
+  const attachments = e.attachments ?? []
+  const canAttach = Boolean(onAttach) && !superseded && !e.is_void && attachments.length < MAX_FILES_PER_RECORD
+
+  async function submitAttachments() {
+    if (!onAttach || pending.length === 0) return
+    setAttachBusy(true)
+    setAttachErrors([])
+    const failures = await onAttach(e.id, pending)
+    setAttachBusy(false)
+    setAttachErrors(failures)
+    if (failures.length === 0) {
+      setPending([])
+      setAttaching(false)
+    } else {
+      setPending([])
+    }
+  }
 
   async function submitVoid(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -69,7 +97,7 @@ export function TimelineEntryCard({ entry: e, successor, original, onVoid }: Pro
           className="rounded-[0.4rem] border-2 px-2 py-0.5 text-xs font-semibold"
           style={{ borderColor: color, color, boxShadow: `inset 0 0 0 1px var(--color-sheet), inset 0 0 0 2px ${color}` }}
         >
-          {SOURCE_LABEL[e.source_type]}
+          {SOURCE_LABEL[evidence]}
         </span>
       </div>
 
@@ -109,6 +137,8 @@ export function TimelineEntryCard({ entry: e, successor, original, onVoid }: Pro
 
       {e.notes && <p className="mt-3 text-sm text-muted">{e.notes}</p>}
 
+      <AttachmentList attachments={attachments} />
+
       {original && e.correction_reason && (
         <p className="mt-3 text-sm text-stamp">
           Corrige o registro de {formatDate(original.service_date, 'short')}. Motivo: {e.correction_reason}
@@ -120,15 +150,44 @@ export function TimelineEntryCard({ entry: e, successor, original, onVoid }: Pro
         </p>
       )}
 
-      {canChange && !voiding && (
-        <div className="mt-3 flex gap-1">
+      {(canChange || canAttach) && !voiding && !attaching && (
+        <div className="mt-3 flex flex-wrap gap-1">
+          {canAttach && (
+            <Button variant="quiet" type="button" onClick={() => setAttaching(true)}>
+              {attachments.length ? 'Anexar mais' : 'Anexar comprovante'}
+            </Button>
+          )}
+          {canChange && (
+            <>
           <Link
             to={`/painel/motos/${e.motorcycle_id}/historico/novo?corrigir=${e.id}`}
-            className="px-2 py-2 text-sm font-semibold text-ink underline-offset-4 hover:underline"
+            className="px-2 py-2 text-sm font-semibold text-ink underline-offset-4 hover:underline sm:text-[0.95rem]"
           >
             Corrigir
           </Link>
           <Button variant="quiet" type="button" onClick={() => setVoiding(true)}>Anular</Button>
+            </>
+          )}
+        </div>
+      )}
+
+      {attaching && (
+        <div className="mt-4 flex flex-col gap-3 rounded-doc border border-rule bg-paper p-3">
+          <p className="text-sm text-muted">Nota fiscal, ordem de serviço, recibo ou foto. Depois de enviado, o arquivo não pode ser trocado.</p>
+          <AttachmentPicker value={pending} onChange={setPending} usage={usage} existingCount={attachments.length} disabled={attachBusy} />
+          {attachErrors.length > 0 && (
+            <Notice tone="error" title="Alguns arquivos não foram enviados">
+              <ul>{attachErrors.map((m) => <li key={m}>{m}</li>)}</ul>
+            </Notice>
+          )}
+          <div className="flex gap-2">
+            <Button type="button" size="sm" loading={attachBusy} disabled={pending.length === 0} onClick={submitAttachments}>
+              {attachBusy ? 'Enviando…' : 'Enviar'}
+            </Button>
+            <Button type="button" size="sm" variant="secondary" disabled={attachBusy} onClick={() => { setAttaching(false); setPending([]); setAttachErrors([]) }}>
+              Fechar
+            </Button>
+          </div>
         </div>
       )}
 

@@ -148,6 +148,20 @@ supabase.rpc('void_maintenance_record', { p_record_id, p_reason })
 ```
 Anula um registro do dono. Nada é apagado.
 
+## Anexos (Fase 2)
+
+Fluxo: (1) enviar o arquivo ao bucket privado `attachments` no caminho `<motorcycle_id>/<uuid>.<jpg|png|webp|pdf>`; (2) chamar `register_attachment`. Implementação em `src/modules/attachments/api.ts`.
+
+### `register_attachment`
+`rpc('register_attachment', { p_motorcycle_id, p_storage_path, p_file_name, p_kind, p_maintenance_record_id? })` → `uuid`.
+`p_kind`: `invoice`, `service_order`, `receipt`, `photo`, `document`, `other`. Erros em português (P0001): arquivo não encontrado, formato não aceito, arquivo grande demais, espaço acabou, registro anulado, já registrado.
+
+### `get_storage_usage`
+`rpc('get_storage_usage')` → `{ used_bytes, quota_bytes, max_file_bytes }`.
+
+### Ver arquivos
+`storage.from('attachments').createSignedUrls(paths, 600)` — só funciona para o titular atual. Os anexos de cada registro vêm em `maintenance_timeline.attachments`.
+
 ## Duplicidade
 
 ```ts

@@ -36,10 +36,20 @@
 |---|---|---|
 | PostgreSQL 16 local + simulação | `tests/security/phase1_rls_test.sql` | 73 aprovadas |
 | Supabase real (dev, PG 17), em transação desfeita | `tests/security/supabase/phase1_rls_test_rollback.sql` | 71 aprovadas, antes e depois do reforço |
-| PostgreSQL 16 local — Fase 2 (manutenção) | `tests/security/phase2_maintenance_test.sql` | 29 aprovadas |
-| Supabase real — Fase 2, em transação desfeita | `tests/security/supabase/phase2_maintenance_rollback.sql` | 26 aprovadas |
+| PostgreSQL 16 local — Fase 2 (manutenção) | `tests/security/phase2a_maintenance_test.sql` | 29 aprovadas |
+| Supabase real — Fase 2, em transação desfeita | `tests/security/supabase/phase2a_maintenance_rollback.sql` | 26 aprovadas |
+| PostgreSQL 16 local — Fase 2 (anexos e Storage simulado) | `tests/security/phase2b_attachments_test.sql` | 22 aprovadas |
+| Supabase real — anexos, em transação desfeita | `tests/security/supabase/phase2b_attachments_rollback.sql` | 21 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
+
+## Anexos (Fase 2)
+
+- Bucket privado; nenhum arquivo é público. Visualização só por link assinado de 10 minutos, gerado para o titular atual.
+- Envio limitado à pasta da moto do titular; nome do arquivo aleatório (UUID), sem dados pessoais no caminho.
+- Tipo e tamanho registrados a partir dos metadados do Storage; o bucket restringe tipos e tamanho. A interface confere o tipo real pelos primeiros bytes antes de enviar; o servidor ainda não faz essa conferência (KI-018).
+- Arquivos não podem ser trocados nem apagados pela API (prova documental). Exclusão por LGPD será tratada na Fase 6.
+- Após transferência, o novo titular passa a ver os anexos; o anterior perde o acesso (regra `is_current_owner`).
 
 ## Advisors do Supabase (06/11/2026, após o reforço)
 

@@ -14,6 +14,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 | `20261107003512_phase1_hardening.sql` | Reforço pelos advisors: bloqueia RPC de funções de trigger, otimiza RLS com `(select auth.uid())`, índices de FKs |
 | `20261107013442_contact_settings.sql` | Configurações públicas `support_email` e `support_whatsapp` (vazias até o responsável definir) |
 | `20261107014505_maintenance.sql` | Fase 2: `maintenance_records`, `maintenance_items`, categorias, `create_maintenance_record`, `void_maintenance_record`, view `maintenance_timeline` |
+| `20261107015821_attachments.sql` | Fase 2: bucket privado `attachments`, tabela `attachments`, políticas do Storage, `register_attachment`, `get_storage_usage`, cota em `system_settings`; `maintenance_timeline` com anexos e `evidence_level` |
 
 Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limit_per_hour`, `support_email`, `support_whatsapp`. Nenhum dado de teste.
 
@@ -49,6 +50,9 @@ Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limi
 |---|---|---|
 | `maintenance_records` | Registros da linha do tempo: categoria (PRD 5.4), título, data, km, oficina (texto livre ou participante), valor em centavos, descrição, origem | Imutáveis. Correção = novo registro com `corrects_record_id` + motivo; anulação = registro `is_void`. Cada registro só pode ser corrigido uma vez (cadeia linear). Dono não corrige registro de oficina |
 | `maintenance_items` | Peças: nome, fabricante, código, quantidade | Imutáveis; até 50 por registro |
+| `attachments` | Comprovantes: caminho no Storage (`<moto>/<uuid>.<ext>`), nome, tipo, tamanho, espécie (nota fiscal, OS, recibo, foto, documento, outro), registro vinculado | Imutáveis (só `uploaded_by` pode virar nulo na exclusão de conta). Tamanho e tipo vêm do Storage, não do cliente. Leitura só pelo titular atual |
+
+**Storage:** bucket `attachments` privado, 10 MB, JPG/PNG/WEBP/PDF. Políticas em `storage.objects`: envio e leitura só na pasta de moto da qual o usuário é titular atual (`can_access_attachment_object`); sem atualização nem exclusão pela API.
 
 ## Operações (funções RPC)
 
@@ -61,12 +65,14 @@ Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limi
 | `get_public_passport(public_id)` | Qualquer pessoa | Retorna apenas campos públicos padrão |
 | `create_maintenance_record(...)` | Titular atual | Cria registro (ou correção) com peças; se informar km, cria/reaproveita/corrige a leitura em `mileage_records`. Retorna `{id, below_previous}` |
 | `void_maintenance_record(id, motivo)` | Titular atual | Anula registro do dono; o original continua visível |
+| `register_attachment(moto, caminho, nome, espécie, registro?)` | Titular atual | Registra arquivo já enviado pelo próprio usuário; confere pasta, tipo, tamanho, cota e registro não anulado. Retorna o id |
+| `get_storage_usage()` | Autenticado | `{used_bytes, quota_bytes, max_file_bytes}` do usuário |
 | `has_role`, `is_admin`, `is_current_owner`, `is_org_member`, `is_org_responsible`, `is_org_active` | Políticas RLS | Verificações de permissão |
 
 ## View
 
 - `my_motorcycles` (`security_invoker`): motos do usuário com placa atual, data de aquisição e última km.
-- `maintenance_timeline` (`security_invoker`): registros com `status` (`current`/`superseded`) e peças agregadas em `items`.
+- `maintenance_timeline` (`security_invoker`): registros com `status` (`current`/`superseded`), peças em `items`, anexos em `attachments` e `evidence_level` (`workshop` > `document` > `owner`; `document` quando o registro tem origem documento ou anexos).
 
 ## Pontos de extensão previstos
 

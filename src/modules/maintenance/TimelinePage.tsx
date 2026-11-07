@@ -9,17 +9,20 @@ import { MotoHeader } from '@/modules/motorcycles/MotoHeader'
 import { CATEGORIES, CATEGORY_LABEL, SOURCE_LABEL, type MaintenanceCategory, type RecordSource } from './labels'
 import { applyFilters, EMPTY_FILTERS, fetchTimeline, voidMaintenanceRecord, type TimelineFilters } from './api'
 import { TimelineEntryCard } from './TimelineEntryCard'
+import { getStorageUsage, uploadAll } from '@/modules/attachments/api'
+import type { PendingAttachment } from '@/modules/attachments/AttachmentPicker'
 
 const SOURCES = Object.keys(SOURCE_LABEL) as RecordSource[]
 
 export function TimelinePage() {
   const { id = '' } = useParams()
   const location = useLocation()
-  const saved = (location.state as { saved?: 'created' | 'corrected'; below?: boolean } | null) ?? null
+  const saved = (location.state as { saved?: 'created' | 'corrected'; below?: boolean; attachFailures?: string[] } | null) ?? null
   const queryClient = useQueryClient()
   const [filters, setFilters] = useState<TimelineFilters>(EMPTY_FILTERS)
 
   const timeline = useQuery({ queryKey: ['timeline', id], queryFn: () => fetchTimeline(id), enabled: Boolean(id) })
+  const usage = useQuery({ queryKey: ['storage-usage'], queryFn: getStorageUsage, retry: false })
 
   const all = timeline.data ?? []
   const byId = useMemo(() => new Map(all.map((e) => [e.id, e])), [all])
@@ -54,6 +57,15 @@ export function TimelinePage() {
     await queryClient.invalidateQueries({ queryKey: ['timeline', id] })
   }
 
+  async function handleAttach(recordId: string, pending: PendingAttachment[]) {
+    const failures = await uploadAll(id, recordId, pending)
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['timeline', id] }),
+      queryClient.invalidateQueries({ queryKey: ['storage-usage'] }),
+    ])
+    return failures
+  }
+
   const set = <K extends keyof TimelineFilters>(key: K, value: TimelineFilters[K]) => setFilters((f) => ({ ...f, [key]: value }))
 
   return (
@@ -69,6 +81,14 @@ export function TimelinePage() {
                 ? 'O registro anterior continua no histórico, marcado como substituído.'
                 : 'O serviço já aparece na linha do tempo.'}
           </Notice>
+          {saved.attachFailures && saved.attachFailures.length > 0 && (
+            <div className="mt-3">
+              <Notice tone="error" title="Alguns comprovantes não foram enviados">
+                <ul>{saved.attachFailures.map((m) => <li key={m}>{m}</li>)}</ul>
+                <p className="mt-1">Use "Anexar comprovante" no registro para tentar de novo.</p>
+              </Notice>
+            </div>
+          )}
         </div>
       )}
 
@@ -148,6 +168,8 @@ export function TimelinePage() {
                     successor={successorOf.get(e.id)}
                     original={e.corrects_record_id ? byId.get(e.corrects_record_id) : undefined}
                     onVoid={handleVoid}
+                    onAttach={handleAttach}
+                    usage={usage.data}
                   />
                 </li>
               ))}

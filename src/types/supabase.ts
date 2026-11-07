@@ -17,6 +17,23 @@ export type Database = {
   }
   public: {
     Tables: {
+      attachments: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_size: number
+          id: string
+          kind: Database["public"]["Enums"]["attachment_kind"]
+          maintenance_record_id: string | null
+          mime_type: string
+          motorcycle_id: string
+          storage_path: string
+          uploaded_by: string | null
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -646,6 +663,8 @@ export type Database = {
     Views: {
       maintenance_timeline: {
         Row: {
+          attachments: Json | null
+          evidence_level: Database["public"]["Enums"]["record_source"] | null
           category: Database["public"]["Enums"]["maintenance_category"] | null
           correction_reason: string | null
           corrects_record_id: string | null
@@ -711,6 +730,18 @@ export type Database = {
         }
         Returns: Json
       }
+      register_attachment: {
+        Args: {
+          p_file_name: string
+          p_kind: Database["public"]["Enums"]["attachment_kind"]
+          p_maintenance_record_id?: string
+          p_motorcycle_id: string
+          p_storage_path: string
+        }
+        Returns: string
+      }
+      get_storage_usage: { Args: never; Returns: Json }
+      can_access_attachment_object: { Args: { p_name: string }; Returns: boolean }
       void_maintenance_record: {
         Args: { p_reason: string; p_record_id: string }
         Returns: string
@@ -782,6 +813,7 @@ export type Database = {
       }
     }
     Enums: {
+      attachment_kind: "photo" | "invoice" | "service_order" | "receipt" | "document" | "other"
       app_role: "owner" | "workshop" | "admin"
       claim_status: "pending" | "approved" | "rejected" | "canceled"
       maintenance_category:
