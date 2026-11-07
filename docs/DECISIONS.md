@@ -109,6 +109,14 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-027 — Estratégia de testes e regressão (PRD 19)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- **Segurança e regras:** no banco, onde a proteção existe (RLS, funções, gatilhos). Suítes por fase em PostgreSQL local com simulação do Supabase e, para cada fase, uma versão no Supabase real dentro de transação desfeita.
+- **Varredura por catálogo** (`sweep_violations.sql.inc`): falha se houver tabela sem RLS, escrita direta liberada, leitura anônima fora da lista, visão que ignora RLS, SECURITY DEFINER sem `search_path`, função liberada a anônimo fora da lista, função de servidor exposta, função `admin_*` sem checagem de admin, bucket público ou política para anônimo fora da lista. O próprio teste prova que cada regra detecta a brecha. Listas permitidas só mudam com decisão registrada.
+- **Ponta a ponta da interface:** navegador real contra o build, com o Supabase simulado por interceptação de rede (o ambiente do Claude não alcança o Supabase, KI-009). Confere que cada perfil conclui seu fluxo, que a interface chama o backend certo, sem erro de JavaScript e sem rolagem lateral no celular.
+- **Com serviços reais:** roteiro manual em `docs/HOMOLOGATION.md`, executado na homologação (6.6).
+- **Regressão:** `scripts/validation/run_all.sh` antes de cada publicação.
+
 ### ADR-026 — Armazenamento: o banco decide, a Edge Function apaga (PRD 7.6)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - Consumo vem dos metadados do bucket privado e de `attachments`. Espaço do titular segue a mesma regra da cota (motos atuais, sem arquivos de oficinas, diário só do próprio autor). Alerta a partir de `storage_alert_percent` (padrão 80%).

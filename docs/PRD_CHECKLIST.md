@@ -4,8 +4,8 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 07/11/2026 — v0.24.0
-**Item atual na ordem:** Fase 6 → testes de segurança, integração, regressão e E2E (6.4)
+**Última conferência:** 07/11/2026 — v0.25.0
+**Item atual na ordem:** Fase 6 → backup, restauração e rollback (6.5)
 
 ## Progresso
 
@@ -19,8 +19,8 @@ Conta: item concluído = 1, parcial = 0,5, planejado = 0. Total de 40 itens nas 
 | 3 — Oficinas e autorizações | 7 | 7 | 100% |
 | 4 — Transferência e compartilhamento | 5 | 5 | 100% |
 | 5 — Monetização e Mercado Pago | 5 | 5 | 100% |
-| 6 — Administração, segurança e lançamento | 6 | 3 | 50% |
-| **Total** | **40** | **37** | **92,5%** |
+| 6 — Administração, segurança e lançamento | 6 | 4 | 67% |
+| **Total** | **40** | **38** | **95%** |
 
 Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0.11.0 = 56,3% · 0.12.0 = 58,8% · 0.13.0 = 62,5% · 0.14.0 = 67,5% · 0.15.0 = 72,5% · 0.16.0 = 75% · 0.17.0 = 76,3% · 0.18.0 = 82,5% · 0.19.0 = 83,8% · 0.20.0 = 85% · 0.21.0 = 86,3% · 0.22.0 = 87,5%.
 
@@ -102,7 +102,7 @@ Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0
 | 6.1 | Dashboard e gestão administrativa | 7 | `implementado` — indicadores (7.1), usuários (7.2), oficinas (7.3), planos (7.4), pagamentos (7.5), auditoria com filtros (7.7) e configurações (7.8), com motivo e auditoria (ADR-023, ADR-024). Identidade visual e textos do site seguem no código (KI-028) |
 | 6.2 | Resolução de pedidos de duplicidade | ADR-007 | `implementado` — solicitante acompanha, complementa e cancela o pedido sem ver a moto existente; admin analisa com contexto (moto, titular, idade da conta), responde, aprova/recusa com motivo auditado e pode avisar o titular atual de forma anônima para transferir (ADR-025). Sem transferência forçada (P-7); banco testado (local 23, Supabase 10) |
 | 6.3 | Monitoramento de armazenamento | 7.6 | `implementado` — consumo total, por categoria, por origem, por conta (com cota), por moto e por oficina; envios em andamento × sem vínculo; alertas de limite configuráveis; limpeza só de arquivos sem registro fora da retenção, com motivo, histórico e auditoria, pela Edge Function `storage-cleanup` (ADR-026); banco testado (local 22, Supabase 10). Limpeza automática agendada pendente (KI-029) |
-| 6.4 | Testes de segurança, integração, regressão, E2E | 19 | segurança do banco Fase 1 `testado`; demais `planejado` |
+| 6.4 | Testes de segurança, integração, regressão, E2E | 19 | `testado` — 20 suítes de banco (regras, RLS, IDOR, arquivos, pagamentos) + varredura de segurança por catálogo (local e Supabase real: 0 violações); 174 testes de tela; 7 cenários ponta a ponta no navegador (visitante, proprietário, comprador, oficina, admin, bloqueios); `run_all.sh` para regressão (ADR-027). Fluxos com Supabase e Mercado Pago reais: roteiro em `HOMOLOGATION.md` (6.6, KI-009) |
 | 6.5 | Backup, restauração e rollback testados | 18.4, 20 | `planejado` |
 | 6.6 | Homologação e publicação | 22 | `planejado` |
 

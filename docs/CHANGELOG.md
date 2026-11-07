@@ -9,6 +9,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.25.0] — 07/11/2026 — Fase 6.4: testes e regressão
+
+### Adicionado
+- Varredura de segurança por catálogo (`tests/security/sweep_violations.sql.inc`), com teste local que prova a detecção de 10 tipos de brecha e versão para o Supabase real (`tests/security/supabase/phase6e_security_sweep.sql`): 0 violações.
+- Testes ponta a ponta no navegador (`tests/e2e/run.mjs`, `scripts/validation/run_e2e.sh`): 7 cenários, 29 verificações.
+- Regressão completa em um comando: `scripts/validation/run_all.sh`.
+- Roteiro de homologação com Supabase e Mercado Pago reais: `docs/HOMOLOGATION.md`.
+
 ## [0.24.0] — 07/11/2026 — Fase 6.3: monitoramento de armazenamento
 
 ### Adicionado

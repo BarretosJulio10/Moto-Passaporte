@@ -103,7 +103,8 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 - Faturas (ADR-022) mantidas dentro de `billing_apply_payment`; recibo interno sem valor fiscal.
 - Administração (ADR-023): ações com motivo (`require_admin_reason`), auditadas; suspensão usa `auth.users.banned_until`.
 - Configurações só por `admin_update_setting` (catálogo `setting_spec`); nova chave editável = adicionar ao catálogo (ADR-024).
-- v0.24.0: 6.3 concluído (ADR-026; limpeza pela Edge Function `storage-cleanup`, porque o Supabase bloqueia DELETE em storage.objects). Próximo item: 6.4 (testes), depois 6.5 (backup). Limites já vêm de `user_plan()` (ADR-018): a 5.4 só troca a regra para a assinatura ativa. Antes de cobrar: decisões P-1, P-3, P-4, P-5 e credenciais de teste do Mercado Pago. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
+- v0.24.0: 6.3 concluído (ADR-026; limpeza pela Edge Function `storage-cleanup`, porque o Supabase bloqueia DELETE em storage.objects).
+- v0.25.0: 6.4 concluído (ADR-027). Regressão: `PGHOST=/tmp/pgtest PGPORT=54329 PGUSER=postgres scripts/validation/run_all.sh`. Ao criar função liberada a anônimo ou leitura anônima, atualizar a lista da varredura (`sweep_violations.sql.inc`) com decisão registrada. Próximo item: 6.5 (backup), depois 6.6 (homologação, roteiro em HOMOLOGATION.md). Limites já vêm de `user_plan()` (ADR-018): a 5.4 só troca a regra para a assinatura ativa. Antes de cobrar: decisões P-1, P-3, P-4, P-5 e credenciais de teste do Mercado Pago. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 

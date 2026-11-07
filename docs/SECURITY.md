@@ -73,6 +73,9 @@
 | PostgreSQL 16 local — armazenamento | `tests/security/phase6d_storage_test.sql` | 22 aprovadas |
 | Supabase real — armazenamento, em transação desfeita | `tests/security/supabase/phase6d_storage_rollback.sql` | 10 aprovadas |
 | Tipos das Edge Functions | `scripts/validation/check_edge_functions.sh` | OK |
+| PostgreSQL 16 local — varredura de segurança por catálogo (e detecção de 10 brechas plantadas) | `tests/security/phase6e_security_sweep_test.sql` | 12 aprovadas |
+| Supabase real — varredura de segurança | `tests/security/supabase/phase6e_security_sweep.sql` | 0 violações |
+| Ponta a ponta no navegador (Supabase simulado) | `scripts/validation/run_e2e.sh` | 7 cenários, 29 verificações |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
