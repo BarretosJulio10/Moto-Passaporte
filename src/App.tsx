@@ -30,6 +30,7 @@ import { PublicWorkshopPage } from '@/modules/workshop/PublicWorkshopPage'
 import { RequireAdmin } from '@/modules/admin/RequireAdmin'
 import { AdminDashboardPage } from '@/modules/admin/AdminDashboardPage'
 import { AdminPlansPage } from '@/modules/admin/AdminPlansPage'
+import { AdminPaymentsPage } from '@/modules/admin/AdminPaymentsPage'
 import { MyPlanPage } from '@/modules/plans/MyPlanPage'
 import { RequireAuth } from '@/core/auth/RequireAuth'
 
@@ -112,6 +113,14 @@ export const routes = [
             element: (
               <RequireAdmin>
                 <AdminPlansPage />
+              </RequireAdmin>
+            ),
+          },
+          {
+            path: '/admin/pagamentos',
+            element: (
+              <RequireAdmin>
+                <AdminPaymentsPage />
               </RequireAdmin>
             ),
           },

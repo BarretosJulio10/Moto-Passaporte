@@ -4,7 +4,7 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 07/11/2026 — v0.16.0
+**Última conferência:** 07/11/2026 — v0.17.0
 **Item atual na ordem:** Fase 5 → Mercado Pago, assinaturas e Webhooks (5.2)
 
 ## Progresso
@@ -18,11 +18,11 @@ Conta: item concluído = 1, parcial = 0,5, planejado = 0. Total de 40 itens nas 
 | 2 — Histórico e arquivos | 6 | 6 | 100% |
 | 3 — Oficinas e autorizações | 7 | 7 | 100% |
 | 4 — Transferência e compartilhamento | 5 | 5 | 100% |
-| 5 — Monetização e Mercado Pago | 5 | 1 | 20% |
+| 5 — Monetização e Mercado Pago | 5 | 1,5 | 30% |
 | 6 — Administração, segurança e lançamento | 6 | 0 | 0% |
-| **Total** | **40** | **30** | **75%** |
+| **Total** | **40** | **30,5** | **76,3%** |
 
-Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0.11.0 = 56,3% · 0.12.0 = 58,8% · 0.13.0 = 62,5% · 0.14.0 = 67,5% · 0.15.0 = 72,5% · 0.16.0 = 75%.
+Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0.11.0 = 56,3% · 0.12.0 = 58,8% · 0.13.0 = 62,5% · 0.14.0 = 67,5% · 0.15.0 = 72,5% · 0.16.0 = 75% · 0.17.0 = 76,3%.
 
 **Fase 1: concluída (base)** em 06/11/2026. Pendências que não bloqueiam a Fase 2: ambientes de homologação/produção (KI-007), revisão jurídica de termos/privacidade, MFA para administradores (KI-014), criptografia do chassi (KI-002).
 
@@ -88,7 +88,7 @@ Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0
 | # | Item | Seção PRD | Estado |
 |---|---|---|---|
 | 5.1 | Planos e preços configuráveis | 4, 7.4 | `implementado` — catálogo `subscription_plans` com histórico de versões; tela `/admin/planos`; site e "Meu plano" lendo do cadastro; limites de motos e espaço vêm do plano (ADR-018); banco testado (local 35, Supabase 19). Valores do Premium provisórios (P-1) |
-| 5.2 | Integração Mercado Pago, assinaturas, Webhooks | 8 | `planejado` |
+| 5.2 | Integração Mercado Pago, assinaturas, Webhooks | 8 | `parcial` — conta do Mercado Pago gerenciada no admin (token no Vault, teste de conexão, ADR-019). Falta: assinaturas, checkout, Webhook idempotente, conciliação |
 | 5.3 | Histórico de pagamentos e faturas | 8.6 | `planejado` |
 | 5.4 | Cotas e benefícios Premium | 4.3, 13 | `planejado` |
 | 5.5 | Atraso, cancelamento, reativação | 8.5 | `planejado` |

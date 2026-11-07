@@ -9,6 +9,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.17.0] — 07/11/2026 — Fase 5.2 (parte 1): conta do Mercado Pago no painel do admin
+
+### Adicionado
+- Migração `payment_settings` (ADR-019): `payment_gateway_settings`, segredos no Supabase Vault, `admin_get_payment_settings`, `admin_save_payment_settings`, funções só do servidor (`payment_access_token`, `payment_webhook_secret`, `record_payment_check`) e `get_payment_public_config` (chave pública só com a contratação liberada).
+- Edge Function `mercadopago-check`: testa o token na API do Mercado Pago e guarda a conta conectada.
+- Administração: página "Pagamentos (Mercado Pago)" (`/admin/pagamentos`) com ambiente, chave pública, token, assinatura do Webhook, teste de conexão e confirmação ao trocar de conta.
+- Testes: banco 29 (local) + 18 (Supabase, transação desfeita, inclui verificação de criptografia no Vault); interface 136 no total (6 novos).
+
 ## [0.16.0] — 07/11/2026 — Fase 5.1: planos e preços configuráveis
 
 ### Adicionado

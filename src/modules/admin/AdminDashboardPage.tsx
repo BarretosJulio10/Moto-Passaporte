@@ -34,6 +34,7 @@ const ENTITY_LABEL: Record<string, string> = {
   user_roles: 'papel de usuário',
   system_settings: 'configuração',
   subscription_plans: 'plano',
+  payment_gateway_settings: 'pagamentos',
 }
 
 /** Painel administrativo base (PRD 7.1). Indicadores financeiros entram com a Fase 5. */
@@ -113,6 +114,12 @@ export function AdminDashboardPage() {
             <Link to="/admin/planos" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
               <span className="font-semibold text-ink">Planos e preços</span>
               <span className="block text-sm text-muted">Preço, periodicidade, limites, benefícios e visibilidade no site, com histórico.</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/pagamentos" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
+              <span className="font-semibold text-ink">Pagamentos (Mercado Pago)</span>
+              <span className="block text-sm text-muted">Conta que recebe as assinaturas: token, chave pública, ambiente e teste de conexão.</span>
             </Link>
           </li>
         </ul>

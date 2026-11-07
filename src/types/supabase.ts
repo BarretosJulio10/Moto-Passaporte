@@ -782,6 +782,12 @@ export type Database = {
       }
       get_storage_usage: { Args: never; Returns: Json }
       get_public_plans: { Args: never; Returns: Json }
+      get_payment_public_config: { Args: never; Returns: Json }
+      admin_get_payment_settings: { Args: never; Returns: Json }
+      admin_save_payment_settings: {
+        Args: { p_access_token?: string | null; p_environment: string; p_public_key: string | null; p_webhook_secret?: string | null }
+        Returns: undefined
+      }
       get_my_plan: { Args: never; Returns: Json }
       admin_list_plans: {
         Args: never

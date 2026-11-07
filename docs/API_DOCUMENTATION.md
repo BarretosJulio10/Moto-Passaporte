@@ -213,6 +213,15 @@ Implementação em `src/modules/transfers/api.ts`.
 - Comprador: `get_my_incoming_transfers()`; `accept_transfer_request({ p_transfer_id, p_acquisition_date? })` → id da moto; `reject_transfer_request({ p_transfer_id })`.
 - Antigo titular: `get_my_previous_motorcycles()`; o próprio diário continua em `motorcycle_diary_feed` (só leitura e exclusão).
 
+## Pagamentos — conta do Mercado Pago (Fase 5.2, ADR-019)
+
+Implementação em `src/modules/admin/paymentsApi.ts`.
+
+- Admin: `rpc('admin_get_payment_settings')` → ambiente, chave pública, `access_token_configured`/`access_token_hint`, `webhook_secret_configured`/`webhook_secret_hint`, conta conectada e último teste (nunca os segredos). `rpc('admin_save_payment_settings', { p_environment, p_public_key, p_access_token?, p_webhook_secret? })` — vazio mantém o segredo atual.
+- Edge Function `POST /functions/v1/mercadopago-check` (login de admin) → `{ ok, message, account_id, nickname, site_id }`.
+- Público: `rpc('get_payment_public_config')` → `{ billing_enabled, environment, public_key }` (chave só com a contratação liberada).
+- Servidor (`service_role`): `payment_access_token()`, `payment_webhook_secret()`, `record_payment_check(...)`.
+
 ## Compartilhamento (Fase 4, ADR-017)
 
 Implementação em `src/modules/sharing/sharesApi.ts`.

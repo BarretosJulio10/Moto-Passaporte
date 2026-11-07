@@ -96,7 +96,8 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 
 ## 7. Pendências imediatas
 
-- Próximo item: Fase 5.2 — Mercado Pago (Edge Function, assinaturas, Webhooks idempotentes, conciliação). Limites já vêm de `user_plan()` (ADR-018): a 5.4 só troca a regra para a assinatura ativa. Antes de cobrar: decisões P-1, P-3, P-4, P-5 e credenciais de teste do Mercado Pago. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
+- Credenciais do Mercado Pago: cadastradas pelo admin em /admin/pagamentos, guardadas no Vault, lidas só por `payment_access_token()` (service_role) — ADR-019. Edge Functions ficam em `supabase/functions/` e são publicadas pelo MCP.
+- Próximo item: Fase 5.2 — assinaturas, checkout, Webhook idempotente (`mercadopago-webhook`, valida x-signature com `payment_webhook_secret()`), conciliação. Limites já vêm de `user_plan()` (ADR-018): a 5.4 só troca a regra para a assinatura ativa. Antes de cobrar: decisões P-1, P-3, P-4, P-5 e credenciais de teste do Mercado Pago. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 

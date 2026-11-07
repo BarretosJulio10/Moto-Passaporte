@@ -56,6 +56,8 @@
 | Supabase real — compartilhamento, em transação desfeita | `tests/security/supabase/phase4b_shares_rollback.sql` | 17 aprovadas |
 | PostgreSQL 16 local — planos | `tests/security/phase5a_plans_test.sql` | 35 aprovadas |
 | Supabase real — planos, em transação desfeita | `tests/security/supabase/phase5a_plans_rollback.sql` | 19 aprovadas |
+| PostgreSQL 16 local — credenciais do Mercado Pago | `tests/security/phase5b_payment_settings_test.sql` | 29 aprovadas |
+| Supabase real — credenciais do Mercado Pago, em transação desfeita | `tests/security/supabase/phase5b_payment_settings_rollback.sql` | 18 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
@@ -118,6 +120,13 @@ Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalad
 - Tabelas sem acesso direto; leitura pública só pela lista de planos ativos e visíveis, sem campos internos.
 - Gestão só para administradores (`is_admin`), com histórico imutável e auditoria de cada mudança.
 - Funções internas de limite (`user_plan`, `user_max_motorcycles`, `user_storage_quota_mb`) não são chamáveis por usuários.
+
+## Credenciais de pagamento (ADR-019)
+
+- Token de acesso e assinatura do Webhook ficam criptografados no Supabase Vault (teste confirma que o valor gravado não é o texto puro).
+- Nenhuma função devolve os segredos ao navegador, nem ao administrador; só os 4 últimos caracteres.
+- Leitura dos segredos apenas por `service_role` (Edge Functions). A Edge Function `mercadopago-check` exige login de administrador e não registra o token em logs.
+- Gravações auditadas sem os valores.
 
 ## Advisors do Supabase (06/11/2026, após o reforço)
 

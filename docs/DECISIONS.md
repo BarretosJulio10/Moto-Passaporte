@@ -109,6 +109,15 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-019 — Credenciais do Mercado Pago gerenciadas pelo administrador (PRD 8, 15.2)
+**Data:** 07/11/2026 · **Status:** aceita (pedido do responsável: trocar de conta do Mercado Pago pelo painel, sem mexer em código)
+- Token de acesso e assinatura secreta do Webhook são cadastrados na página "Pagamentos" do admin e guardados **criptografados no Supabase Vault**. A tabela `payment_gateway_settings` guarda só a referência, os 4 últimos caracteres, o ambiente (teste/produção), a chave pública e o resultado do último teste.
+- O navegador só envia os segredos; nenhuma função devolve o valor (nem ao admin). Leitura só por funções restritas ao servidor (`service_role`), usadas pelas Edge Functions.
+- Campo em branco mantém o segredo atual. Trocar token ou ambiente apaga a verificação da conta e exige novo "Testar conexão" (Edge Function `mercadopago-check`, que consulta `/users/me` e exige conta do Brasil). A tela pede confirmação antes de trocar de conta.
+- Toda gravação é auditada sem os segredos (só "token alterado: sim/não").
+- Consequência para a 5.2: cada assinatura guardará a conta do Mercado Pago em que foi criada; trocar de conta não migra assinaturas existentes (elas continuam sendo cobradas na conta anterior até acabarem ou serem canceladas). Tratar no Webhook e no painel quando as assinaturas existirem.
+- Alternativa descartada: segredos das Edge Functions (exigiriam acesso ao painel do Supabase a cada troca).
+
 ### ADR-018 — Catálogo de planos como fonte única dos limites (PRD 4, 7.4, 8.5, 8.6)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - `subscription_plans` guarda os planos: um gratuito (sempre ativo, visível e sem cobrança) e Premium por periodicidade (mensal, semestral, anual), cada um com preço, observação de preço, limite de motos, espaço, benefícios, teste grátis (0 a 90 dias), regras de cancelamento, visibilidade e ordem.
