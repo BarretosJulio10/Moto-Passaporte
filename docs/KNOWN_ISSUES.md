@@ -10,5 +10,5 @@ Problemas conhecidos e sua situação.
 | KI-004 | Pedidos de verificação de duplicidade (`motorcycle_claim_requests`) ainda não têm tela/função administrativa de resolução | Baixa | Planejado — Fase 6 |
 | KI-005 | O cadastro com placa já ativa informa "verificação necessária", o que permite a um usuário autenticado inferir que a placa existe. Mitigado por rate limit (10/hora) e auditoria | Baixa | Aceito — inerente à regra de duplicidade por placa (ADR-007) |
 | KI-006 | Supabase em us-east-1: latência maior para usuários no Brasil do que sa-east-1 | Baixa | Aceito (ADR-009) — reavaliar antes do lançamento |
-| KI-008 | O ambiente de desenvolvimento da IA (Claude) não tem acesso de rede para instalar pacotes npm (React, Vite, supabase-js); interface escrita lá não pode ser executada nem testada | Média | Aberto — ver D-T1 |
+| KI-008 | O ambiente de desenvolvimento da IA (Claude) não tem acesso de rede para instalar pacotes npm (React, Vite, supabase-js); interface escrita lá não pode ser executada nem testada | **Alta** (bloqueia a interface) | Aberto — aguardando liberação de rede e nova conversa (ADR-011) |
 | KI-007 | Existe um único projeto Supabase (dev). Homologação e produção ainda não existem | Média | Aberto — criar antes de usuários reais (PRD 20) |

@@ -50,13 +50,26 @@ Uma placa ativa só pode pertencer a uma moto (índice único parcial em `motorc
 **Data:** 06/11/2026 · **Status:** aceita
 Por padrão, a página pública / QR Code exibe somente: marca, modelo, versão, ano de fabricação, ano/modelo, cilindrada, cor e data de criação do passaporte (foto principal quando existir, Fase 2). Histórico, quilometragem, oficinas e comprovantes só aparecem quando o proprietário escolher expressamente (Fase 4). Nunca públicos: placa, chassi, dados pessoais, proprietários anteriores e diário privado.
 
+### ADR-011 — Interface construída direto neste repositório (resolve D-T1)
+**Data:** 06/11/2026 · **Status:** aceita
+O responsável pelo produto escolheu que a interface seja desenvolvida diretamente neste repositório (pelo Claude), e não pelo Lovable.
+**Pré-requisito:** liberar a instalação de pacotes (rede) no ambiente do Claude e iniciar uma nova conversa (KI-008).
+**Stack do frontend** (mantém o previsto no PRD 16.1 e compatível com o padrão do Lovable, caso se decida usá-lo no futuro):
+- Vite + React + TypeScript (strict)
+- Tailwind CSS + componentes acessíveis no estilo shadcn/ui
+- React Router (rotas públicas e áreas autenticadas separadas)
+- `@supabase/supabase-js` tipado com `src/types/supabase.ts`
+- TanStack Query para dados do servidor
+- Biblioteca de QR Code no cliente a partir do `public_id`
+- Vitest + Testing Library (unitários) e Playwright (E2E, já disponível no ambiente)
+Organização de pastas conforme PRD 16.3 (`src/core`, `src/modules/...`), sem criar diretórios vazios.
+
 ---
 
 ## Pendentes — técnicas
 
 | ID | Decisão | Impacto | Necessária antes de |
 |---|---|---|---|
-| D-T1 | Quem constrói a interface: Lovable (conectado a este GitHub e Supabase, seguindo `API_DOCUMENTATION.md`) ou desenvolvimento direto neste repositório (exige liberar instalação de pacotes — KI-008) | Define o fluxo de trabalho do frontend | Início do frontend da Fase 1 |
 | D-T3 | Criptografia em coluna do chassi (Supabase Vault/pgsodium) vs. tabela isolada com RLS só do proprietário | Proteção extra do chassi em caso de vazamento do banco | Antes de produção |
 
 ## Pendentes — produto (PRD seção 27)

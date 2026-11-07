@@ -81,7 +81,7 @@ Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `te
 
 | Item | Referência |
 |---|---|
-| Quem constrói a interface | D-T1 |
+| Interface direto no repositório — aguardando liberação de rede | ADR-011 / KI-008 |
 | Criptografia do chassi | D-T3 / KI-002 |
 | Ambientes de homologação e produção | KI-007 |
 | Decisões de produto P-1 a P-11 (restantes) | `DECISIONS.md` |

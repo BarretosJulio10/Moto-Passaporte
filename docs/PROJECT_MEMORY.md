@@ -28,7 +28,7 @@ Documento de referência: [`docs/PRD.md`](./PRD.md) (v2.0). As regras da v1.0 co
 
 | Camada | Tecnologia | Situação |
 |---|---|---|
-| Frontend | React + TypeScript, responsivo (Lovable previsto) | `planejado` |
+| Frontend | Vite + React + TypeScript, Tailwind, React Router, supabase-js, TanStack Query (ADR-011) — desenvolvido direto no repositório | `planejado` — bloqueado por KI-008 |
 | Backend | Supabase: PostgreSQL 17, Auth, Storage, RLS, Edge Functions | Projeto dev `ripgenhykaajcnzdxoid` (us-east-1) com banco da Fase 1 aplicado |
 | Pagamentos | Mercado Pago (API de Assinaturas + Webhooks) | `planejado` — Fase 5 |
 | Versionamento | Git / GitHub `BarretosJulio10/Moto-Passaporte` | `implementado` |
@@ -85,7 +85,7 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access`, `mainte
 
 ## 7. Pendências imediatas
 
-- Decidir quem constrói a interface: Lovable ou desenvolvimento direto no repositório (D-T1).
+- Interface: será construída direto neste repositório (ADR-011). **Bloqueada** até liberar instalação de pacotes no ambiente do Claude e abrir nova conversa (KI-008). Próximos passos detalhados em `PROJECT_STATUS.md`.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 
