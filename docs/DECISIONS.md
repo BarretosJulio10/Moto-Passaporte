@@ -109,6 +109,15 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-028 — Backup, restauração e rollback (PRD 18.4, 20)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- **Backup diário** pelo GitHub Actions (local separado do Supabase): só **dados** (`public`, `auth.users/identities`, `storage.buckets/objects`), estrutura do `public` como referência e todos os arquivos do bucket. Retenção de 30 dias.
+- **Criptografia com chave pública (age):** o servidor de backup não consegue abrir o que guarda. Escolhido em vez de senha compartilhada porque o repositório é público e porque uma senha precisaria ficar no próprio GitHub.
+- **Restauração = migrações do Git + dados do backup**, com gatilhos desligados na carga. Um dump só do `public` perderia as políticas de `storage.objects` e o gatilho de `auth.users`; um dump completo do banco não é restaurável num projeto Supabase novo (schemas gerenciados).
+- Segredos do Vault ficam fora do backup e são recadastrados no painel admin.
+- **Rollback:** preferência por correção para frente; scripts `supabase/rollback/*.down.sql` para as migrações da Fase 6, testados (desfaz → confere → reaplica). Rollback nunca reabre falha de segurança já corrigida.
+- **Teste de restauração** automático em banco de teste em toda regressão; com backup real a cada 3 meses, num projeto separado.
+
 ### ADR-027 — Estratégia de testes e regressão (PRD 19)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - **Segurança e regras:** no banco, onde a proteção existe (RLS, funções, gatilhos). Suítes por fase em PostgreSQL local com simulação do Supabase e, para cada fase, uma versão no Supabase real dentro de transação desfeita.

@@ -1,0 +1,96 @@
+# Backup diário criptografado do banco e dos arquivos (PRD 20, ADR-028). Ver docs/OPERATIONS.md.
+# Só a chave PÚBLICA do age fica aqui (variável BACKUP_AGE_RECIPIENT); a privada fica só com o responsável.
+# Segredos: SUPABASE_DB_URL (Session pooler, com senha), SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
+# Enquanto os segredos não forem cadastrados, o workflow termina sem fazer nada.
+name: Backup
+
+on:
+  schedule:
+    - cron: '17 6 * * *' # 03:17 em Brasília
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      RECIPIENT: ${{ vars.BACKUP_AGE_RECIPIENT }}
+      RETENTION_DAYS: ${{ vars.BACKUP_RETENTION_DAYS || '30' }}
+    steps:
+      - name: Conferir configuração
+        id: cfg
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ] || [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ] || [ -z "$RECIPIENT" ]; then
+            echo "Backup não configurado (faltam segredos ou a chave pública). Ver docs/OPERATIONS.md §2."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.ready == 'true'
+
+      - name: Instalar pg_dump 17 e age
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17 age
+
+      - uses: actions/setup-node@v4
+        if: steps.cfg.outputs.ready == 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Banco de dados
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          set -euo pipefail
+          umask 077
+          STAMP=$(date -u +%Y%m%dT%H%MZ)
+          echo "STAMP=$STAMP" >> "$GITHUB_ENV"
+          mkdir -p out work
+          # Dados do app e das contas/arquivos (a estrutura vem das migrações do Git — ver OPERATIONS.md §3)
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" -Fc --data-only -n public -f work/public_data.dump
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" -Fc --data-only \
+            -t auth.users -t auth.identities -t storage.buckets -t storage.objects -f work/auth_storage_data.dump
+          # Estrutura do public só como referência/perícia
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" -Fc --schema-only --no-owner -n public -f work/public_schema.dump
+          for f in work/*.dump; do /usr/lib/postgresql/17/bin/pg_restore -l "$f" > /dev/null; done
+          git rev-parse HEAD > work/GIT_COMMIT
+          tar -C work -cf - . | age -r "$RECIPIENT" -o "out/db-$STAMP.tar.age"
+          rm -rf work
+
+      - name: Arquivos
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          set -euo pipefail
+          umask 077
+          npm ci --ignore-scripts --no-audit --no-fund
+          mkdir -p files
+          node scripts/ops/backup_storage.mjs files
+          tar -C files -cf - . | age -r "$RECIPIENT" -o "out/files-$STAMP.tar.age"
+          rm -rf files
+          ls -l out
+
+      - name: Guardar
+        if: steps.cfg.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-${{ env.STAMP }}
+          path: out/
+          retention-days: ${{ env.RETENTION_DAYS }}
+          if-no-files-found: error

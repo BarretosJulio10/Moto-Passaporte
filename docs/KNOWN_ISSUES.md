@@ -32,4 +32,6 @@ Problemas conhecidos e sua situação.
 | KI-026 | Fluxo de assinatura ainda não testado ponta a ponta com o Mercado Pago (só respostas simuladas). Em ambiente de teste, o e-mail do pagador precisa ser de um usuário de teste do Mercado Pago | Alta | Aberto — homologação (PRD 8.7) com credenciais de teste |
 | KI-027 | Recibo é comprovante interno; não há emissão de nota fiscal de serviço (NFS-e) | Média | Aberto — depende de decisão contábil antes da cobrança real |
 | KI-029 | Limpeza de arquivos sem vínculo é manual (botão em /admin/armazenamento); falta agendamento automático (pg_cron chamando a Edge Function com segredo próprio) | Baixa | Aberto — avaliar após o lançamento |
+| KI-030 | Sem alerta ativo (e-mail/WhatsApp) para erro de aplicação, falhas de login em massa ou indisponibilidade; hoje só painéis e logs (OPERATIONS.md §5) | Média | Aberto — antes do lançamento aberto |
+| KI-031 | Repositório do GitHub é público: os artefatos de backup (criptografados) ficam baixáveis por qualquer conta do GitHub, com nomes/datas/tamanhos visíveis | Média | Aberto — decisão do responsável (tornar privado ou mover para armazenamento privado) |
 | KI-028 | Identidade visual e textos do site público ficam no código (não editáveis pelo admin, PRD 7.8) | Baixa | Aberto — avaliar após o lançamento |

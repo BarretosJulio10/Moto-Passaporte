@@ -1,6 +1,6 @@
 # PROJECT_STATUS — Moto Passaporte
 
-**Versão atual:** 0.25.0
+**Versão atual:** 0.26.0
 **Data:** 07/11/2026
 **Fase:** Fases 1 a 4 concluídas. Fases 1 a 5 concluídas (Mercado Pago aguardando teste ponta a ponta). Fase 6 em andamento: painel administrativo
 **Progresso geral:** 87,5% (35 de 40 itens do PRD — quadro em `PRD_CHECKLIST.md`)
@@ -22,13 +22,13 @@
 | 3 — Oficinas e autorizações | concluída: cadastro, perfil, pesquisa por placa, autorizações, Oficina de Origem, equipe e serviços da oficina |
 | 4 — Transferência e compartilhamento | concluída: transferência, motos anteriores, compartilhamento controlado e revogável |
 | 5 — Monetização | concluída: planos, conta do Mercado Pago, assinaturas, Webhook, conciliação, atraso, cancelamento, benefícios Premium e faturas (falta teste real com o Mercado Pago, KI-026) |
-| 6 — Administração e lançamento | em andamento: painel administrativo completo, verificação de placa, armazenamento e testes/regressão; faltam backup e homologação |
+| 6 — Administração e lançamento | em andamento: painel administrativo completo, verificação de placa, armazenamento, testes/regressão e backup/restauração; falta homologação e lançamento |
 
 ## Próximos passos (em ordem)
 
-Concluído em 0.25.0: testes e regressão (ADR-027). Item 6.4 concluído. Antes de publicar: `scripts/validation/run_all.sh`.
+Concluído em 0.26.0: backup, restauração e rollback (ADR-028, `OPERATIONS.md`). Item 6.5 concluído; ativar o backup cadastrando os segredos no GitHub. Antes de publicar: `scripts/validation/run_all.sh`.
 
-1. Fase 6.5 — backup, restauração e rollback testados.
+1. Fase 6.6 — homologação (`HOMOLOGATION.md`) e publicação.
 2. Fase 6 — testes de segurança, backup, homologação e lançamento.
 2. Validação ponta a ponta com credenciais de teste (KI-026) assim que o responsável cadastrar a conta de teste.
 2. Fase 5.3 a 5.5 — faturas, cotas Premium, atraso, cancelamento e reativação.

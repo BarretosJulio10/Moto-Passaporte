@@ -76,6 +76,7 @@
 | PostgreSQL 16 local — varredura de segurança por catálogo (e detecção de 10 brechas plantadas) | `tests/security/phase6e_security_sweep_test.sql` | 12 aprovadas |
 | Supabase real — varredura de segurança | `tests/security/supabase/phase6e_security_sweep.sql` | 0 violações |
 | Ponta a ponta no navegador (Supabase simulado) | `scripts/validation/run_e2e.sh` | 7 cenários, 29 verificações |
+| Backup criptografado, restauração e rollback (banco de teste) | `scripts/ops/restore_check.sh` | 13 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
@@ -183,3 +184,11 @@ Ver `KNOWN_ISSUES.md`.
 - `.env` real nunca é versionado (`.gitignore`); modelo em `.env.example`.
 - Service role key e Access Token do Mercado Pago apenas como secrets das Edge Functions.
 - `system_settings` não armazena segredos.
+
+## Backup (Fase 6.5, ADR-028)
+
+- Backups criptografados com chave pública (age); a chave privada fica só com o responsável. O GitHub Actions guarda só a chave pública e os segredos de leitura (`SUPABASE_DB_URL`, service role), nunca registrados em log.
+- Segredos do Vault (Mercado Pago) não entram no backup.
+- Restauração com gatilhos desligados apenas durante a carga; depois, varredura de segurança obrigatória.
+- Rollback de migração nunca reabre falha corrigida (testado: escrita direta em `system_settings` continua fechada).
+- Repositório público: ver KI-031.

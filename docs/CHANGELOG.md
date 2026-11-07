@@ -9,6 +9,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.26.0] — 07/11/2026 — Fase 6.5: backup, restauração e rollback
+
+### Adicionado
+- Workflow `.github/workflows/backup.yml`: backup diário criptografado (age) de dados, contas, metadados e arquivos; inativo até os segredos serem cadastrados.
+- `scripts/ops/backup_storage.mjs`: cópia de todos os arquivos do bucket com `MANIFEST.json`.
+- `scripts/ops/restore_check.sh`: teste de backup → criptografia → restauração → rollback → reaplicação (13 verificações), incluído em `run_all.sh`.
+- Scripts de rollback das migrações da Fase 6 em `supabase/rollback/`.
+- Manual de operação: `docs/OPERATIONS.md` (backup, restauração, rollback por camada, monitoramento, ambientes).
+
+### Rollback desta versão
+- Só arquivos de operação e documentação; nada no banco ou no site. Desfazer = remover o workflow.
+
 ## [0.25.0] — 07/11/2026 — Fase 6.4: testes e regressão
 
 ### Adicionado
