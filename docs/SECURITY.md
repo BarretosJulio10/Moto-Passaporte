@@ -42,6 +42,8 @@
 | Supabase real — anexos, em transação desfeita | `tests/security/supabase/phase2b_attachments_rollback.sql` | 21 aprovadas |
 | PostgreSQL 16 local — diário, com venda simulada | `tests/security/phase2c_diary_test.sql` | 44 aprovadas |
 | Supabase real — diário, em transação desfeita | `tests/security/supabase/phase2c_diary_rollback.sql` | 27 aprovadas |
+| PostgreSQL 16 local — pesquisa por placa e autorizações | `tests/security/phase3a_workshop_access_test.sql` | 46 aprovadas |
+| Supabase real — pesquisa por placa e autorizações, em transação desfeita | `tests/security/supabase/phase3a_workshop_access_rollback.sql` | 22 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
@@ -60,6 +62,15 @@ Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalad
 - Fotos herdam a visibilidade da entrada, inclusive no Storage.
 - Auditoria registra só categoria, data e visibilidade.
 - No Supabase real, arquivos só são apagados pela API do Storage; a política de exclusão (arquivo próprio e sem registro) foi testada no banco local.
+
+## Pesquisa por placa e autorizações (Fase 3)
+
+- Só membro ativo de oficina ativa pesquisa. Antes da autorização a resposta traz apenas marca, modelo e ano; nunca dono, placas antigas, chassi, quilometragem, `public_id` ou id interno.
+- O pedido é feito pela placa, sem expor o id da moto.
+- Limites (configuráveis em `system_settings`): 30 pesquisas/hora por usuário, 100 por oficina, 20 pedidos/dia por oficina, 7 dias de espera após recusa. Pesquisas registradas com hash sha256, sem a placa em texto.
+- Revogação e suspensão da oficina cortam o acesso na hora (todas as funções conferem a situação atual).
+- Autorizações não podem ser apagadas nem ter dados alterados; mudanças de situação seguem transições fixas e são auditadas.
+- Ainda sem CAPTCHA ou detecção de automação além do limite (KI-020).
 
 ## Advisors do Supabase (06/11/2026, após o reforço)
 

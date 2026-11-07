@@ -14,6 +14,8 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 | `20261107003512_phase1_hardening.sql` | Reforço pelos advisors: bloqueia RPC de funções de trigger, otimiza RLS com `(select auth.uid())`, índices de FKs |
 | `20261107013442_contact_settings.sql` | Configurações públicas `support_email` e `support_whatsapp` (vazias até o responsável definir) |
 | `20261107014505_maintenance.sql` | Fase 2: `maintenance_records`, `maintenance_items`, categorias, `create_maintenance_record`, `void_maintenance_record`, view `maintenance_timeline` |
+| `20261107101141_workshop_access.sql` | Fase 3: `plate_search_log`, `motorcycle_workshop_access`, pesquisa por placa, pedido, decisão, revogação e leituras por papel |
+| `20261107101234_workshop_access_indexes.sql` | Índices de `decided_by` e `ended_by` |
 | `20261107095618_diary.sql` | Fase 2: `motorcycle_diary`, fotos do diário em `attachments.diary_entry_id`, RPCs do diário, view `motorcycle_diary_feed`, políticas do Storage separadas (envio, leitura, exclusão de arquivo próprio sem registro) |
 | `20261107015821_attachments.sql` | Fase 2: bucket privado `attachments`, tabela `attachments`, políticas do Storage, `register_attachment`, `get_storage_usage`, cota em `system_settings`; `maintenance_timeline` com anexos e `evidence_level` |
 
@@ -55,6 +57,13 @@ Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limi
 
 | `motorcycle_diary` | Diário (PRD 5.7): categoria, título, texto, data, local, visibilidade (`private`/`shareable`) | Autor edita enquanto titular e exclui a qualquer momento. Privada: só o autor. Compartilhável: titular atual. `author_id` não é concedido ao frontend. Auditoria só com metadados (ADR-013) |
 
+### Oficinas e autorizações (Fase 3)
+
+| Tabela | Conteúdo | Regras |
+|---|---|---|
+| `plate_search_log` | Pesquisas por placa: oficina, usuário, hash sha256 da placa, encontrou ou não | Imutável; só admin lê; base do limite de tentativas |
+| `motorcycle_workshop_access` | Pedidos e autorizações por moto e oficina: tipo (`regular`/`origin`), situação, mensagem, quem pediu/decidiu/encerrou e quando | Nunca apagada. Transições só pending → approved/rejected/canceled e approved → revoked/ended. No máximo um pedido aberto por oficina e moto. Leitura pelas funções `get_*` |
+
 **Storage:** bucket `attachments` privado, 10 MB, JPG/PNG/WEBP/PDF. Políticas em `storage.objects`: envio e leitura só na pasta de moto da qual o usuário é titular atual (`can_access_attachment_object`); sem atualização nem exclusão pela API.
 
 ## Operações (funções RPC)
@@ -71,6 +80,12 @@ Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limi
 | `register_attachment(moto, caminho, nome, espécie, registro?)` | Titular atual | Registra arquivo já enviado pelo próprio usuário; confere pasta, tipo, tamanho, cota e registro não anulado. Retorna o id |
 | `create_diary_entry(...)` / `update_diary_entry(...)` | Titular atual (edição: só o autor) | Cria/edita entrada do diário |
 | `delete_diary_entry(id)` / `delete_diary_photo(id)` | Autor | Exclui e devolve os caminhos dos arquivos para o app apagar no Storage |
+| `search_motorcycle_by_plate(org, placa)` | Membro ativo de oficina ativa | `{found, brand, model, manufacturing_year, access_status, motorcycle_id só se autorizada}`; limita e registra |
+| `request_workshop_access(org, placa, msg?)` / `cancel_workshop_access_request(id)` | Membro da oficina | Pede (ou devolve o pedido aberto) / cancela pendente |
+| `decide_workshop_access(id, aprovar)` / `revoke_workshop_access(id)` | Titular atual | Autoriza ou recusa pendente / revoga autorizada |
+| `get_motorcycle_workshop_access(moto)` / `get_my_pending_access_requests()` | Titular atual | Autorizações da moto com dados públicos da oficina / pendências em todas as motos |
+| `get_workshop_access_list(org)` | Membro da oficina | Pedidos da oficina; placa, km e id só quando autorizada |
+| `workshop_has_access(moto, org?)` | Autenticado | Verdadeiro se o usuário é membro ativo de oficina ativa com autorização aprovada |
 | `get_storage_usage()` | Autenticado | `{used_bytes, quota_bytes, max_file_bytes}` do usuário |
 | `has_role`, `is_admin`, `is_current_owner`, `is_org_member`, `is_org_responsible`, `is_org_active` | Políticas RLS | Verificações de permissão |
 

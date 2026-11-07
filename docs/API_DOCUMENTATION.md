@@ -173,6 +173,20 @@ Implementação em `src/modules/diary/api.ts`.
 - `delete_diary_photo({ p_attachment_id })` → `text` (caminho); depois `remove([caminho])`.
 - Fotos: mesmo fluxo de anexos com `register_attachment(..., p_diary_entry_id)`; só imagens, até 10.
 
+## Autorizações de oficina (Fase 3)
+
+Implementação em `src/modules/workshop_access/api.ts`.
+
+Oficina (membro ativo de oficina ativa):
+- `rpc('search_motorcycle_by_plate', { p_organization_id, p_plate })` → `{ found: false }` ou `{ found: true, brand, model, manufacturing_year, access_id, access_status, motorcycle_id }` (`motorcycle_id` só com autorização ativa). Erros: placa inválida (22023), limite de pesquisas (P0001).
+- `rpc('request_workshop_access', { p_organization_id, p_plate, p_message? })` → `{ id, status }`. Devolve o pedido aberto se já existir. Erros: placa não encontrada, espera após recusa, limite diário.
+- `rpc('cancel_workshop_access_request', { p_access_id })`.
+- `rpc('get_workshop_access_list', { p_organization_id })` → lista; `plate`, `latest_mileage`, `motorcycle_id` só quando `status = 'approved'`.
+
+Titular:
+- `rpc('get_motorcycle_workshop_access', { p_motorcycle_id })`, `rpc('get_my_pending_access_requests')`.
+- `rpc('decide_workshop_access', { p_access_id, p_approve })`, `rpc('revoke_workshop_access', { p_access_id })`.
+
 ## Duplicidade
 
 ```ts

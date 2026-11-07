@@ -9,6 +9,7 @@ import { MileageSection } from '@/modules/motorcycles/MileageSection'
 import { QrCodePanel } from '@/modules/sharing/QrCodePanel'
 import { MotoHeader } from '@/modules/motorcycles/MotoHeader'
 import { RecentRecords } from '@/modules/maintenance/RecentRecords'
+import { OwnerAccessSection } from '@/modules/workshop_access/OwnerAccessSection'
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
@@ -70,6 +71,7 @@ export function MotorcyclePage() {
             <ChassisSection motorcycleId={motoId} />
           </div>
           <RecentRecords motorcycleId={motoId} />
+          <OwnerAccessSection motorcycleId={motoId} />
         </div>
         <aside className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <QrCodePanel publicId={publicId} label={`${m.brand}-${m.model}`} />

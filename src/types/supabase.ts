@@ -801,6 +801,62 @@ export type Database = {
         }
         Returns: undefined
       }
+      search_motorcycle_by_plate: { Args: { p_organization_id: string; p_plate: string }; Returns: Json }
+      request_workshop_access: { Args: { p_message?: string; p_organization_id: string; p_plate: string }; Returns: Json }
+      cancel_workshop_access_request: { Args: { p_access_id: string }; Returns: undefined }
+      decide_workshop_access: { Args: { p_access_id: string; p_approve: boolean }; Returns: undefined }
+      revoke_workshop_access: { Args: { p_access_id: string }; Returns: undefined }
+      workshop_has_access: { Args: { p_motorcycle: string; p_organization?: string }; Returns: boolean }
+      get_motorcycle_workshop_access: {
+        Args: { p_motorcycle_id: string }
+        Returns: {
+          access_type: Database["public"]["Enums"]["workshop_access_type"]
+          decided_at: string | null
+          end_reason: string | null
+          ended_at: string | null
+          id: string
+          message: string | null
+          requested_at: string
+          status: Database["public"]["Enums"]["workshop_access_status"]
+          workshop_active: boolean
+          workshop_city: string | null
+          workshop_name: string
+          workshop_slug: string | null
+          workshop_state: string | null
+          workshop_verified: boolean
+        }[]
+      }
+      get_my_pending_access_requests: {
+        Args: never
+        Returns: {
+          id: string
+          message: string | null
+          motorcycle_id: string
+          motorcycle_label: string
+          requested_at: string
+          workshop_city: string | null
+          workshop_name: string
+          workshop_state: string | null
+        }[]
+      }
+      get_workshop_access_list: {
+        Args: { p_organization_id: string }
+        Returns: {
+          access_type: Database["public"]["Enums"]["workshop_access_type"]
+          brand: string
+          decided_at: string | null
+          ended_at: string | null
+          id: string
+          latest_mileage: number | null
+          latest_mileage_at: string | null
+          manufacturing_year: number
+          model: string
+          motorcycle_id: string | null
+          plate: string | null
+          requested_at: string
+          status: Database["public"]["Enums"]["workshop_access_status"]
+        }[]
+      }
       delete_diary_entry: { Args: { p_entry_id: string }; Returns: string[] }
       delete_diary_photo: { Args: { p_attachment_id: string }; Returns: string }
       can_access_attachment_object: { Args: { p_name: string }; Returns: boolean }
@@ -875,6 +931,8 @@ export type Database = {
       }
     }
     Enums: {
+      workshop_access_status: "pending" | "approved" | "rejected" | "canceled" | "revoked" | "ended"
+      workshop_access_type: "regular" | "origin"
       diary_category: "first_ride" | "trip" | "meetup" | "accessory" | "customization" | "photo" | "other"
       diary_visibility: "private" | "shareable"
       attachment_kind: "photo" | "invoice" | "service_order" | "receipt" | "document" | "other"

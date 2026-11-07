@@ -9,6 +9,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.10.0] — 07/11/2026 — Fase 3: pesquisa por placa e autorizações
+
+### Adicionado
+- Migração `workshop_access`: `plate_search_log` (só hash da placa), `motorcycle_workshop_access` (pendente → autorizada/recusada/cancelada; autorizada → revogada/encerrada; nunca apagada; auditada), `search_motorcycle_by_plate`, `request_workshop_access`, `cancel_workshop_access_request`, `decide_workshop_access`, `revoke_workshop_access`, `get_motorcycle_workshop_access`, `get_my_pending_access_requests`, `get_workshop_access_list`, `workshop_has_access`. Limites configuráveis: 30 pesquisas/hora por pessoa, 100 por oficina, 20 pedidos/dia por oficina, 7 dias de espera após recusa.
+- Migração `workshop_access_indexes` (aviso de desempenho do Supabase).
+- Painel da oficina: pesquisa por placa (antes da autorização só marca, modelo e ano), pedido com mensagem, cancelamento, motos autorizadas com placa e última quilometragem, pedidos aguardando e histórico.
+- Página da moto: seção "Oficinas com acesso" com autorizar, recusar, revogar (com confirmação) e histórico. Painel do dono avisa pedidos pendentes.
+- Testes: banco 46 (local) + 22 (Supabase, transação desfeita); interface 86 no total (9 novos). Verificação visual em 360 e 1280 px.
+
 ## [0.9.0] — 07/11/2026 — Fase 2 concluída: diário da moto
 
 ### Adicionado

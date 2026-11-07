@@ -4,8 +4,8 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 07/11/2026 — v0.9.0
-**Item atual na ordem:** Fase 3 → pesquisa protegida por placa (3.3)
+**Última conferência:** 07/11/2026 — v0.10.0
+**Item atual na ordem:** Fase 3 → Oficina de Origem (3.5)
 
 ## Progresso
 
@@ -16,13 +16,13 @@ Conta: item concluído = 1, parcial = 0,5, planejado = 0. Total de 40 itens nas 
 |---|---|---|---|
 | 1 — Fundação SaaS e site | 11 | 11 | 100% |
 | 2 — Histórico e arquivos | 6 | 5,5 | 92% |
-| 3 — Oficinas e autorizações | 7 | 2 | 29% |
+| 3 — Oficinas e autorizações | 7 | 4 | 57% |
 | 4 — Transferência e compartilhamento | 5 | 1 | 20% |
 | 5 — Monetização e Mercado Pago | 5 | 0 | 0% |
 | 6 — Administração, segurança e lançamento | 6 | 0 | 0% |
-| **Total** | **40** | **19,5** | **48,8%** |
+| **Total** | **40** | **21,5** | **53,8%** |
 
-Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8%.
+Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8%.
 
 **Fase 1: concluída (base)** em 06/11/2026. Pendências que não bloqueiam a Fase 2: ambientes de homologação/produção (KI-007), revisão jurídica de termos/privacidade, MFA para administradores (KI-014), criptografia do chassi (KI-002).
 
@@ -63,8 +63,8 @@ Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8%.
 |---|---|---|---|
 | 3.1 | Cadastro gratuito de oficina | 6.1 | `implementado` — banco testado + tela (antecipado na Fase 1) |
 | 3.2 | Perfil público da oficina | 6.1 | `implementado` — edição e página pública `/oficinas/:slug` |
-| 3.3 | Pesquisa protegida por placa | 6.4 | `planejado` |
-| 3.4 | Solicitação, aprovação e revogação (`motorcycle_workshop_access`) | 6.4, 6.6 | `planejado` |
+| 3.3 | Pesquisa protegida por placa | 6.4 | `implementado` — antes da autorização revela só marca, modelo e ano; limite de 30 pesquisas/hora por pessoa e 100 por oficina; registro só com hash da placa; banco testado |
+| 3.4 | Solicitação, aprovação e revogação (`motorcycle_workshop_access`) | 6.4, 6.6 | `implementado` — pedido pela placa, aprovação/recusa/revogação pelo titular, cancelamento pela oficina, histórico imutável, revogação imediata; aviso de pedido no painel do dono (notificação por e-mail e central: KI-020); banco testado (local 46, Supabase 22) |
 | 3.5 | Oficina de Origem | 6.5 | `planejado` |
 | 3.6 | Membros da oficina e permissões | 6.2 | `planejado` (tabela existe; gestão pendente) |
 | 3.7 | Registro de serviços pela oficina | 6.7 | `planejado` |

@@ -5,6 +5,8 @@ import { Notice } from '@/components/Notice'
 import { ButtonLink } from '@/components/Button'
 import { formatKm, formatPlate } from '@/core/shared/format'
 import { fetchMyMotorcycles } from '@/modules/motorcycles/api'
+import { fetchPendingRequests } from '@/modules/workshop_access/api'
+import { PendingRequestsNotice } from '@/modules/workshop_access/OwnerAccessSection'
 
 export function DashboardPage() {
   const { user } = useAuth()
@@ -16,11 +18,18 @@ export function DashboardPage() {
     queryFn: fetchMyMotorcycles,
   })
 
+  const pending = useQuery({ queryKey: ['pending-access', user?.id], enabled: Boolean(user), queryFn: fetchPendingRequests })
+
   const hasMotos = Boolean(motorcycles.data && motorcycles.data.length > 0)
 
   return (
     <div>
       <h1 className="heading text-3xl text-ink">{firstName ? `Olá, ${firstName}` : 'Seu painel'}</h1>
+      {pending.data && pending.data.length > 0 && (
+        <div className="mt-6">
+          <PendingRequestsNotice requests={pending.data} />
+        </div>
+      )}
 
       <div className="mt-10 flex flex-wrap items-baseline justify-between gap-3">
         <h2 className="font-semibold text-ink">Minhas motos</h2>

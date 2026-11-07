@@ -2,10 +2,10 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { ButtonLink } from '@/components/Button'
 import { Notice } from '@/components/Notice'
 import { useMyWorkshops } from './WorkshopIndexPage'
+import { PlateSearchPanel } from '@/modules/workshop_access/PlateSearchPanel'
+import { WorkshopAccessList } from '@/modules/workshop_access/WorkshopAccessList'
 
 const COMING = [
-  ['Pesquisa por placa', 'Encontrar a moto do cliente e pedir acesso ao passaporte.'],
-  ['Solicitações de acesso', 'Acompanhar os pedidos aprovados ou recusados pelos donos.'],
   ['Registro de serviços', 'Lançar serviço, peças, quilometragem e fotos da nota no histórico da moto.'],
   ['Funcionários', 'Dar acesso à equipe, cada um com o próprio login.'],
 ]
@@ -68,6 +68,11 @@ export function WorkshopDashboardPage() {
           </dd>
         </div>
       </dl>
+
+      <div className="mt-8 flex flex-col gap-8">
+        <PlateSearchPanel organizationId={shop.organization_id} />
+        <WorkshopAccessList organizationId={shop.organization_id} />
+      </div>
 
       <section className="mt-10" aria-labelledby="coming-title">
         <h2 id="coming-title" className="heading text-2xl text-ink">Chegando em breve</h2>
