@@ -71,6 +71,22 @@ export async function getStorageUsage(): Promise<StorageUsage> {
   return { used_bytes: Number(u.used_bytes), quota_bytes: Number(u.quota_bytes), max_file_bytes: Number(u.max_file_bytes) }
 }
 
+/** Conferência do conteúdo no servidor (ADR-033); o banco só registra arquivo conferido. */
+async function checkContent(path: string): Promise<void> {
+  const { error } = await getSupabase().functions.invoke('attachment-check', { body: { path } })
+  if (!error) return
+  let message: string | undefined
+  const ctx = (error as { context?: Response }).context
+  if (ctx && typeof ctx.json === 'function') {
+    try {
+      message = ((await ctx.json()) as { message?: string }).message
+    } catch {
+      /* resposta sem corpo */
+    }
+  }
+  throw new AttachmentError(message ?? 'Não foi possível conferir o arquivo. Tente de novo.')
+}
+
 export async function uploadAttachment(params: {
   motorcycleId: string
   file: PreparedFile
@@ -93,6 +109,7 @@ export async function uploadAttachment(params: {
     if (/mime|content type/i.test(msg)) throw new AttachmentError('Formato não aceito.')
     throw new AttachmentError('Não foi possível enviar o arquivo. Tente de novo.')
   }
+  await checkContent(path)
   const { data, error } = params.organizationId
     ? await supabase.rpc('register_workshop_attachment', {
         p_organization_id: params.organizationId,

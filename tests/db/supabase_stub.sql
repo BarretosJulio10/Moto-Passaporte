@@ -83,6 +83,21 @@ begin
 end $$;
 create trigger objects_owner before insert on storage.objects for each row execute function storage.set_owner();
 
+-- Simulação da Edge Function attachment-check (ADR-033): no banco de teste todo envio é
+-- considerado conferido, exceto quando a suíte define tests.skip_file_check = 'on'.
+create function storage.simulate_file_check() returns trigger language plpgsql security definer as $$
+begin
+  if to_regclass('public.attachment_checks') is not null
+     and new.metadata ->> 'mimetype' is not null
+     and coalesce(current_setting('tests.skip_file_check', true), '') <> 'on' then
+    execute 'insert into public.attachment_checks (storage_path, mime_type, ok) values ($1, $2, true)
+             on conflict (storage_path) do update set ok = true, mime_type = excluded.mime_type, checked_at = now()'
+      using new.name, new.metadata ->> 'mimetype';
+  end if;
+  return new;
+end $$;
+create trigger objects_simulated_check after insert on storage.objects for each row execute function storage.simulate_file_check();
+
 create function storage.foldername(name text) returns text[]
 language sql immutable as $$ select (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
 
