@@ -109,6 +109,13 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-030 — Verificação em duas etapas obrigatória para administradores (PRD 15.1)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- `is_admin()` só vale com sessão verificada em duas etapas (claim `aal` = `aal2` do Supabase Auth). Como toda autorização administrativa passa por ela (funções `admin_*`, políticas RLS de admin, Edge Functions com login de admin), a regra vale no banco, não só na tela. Token sem `aal` conta como `aal1`.
+- Método: TOTP (aplicativo autenticador), nativo do Supabase Auth, sem custo e sem SMS.
+- No site, o admin que ainda não ativou vê o QR Code; quem já ativou digita o código ao entrar em `/admin`. Usuário comum não vê diferença.
+- Recuperação (celular perdido): remover o fator no painel do Supabase (Authentication → Users) e ativar de novo. Rollback de emergência existe, mas volta a liberar a administração só com senha.
+
 ### ADR-029 — Rotinas automáticas por pg_cron + Edge Function (PRD 8.3, 7.6, 20)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - **Conciliação com o Mercado Pago a cada 6 horas** (KI-024) e **limpeza diária de arquivos sem vínculo** (KI-029), mesmas regras das ações manuais. Sem token do Mercado Pago, a conciliação fica como "pulada".

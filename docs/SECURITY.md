@@ -75,9 +75,11 @@
 | Tipos das Edge Functions | `scripts/validation/check_edge_functions.sh` | OK |
 | PostgreSQL 16 local — varredura de segurança por catálogo (e detecção de 10 brechas plantadas) | `tests/security/phase6e_security_sweep_test.sql` | 12 aprovadas |
 | Supabase real — varredura de segurança | `tests/security/supabase/phase6e_security_sweep.sql` | 0 violações |
-| Ponta a ponta no navegador (Supabase simulado) | `scripts/validation/run_e2e.sh` | 7 cenários, 29 verificações |
+| Ponta a ponta no navegador (Supabase simulado) | `scripts/validation/run_e2e.sh` | 8 cenários, 35 verificações |
 | Backup criptografado, restauração e rollback (banco de teste) | `scripts/ops/restore_check.sh` | 13 aprovadas |
 | PostgreSQL 16 local — rotinas automáticas | `tests/security/phase6f_jobs_test.sql` | 17 aprovadas |
+| PostgreSQL 16 local — MFA de administradores | `tests/security/phase6g_admin_mfa_test.sql` | 15 aprovadas |
+| Supabase real — MFA de administradores, em transação desfeita | `tests/security/supabase/phase6g_admin_mfa_rollback.sql` | 8 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
@@ -193,6 +195,11 @@ Ver `KNOWN_ISSUES.md`.
 - Restauração com gatilhos desligados apenas durante a carga; depois, varredura de segurança obrigatória.
 - Rollback de migração nunca reabre falha corrigida (testado: escrita direta em `system_settings` continua fechada).
 - Repositório público: ver KI-031.
+
+## Verificação em duas etapas dos administradores (ADR-030)
+
+- `is_admin()` = papel admin **e** sessão `aal2`. Testado: sem a segunda etapa, indicadores, usuários, configurações, limpeza e auditoria ficam bloqueados (local 15, Supabase real 8).
+- Celular perdido: remover o fator em Supabase → Authentication → Users. Nunca desligar a regra para contornar.
 
 ## Rotinas automáticas (ADR-029)
 

@@ -325,3 +325,6 @@ Implementação em `src/modules/plans/api.ts`.
 ### Rotinas automáticas (ADR-029)
 - `admin_job_status()` → por rotina (`reconcile`, `storage_cleanup`): última situação, detalhe, horários, falhas e execuções em 24 h.
 - Edge Function `POST /functions/v1/scheduled-jobs` `{ job }` — só para o pg_cron (cabeçalho `x-job-secret`); não chamar pelo navegador.
+
+### Acesso administrativo (ADR-030)
+- `my_admin_access()` → `{ has_admin_role, aal, allowed }` da própria sessão. Ativação e código: `supabase.auth.mfa.enroll({ factorType: 'totp' })`, `mfa.challengeAndVerify({ factorId, code })`.

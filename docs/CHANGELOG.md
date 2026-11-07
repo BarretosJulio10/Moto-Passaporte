@@ -9,6 +9,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.28.0] — 07/11/2026 — Verificação em duas etapas para administradores
+
+### Segurança
+- `is_admin()` exige sessão com verificação em duas etapas (aal2). Sem ela, nenhuma função, dado ou Edge Function administrativa responde (ADR-030; KI-014).
+- `/admin` mostra a ativação do aplicativo autenticador (QR Code e chave) ou pede o código.
+
+### Testes
+- Banco local: 15 verificações novas (22 suítes). Supabase real: 8 (aal1, sem claim, aal2, usuário comum). Testes antigos do Supabase atualizados para sessões de admin com aal2 (conferido com a suíte 6.1: 4/4). Ponta a ponta: 8 cenários, 35 verificações (ativação com código errado e certo).
+
+### Rollback desta versão
+- `supabase/rollback/20261107223918_admin_mfa.down.sql` (só em emergência: volta a administração com senha apenas) e publicar o site anterior.
+
 ## [0.27.0] — 07/11/2026 — Preparação do lançamento: rotinas automáticas
 
 ### Adicionado

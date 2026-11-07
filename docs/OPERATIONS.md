@@ -77,6 +77,12 @@ Cada release registra no `CHANGELOG.md` o que precisa para voltar; a nota "Rollb
 
 Ainda não há alerta ativo (e-mail/WhatsApp) para erro de aplicação, falha de login em massa ou indisponibilidade (KI-030). Alertas não devem conter dados pessoais.
 
-## 6. Ambientes
+## 6. Acesso de administrador
+
+- Entrar em `/admin` exige a verificação em duas etapas (aplicativo autenticador). Na primeira vez, a tela mostra o QR Code.
+- Celular perdido ou trocado: Supabase → *Authentication → Users* → sua conta → remover o fator MFA; entrar de novo em `/admin` e ativar no celular novo.
+- Conceder o papel admin a outra pessoa: só pelo SQL Editor (`insert into public.user_roles (user_id, role) values ('<id>', 'admin')`), e ela também precisará ativar a segunda etapa.
+
+## 7. Ambientes
 
 Hoje há um ambiente (desenvolvimento = produção em teste) — KI-007. Antes do lançamento aberto: projeto Supabase de homologação separado, com dados fictícios. Não copiar dados reais para testes sem anonimização.
