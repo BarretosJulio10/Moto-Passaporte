@@ -65,7 +65,8 @@ from (select public.register_motorcycle('Honda', 'CB 500F', 2022, 'abc-1d23', 12
 select tests.ok(:'st_a' = 'created', 'A cadastra a moto');
 select tests.ok((select count(*) = 1 from public.my_motorcycles), 'moto aparece em my_motorcycles');
 select tests.ok((select current_plate = 'ABC1D23' and latest_mileage = 12000 from public.my_motorcycles), 'placa normalizada e km inicial registrados');
-select tests.ok((select chassis = '9C2PC4500NR000001' from public.motorcycle_private where motorcycle_id = :'moto_a'), 'A vê o próprio chassi');
+select tests.ok(public.get_my_chassis(:'moto_a') = '9C2PC4500NR000001', 'A vê o próprio chassi (decifrado)');
+select tests.must_fail($$select * from public.motorcycle_private$$, 'tabela do chassi fechada até para o titular (só pela função)');
 
 select tests.must_fail($$select public.register_motorcycle('Yamaha','MT-03',2021,'XYZ1234',5000)$$, 'limite de 1 moto no plano gratuito');
 select tests.must_fail(format($$update public.motorcycles set public_id = 'x' where id = %L$$, :'moto_a'), 'public_id não pode ser alterado');
@@ -90,7 +91,9 @@ select tests.ok((select count(*) = 2 from public.motorcycle_plates where motorcy
 select tests.ok((select count(*) = 1 from public.motorcycles), 'troca de placa não cria outra moto');
 select tests.ok((select current_plate = 'ABC1234' from public.my_motorcycles), 'placa atual atualizada');
 
-update public.motorcycle_private set chassis = '9C2PC4500NR000002' where motorcycle_id = :'moto_a';
+select public.set_my_chassis(:'moto_a', '9c2pc4500nr000002');
+select tests.ok(public.get_my_chassis(:'moto_a') = '9C2PC4500NR000002', 'A altera o próprio chassi');
+select tests.must_fail(format($$select public.set_my_chassis(%L, 'AB1')$$, :'moto_a'), 'chassi inválido (curto demais) recusado');
 select tests.ok((select count(*) = 0 from public.audit_logs), 'usuária comum não lê a auditoria');
 
 reset role;
@@ -102,7 +105,7 @@ set role authenticated;
 
 select tests.ok((select count(*) = 0 from public.motorcycles),           'B não vê a moto de A');
 select tests.ok((select count(*) = 0 from public.motorcycle_plates),     'B não vê placas de A');
-select tests.ok((select count(*) = 0 from public.motorcycle_private),    'B não vê chassi de A');
+select tests.must_fail(format($$select public.get_my_chassis(%L)$$, :'moto_a'), 'B não vê chassi de A');
 select tests.ok((select count(*) = 0 from public.mileage_records),       'B não vê km de A');
 select tests.ok((select count(*) = 0 from public.motorcycle_ownerships), 'B não vê titularidade de A');
 select tests.ok((select count(*) = 1 from public.profiles),              'B vê apenas o próprio perfil');
@@ -118,8 +121,8 @@ select tests.ok((public.register_motorcycle('Yamaha','Fazer 250',2019,'ABC1D23',
 
 with u as (update public.motorcycles set color = 'Hackeada' where id = :'moto_a' returning 1)
 select tests.ok((select count(*) = 0 from u), 'B não edita a moto de A');
-with u as (update public.motorcycle_private set chassis = 'XXXXX' where motorcycle_id = :'moto_a' returning 1)
-select tests.ok((select count(*) = 0 from u), 'B não altera o chassi de A');
+select tests.must_fail(format($$select public.set_my_chassis(%L, 'XXXXX')$$, :'moto_a'), 'B não altera o chassi de A');
+select tests.must_fail(format($$update public.motorcycle_private set chassis = 'XXXXX' where motorcycle_id = %L$$, :'moto_a'), 'escrita direta no chassi revogada');
 select tests.must_fail(format($$select public.change_motorcycle_plate(%L, 'QWE1234')$$, :'moto_a'), 'B não troca a placa de A');
 select tests.must_fail(format($$select public.record_mileage(%L, 99999)$$, :'moto_a'), 'B não registra km na moto de A');
 
@@ -179,7 +182,7 @@ select set_config('request.jwt.claim.sub', :'D', false);
 set role authenticated;
 select tests.ok((select count(*) > 0 from public.audit_logs), 'admin lê a auditoria');
 select tests.ok((select count(*) = 2 from public.motorcycles), 'admin vê dados básicos das motos');
-select tests.ok((select count(*) = 0 from public.motorcycle_private), 'admin NÃO vê chassi por padrão');
+select tests.must_fail(format($$select public.get_my_chassis(%L)$$, :'moto_a'), 'admin NÃO vê chassi por padrão');
 select tests.ok((select count(*) = 0 from public.motorcycle_plates), 'admin NÃO vê placas por padrão');
 select tests.must_fail($$update public.audit_logs set action = 'x'$$, 'nem admin altera auditoria');
 reset role;
@@ -196,6 +199,13 @@ select tests.must_fail($$update public.mileage_records set mileage = 1$$, 'km n�
 select tests.must_fail(format($$delete from auth.users where id = %L$$, :'A'), 'excluir conta não apaga a história da moto');
 select tests.ok((select count(*) = 0 from public.audit_logs where action = 'chassis_changed' and new_data is not null),
                 'auditoria de chassi não grava o valor');
+select tests.ok((select count(*) = 0 from public.motorcycle_private where chassis is not null), 'nenhum chassi em texto aberto no banco');
+select tests.ok((select chassis_enc is not null and position(convert_to('9C2PC4500NR000002', 'UTF8') in chassis_enc) = 0
+                   from public.motorcycle_private where motorcycle_id = :'moto_a'), 'chassi guardado cifrado (texto não aparece nos bytes)');
+update public.motorcycle_private set chassis = 'ABCDE12345' where motorcycle_id <> :'moto_a';
+select tests.ok((select bool_and(chassis is null and chassis_enc is not null) from public.motorcycle_private where motorcycle_id <> :'moto_a'),
+                'mesmo gravando direto no banco, o chassi é cifrado');
+select tests.ok((select count(*) = 1 from public.audit_logs where action = 'chassis_changed' and entity_id = :'moto_a'), 'troca de chassi auditada uma vez');
 select tests.ok((select count(*) >= 1 from public.audit_logs where action = 'duplicate_plate_claim'), 'pedido de duplicidade auditado');
 
 \echo '=== TODOS OS TESTES DA FASE 1 PASSARAM ==='

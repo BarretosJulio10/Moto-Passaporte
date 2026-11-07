@@ -24,6 +24,7 @@ create table public.t_aberta (id int);
 alter table public.t_aberta enable row level security;
 grant insert on public.t_aberta to authenticated;
 grant select on public.t_aberta to anon;
+grant update (id) on public.t_sem_rls to authenticated;
 create view public.v_definer as select 1 as x;
 grant select on public.v_definer to authenticated;
 create function public.f_sem_path() returns int language sql security definer as 'select 1';
@@ -38,6 +39,7 @@ update storage.buckets set public = true where id = 'attachments';
 
 select tests.ok(exists (select 1 from sweep where regra = 'tabela sem RLS' and objeto = 't_sem_rls'), 'detecta tabela sem RLS');
 select tests.ok(exists (select 1 from sweep where regra like 'escrita direta%' and objeto like 't_aberta%'), 'detecta escrita direta');
+select tests.ok(exists (select 1 from sweep where regra like 'escrita por coluna%' and objeto like 't_sem_rls.id%'), 'detecta escrita por coluna fora da lista');
 select tests.ok(exists (select 1 from sweep where regra = 'leitura anônima fora da lista' and objeto = 't_aberta'), 'detecta leitura anônima');
 select tests.ok(exists (select 1 from sweep where regra = 'visão sem security_invoker exposta' and objeto = 'v_definer'), 'detecta visão que ignora RLS');
 select tests.ok(exists (select 1 from sweep where regra = 'SECURITY DEFINER sem search_path' and objeto = 'f_sem_path'), 'detecta função sem search_path');

@@ -61,18 +61,16 @@ export async function fetchMileage(motorcycleId: string) {
   return data
 }
 
+/** Chassi decifrado no banco, só para o titular atual (ADR-032). */
 export async function fetchChassis(motorcycleId: string): Promise<string | null> {
-  const { data, error } = await getSupabase()
-    .from('motorcycle_private')
-    .select('chassis')
-    .eq('motorcycle_id', motorcycleId)
-    .maybeSingle()
+  const { data, error } = await getSupabase().rpc('get_my_chassis', { p_motorcycle_id: motorcycleId })
   if (error) throw error
-  return data?.chassis ?? null
+  return (data as string | null) ?? null
 }
 
+/** Grava o chassi cifrado (vazio apaga). Só o titular atual. */
 export async function updateChassis(motorcycleId: string, chassis: string | null) {
-  const { error } = await getSupabase().from('motorcycle_private').update({ chassis }).eq('motorcycle_id', motorcycleId)
+  const { error } = await getSupabase().rpc('set_my_chassis', { p_motorcycle_id: motorcycleId, p_chassis: chassis ?? '' })
   if (error) throw error
 }
 

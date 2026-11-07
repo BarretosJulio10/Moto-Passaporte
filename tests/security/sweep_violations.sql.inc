@@ -8,7 +8,13 @@ anon_exec_ok(f) as (values ('get_payment_public_config'), ('get_public_passport'
   ('is_org_active'), ('is_valid_plate'), ('mask_email'), ('normalize_plate'), ('setting_spec'), ('transfer_status_of'), ('rls_auto_enable')),
 service_only(f) as (values ('payment_access_token'), ('payment_webhook_secret'), ('storage_cleanup_finish'), ('record_payment_check'),
   ('user_storage_used_bytes'), ('upsert_vault_secret'), ('scheduled_job_secret_ok'), ('job_run_start'), ('job_run_finish'),
-  ('system_plan_storage_cleanup'), ('notify'), ('moto_label'), ('moto_owner'), ('org_label'), ('system_generate_notifications')),
+  ('system_plan_storage_cleanup'), ('notify'), ('moto_label'), ('moto_owner'), ('org_label'), ('system_generate_notifications'), ('chassis_key'), ('moto_owner_is_me')),
+column_write_ok(c) as (values ('motorcycles.brand'), ('motorcycles.model'), ('motorcycles.version'), ('motorcycles.manufacturing_year'),
+  ('motorcycles.model_year'), ('motorcycles.displacement_cc'), ('motorcycles.color'), ('motorcycles.initial_notes'),
+  ('profiles.full_name'), ('profiles.phone'), ('profiles.avatar_url'),
+  ('workshops.business_name'), ('workshops.legal_name'), ('workshops.cnpj'), ('workshops.public_slug'), ('workshops.city'), ('workshops.state'),
+  ('workshops.address'), ('workshops.phone'), ('workshops.whatsapp'), ('workshops.email'), ('workshops.description'), ('workshops.specialties'),
+  ('workshops.opening_hours'), ('workshops.logo_url'), ('workshops.is_public'), ('workshops.responsible_name')),
 fns as (
   select p.oid, p.proname, p.prosecdef, p.proconfig, p.prosrc, t.typname as rettype
     from pg_proc p join pg_namespace n on n.oid = p.pronamespace join pg_type t on t.oid = p.prorettype
@@ -22,6 +28,11 @@ select 'escrita direta liberada para ' || g.grantee, g.table_name || ' (' || g.p
   from information_schema.role_table_grants g
  where g.table_schema = 'public' and g.grantee in ('anon', 'authenticated')
    and g.privilege_type in ('INSERT', 'UPDATE', 'DELETE', 'TRUNCATE')
+union all
+select 'escrita por coluna fora da lista (' || g.grantee || ')', g.table_name || '.' || g.column_name || ' (' || g.privilege_type || ')'
+  from information_schema.role_column_grants g
+ where g.table_schema = 'public' and g.grantee in ('anon', 'authenticated') and g.privilege_type in ('INSERT', 'UPDATE')
+   and (g.grantee = 'anon' or g.table_name || '.' || g.column_name not in (select c from column_write_ok))
 union all
 select 'leitura anônima fora da lista', g.table_name
   from information_schema.role_table_grants g

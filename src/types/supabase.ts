@@ -835,6 +835,8 @@ export type Database = {
       }
       set_my_notification_preference: { Args: { p_kind: string; p_in_app: boolean; p_email: boolean }; Returns: undefined }
       admin_send_notice: { Args: { p_user_id: string; p_title: string; p_body: string; p_reason: string }; Returns: undefined }
+      get_my_chassis: { Args: { p_motorcycle_id: string }; Returns: string | null }
+      set_my_chassis: { Args: { p_motorcycle_id: string; p_chassis: string }; Returns: undefined }
       my_admin_access: { Args: Record<PropertyKey, never>; Returns: Json }
       session_aal: { Args: Record<PropertyKey, never>; Returns: string }
       admin_job_status: {
