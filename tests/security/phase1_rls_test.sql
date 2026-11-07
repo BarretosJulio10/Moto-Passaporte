@@ -138,7 +138,7 @@ select tests.ok(public.get_public_passport(:'moto_a') is null, 'id interno não 
 select tests.must_fail($$select * from public.motorcycles$$, 'anônimo não lê tabela de motos');
 select tests.must_fail($$select * from public.profiles$$, 'anônimo não lê perfis');
 select tests.must_fail($$select public.register_motorcycle('a','b',2020,'AAA1111',1)$$, 'anônimo não cadastra moto');
-select tests.ok((select count(*) = 1 from public.system_settings), 'anônimo vê apenas configurações públicas');
+select tests.ok((select count(*) >= 1 and bool_and(is_public) from public.system_settings), 'anônimo vê apenas configurações públicas');
 
 reset role;
 

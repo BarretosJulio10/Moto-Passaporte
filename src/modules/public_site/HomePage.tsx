@@ -123,6 +123,7 @@ export function HomePage() {
             <p className="mt-4 max-w-sm text-sheet/80">
               Uma ferramenta gratuita para documentar o serviço e manter o cliente por perto.
             </p>
+            <ButtonLink to="/oficina/nova" variant="inverse" className="mt-6">Cadastrar minha oficina</ButtonLink>
           </div>
           <dl className="divide-y divide-sheet/20 border-y border-sheet/20">
             {WORKSHOP_POINTS.map(([title, text]) => (

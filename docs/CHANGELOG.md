@@ -4,6 +4,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 
 ## [Não publicado]
 
+## [0.6.0] — 06/11/2026 — Fase 1 concluída (base)
+
+### Adicionado
+- Perguntas frequentes (`/perguntas-frequentes`), com recursos futuros indicados como "em breve".
+- Contato (`/contato`) com canais vindos de `system_settings` (migração `contact_settings`).
+- Área logada com troca de contexto: Minhas motos, Minha oficina, Administração (só para admin).
+- Oficina: cadastro gratuito (`create_workshop`), painel, edição de perfil (especialidades, horário, descrição, visibilidade), perfil público `/oficinas/:slug`, botão de cadastro na página inicial.
+- Administração (`/admin`): indicadores (usuários, motos, oficinas) e atividade recente da auditoria, protegido no banco por RLS.
+- Validações: endereço público (slug), CNPJ com dígitos verificadores, telefone com DDD, UF.
+- Testes: 47 no total (10 novos). Verificação visual com Supabase simulado, sem erros nem rolagem horizontal.
+
+### Corrigido
+- KI-012 (URLs de autenticação) configurado no Supabase.
+
 ## [0.5.0] — 06/11/2026
 
 ### Adicionado

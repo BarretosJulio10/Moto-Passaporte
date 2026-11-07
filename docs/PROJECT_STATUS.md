@@ -1,8 +1,8 @@
 # PROJECT_STATUS — Moto Passaporte
 
-**Versão atual:** 0.5.0
+**Versão atual:** 0.6.0
 **Data:** 06/11/2026
-**Fase:** Fase 1 — banco testado; site público, autenticação e painel do proprietário implementados; publicado na Vercel
+**Fase:** Fase 1 concluída (base). Próxima: Fase 2 — histórico e arquivos
 
 ## Ambientes
 
@@ -27,12 +27,12 @@
 
 ## Próximos passos (em ordem)
 
-Concluído em 0.5.0: painel do proprietário (cadastro de moto, página da moto, placa, chassi, quilometragem, QR Code) e passaporte público.
+Concluído em 0.6.0: perguntas frequentes, contato, painéis base de oficina e admin. **Fase 1 concluída (base).**
 
-1. **Responsável pelo produto:** confirmar URLs de autenticação no Supabase (KI-012) e testar criar conta + cadastrar moto no site publicado.
-2. Fase 1, item 1.8b — páginas de FAQ e contato.
-3. Fase 1, item 1.9b — base do painel da oficina (cadastro gratuito via `create_workshop`, perfil) e base do painel admin.
-4. Fechar a Fase 1 no `PRD_CHECKLIST.md`; depois, Fase 2 (linha do tempo, manutenções, anexos, diário).
+1. **Responsável pelo produto:** criar a própria conta no site; pedir ao Claude para conceder o papel admin a ela (via SQL interno); definir e-mail/WhatsApp de atendimento (KI-015).
+2. **Fase 2** — linha do tempo e registros de manutenção (`maintenance_records`, `maintenance_items`), com origem do registro.
+3. Fase 2 — anexos e cotas (Storage privado, compressão de imagens, limites por plano).
+4. Fase 2 — diário da moto (privado/compartilhável).
 
 ## Riscos ativos
 

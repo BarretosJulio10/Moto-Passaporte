@@ -12,8 +12,9 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 | `20261107003222_motorcycles.sql` | `motorcycles`, `motorcycle_plates`, `motorcycle_ownerships`, `motorcycle_private`, `mileage_records`, `motorcycle_claim_requests`, operações e view `my_motorcycles` |
 | `20261107003227_public_passport.sql` | `get_public_passport` (campos públicos padrão — ADR-008) |
 | `20261107003512_phase1_hardening.sql` | Reforço pelos advisors: bloqueia RPC de funções de trigger, otimiza RLS com `(select auth.uid())`, índices de FKs |
+| `20261107013442_contact_settings.sql` | Configurações públicas `support_email` e `support_whatsapp` (vazias até o responsável definir) |
 
-Dados existentes após a aplicação: apenas as 2 configurações iniciais de `system_settings` (e seus 2 eventos de auditoria). Nenhum dado de teste.
+Configurações existentes: `free_plan_max_motorcycles`, `registration_rate_limit_per_hour`, `support_email`, `support_whatsapp`. Nenhum dado de teste.
 
 ## Tabelas
 

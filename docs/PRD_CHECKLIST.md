@@ -4,8 +4,10 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 06/11/2026 — v0.5.0
-**Item atual na ordem:** Fase 1 → páginas de FAQ e contato (1.8b) e bases dos painéis de oficina e admin (1.9b)
+**Última conferência:** 06/11/2026 — v0.6.0
+**Item atual na ordem:** Fase 2 → linha do tempo e registros de manutenção (2.1, 2.2)
+
+**Fase 1: concluída (base)** em 06/11/2026. Pendências que não bloqueiam a Fase 2: ambientes de homologação/produção (KI-007), revisão jurídica de termos/privacidade, MFA para administradores (KI-014), criptografia do chassi (KI-002).
 
 ---
 
@@ -21,9 +23,9 @@ Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `te
 | 1.6 | QR Code e página pública com campos padrão | 9, ADR-008 | `implementado` | QR na página da moto (baixar PNG, copiar link); `/p/:publicId` sem placa/chassi/dono, `noindex` |
 | 1.7 | Cadastro, login e recuperação de senha | 5.1, 15.1 | `implementado` (testes unitários e de tela OK) | Telas `/criar-conta`, `/entrar`, `/recuperar-senha`, `/redefinir-senha`. Falta: teste ponta a ponta com o Supabase real (KI-009) e URLs do Auth no Supabase (KI-012) |
 | 1.8a | Identidade visual | 3.2 | `implementado` | `docs/DESIGN.md`, `src/index.css` |
-| 1.8b | Site público: início (como funciona, motociclistas, oficinas, o que não é, planos), termos e privacidade (rascunho) | 3.3 | `implementado` (parcial) | Faltam páginas dedicadas: FAQ, contato/suporte. Termos/privacidade aguardam revisão jurídica |
+| 1.8b | Site público: início, perguntas frequentes, contato (canais configuráveis), termos e privacidade (rascunho) | 3.3 | `implementado` | `/perguntas-frequentes`, `/contato` (`support_email`/`support_whatsapp` em `system_settings`). Termos/privacidade aguardam revisão jurídica |
 | 1.9a | Painel do proprietário | 5.3 | `implementado` | "Minhas motos", página da moto (dados, placa e histórico, troca de placa, chassi mascarado, quilometragem, QR Code). Próximos registros e lembretes vêm na Fase 2 |
-| 1.9b | Painéis base de oficina e admin | 6.3, 7.1 | `planejado` | — |
+| 1.9b | Painéis base de oficina e admin | 6.1, 6.3, 7.1 | `implementado` (base) | Oficina: cadastro gratuito, painel, edição de perfil, perfil público `/oficinas/:slug`, troca de contexto. Admin: `/admin` com indicadores e atividade recente da auditoria |
 
 ## Fase 2 — Histórico e arquivos
 
@@ -40,8 +42,8 @@ Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `te
 
 | # | Item | Seção PRD | Estado |
 |---|---|---|---|
-| 3.1 | Cadastro gratuito de oficina | 6.1 | `testado` (banco) — antecipado na Fase 1 |
-| 3.2 | Perfil público da oficina | 6.1 | `testado` (banco) |
+| 3.1 | Cadastro gratuito de oficina | 6.1 | `implementado` — banco testado + tela (antecipado na Fase 1) |
+| 3.2 | Perfil público da oficina | 6.1 | `implementado` — edição e página pública `/oficinas/:slug` |
 | 3.3 | Pesquisa protegida por placa | 6.4 | `planejado` |
 | 3.4 | Solicitação, aprovação e revogação (`motorcycle_workshop_access`) | 6.4, 6.6 | `planejado` |
 | 3.5 | Oficina de Origem | 6.5 | `planejado` |
@@ -84,7 +86,7 @@ Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `te
 | Item | Referência |
 |---|---|
 | Teste ponta a ponta com Supabase real a partir do ambiente do Claude | KI-009 |
-| URLs de autenticação no Supabase (Site URL / Redirect URLs) | KI-012 |
+| MFA obrigatório para administradores | KI-014 |
 | Criptografia do chassi | D-T3 / KI-002 |
 | Ambientes de homologação e produção | KI-007 |
 | Decisões de produto P-1 a P-11 (restantes) | `DECISIONS.md` |

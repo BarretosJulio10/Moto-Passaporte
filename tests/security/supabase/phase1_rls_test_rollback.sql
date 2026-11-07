@@ -121,7 +121,7 @@ begin
   perform tests.must_fail($$select * from public.motorcycles$$, 'anônimo não lê motos');
   perform tests.must_fail($$select * from public.profiles$$, 'anônimo não lê perfis');
   perform tests.must_fail($$select public.register_motorcycle('a','b',2020,'AAA1111',1)$$, 'anônimo não cadastra');
-  perform tests.ok((select count(*) = 1 from public.system_settings), 'anônimo vê só configs públicas');
+  perform tests.ok((select count(*) >= 1 and bool_and(is_public) from public.system_settings), 'anônimo vê só configs públicas');
 
   -- ===== Oficina C
   perform tests.act_as(C, 'authenticated');

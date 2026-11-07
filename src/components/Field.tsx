@@ -1,4 +1,4 @@
-import { useId, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from 'react'
+import { useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react'
 
 type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string
@@ -66,6 +66,45 @@ export function TextAreaField({
           {hint}
         </p>
       )}
+      {error && (
+        <p id={`${id}-error`} className="text-sm text-danger">
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
+export function SelectField({
+  label,
+  error,
+  options,
+  placeholder,
+  className = '',
+  ...props
+}: SelectHTMLAttributes<HTMLSelectElement> & { label: string; error?: string; options: readonly string[]; placeholder?: string }) {
+  const id = useId()
+  return (
+    <div className={`flex flex-col gap-1.5 ${className}`}>
+      <label htmlFor={id} className="text-sm font-semibold text-graphite">
+        {label}
+      </label>
+      <select
+        id={id}
+        {...props}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-error` : undefined}
+        className={`w-full rounded-doc border bg-sheet px-3 py-2.5 text-base text-graphite focus:border-ink focus:outline-none ${
+          error ? 'border-danger' : 'border-rule'
+        }`}
+      >
+        {placeholder !== undefined && <option value="">{placeholder}</option>}
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
       {error && (
         <p id={`${id}-error`} className="text-sm text-danger">
           {error}

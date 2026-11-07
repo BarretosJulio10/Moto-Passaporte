@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { Link, type LinkProps } from 'react-router-dom'
 
-type Variant = 'primary' | 'secondary' | 'quiet'
+type Variant = 'primary' | 'secondary' | 'quiet' | 'inverse'
 type Size = 'md' | 'sm'
 
 // Tamanho e variante ficam em mapas separados para que classes não se anulem.
@@ -17,6 +17,7 @@ const variants: Record<Variant, string> = {
   primary: 'bg-ink text-sheet hover:bg-ink-soft',
   secondary: 'border border-ink/30 bg-transparent text-ink hover:border-ink hover:bg-sheet',
   quiet: 'text-ink underline-offset-4 hover:underline',
+  inverse: 'bg-sheet text-ink hover:bg-paper',
 }
 
 function classes(variant: Variant, size: Size, extra: string) {

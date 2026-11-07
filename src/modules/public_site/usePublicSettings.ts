@@ -4,9 +4,13 @@ import { isSupabaseConfigured } from '@/core/config/env'
 
 export type PublicSettings = {
   freePlanMaxMotorcycles: number | null
+  supportEmail: string | null
+  supportWhatsapp: string | null
 }
 
-/** Lê parâmetros públicos (ex.: limite do plano gratuito). Nunca fixar esses valores no código. */
+const asText = (v: unknown) => (typeof v === 'string' && v.trim() !== '' ? v.trim() : null)
+
+/** Lê parâmetros públicos (limite do plano, canais de contato). Nunca fixar esses valores no código. */
 export function usePublicSettings() {
   return useQuery({
     queryKey: ['public-settings'],
@@ -20,7 +24,11 @@ export function usePublicSettings() {
       if (error) throw error
       const map = new Map(data.map((row) => [row.key, row.value]))
       const free = map.get('free_plan_max_motorcycles')
-      return { freePlanMaxMotorcycles: typeof free === 'number' ? free : null }
+      return {
+        freePlanMaxMotorcycles: typeof free === 'number' ? free : null,
+        supportEmail: asText(map.get('support_email')),
+        supportWhatsapp: asText(map.get('support_whatsapp'))?.replace(/\D/g, '') || null,
+      }
     },
   })
 }

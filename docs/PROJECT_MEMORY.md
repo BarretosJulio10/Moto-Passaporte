@@ -5,8 +5,8 @@
 > Nunca registrar aqui senhas, tokens, chaves, dados pessoais ou segredos operacionais.
 
 **Última atualização:** 06/11/2026
-**Versão do projeto:** 0.5.0
-**Situação geral:** Fase 1 quase concluída — banco testado no Supabase dev; site público, autenticação e painel do proprietário publicados em https://moto-passaporte.vercel.app (v0.5.0).
+**Versão do projeto:** 0.6.0
+**Situação geral:** Fase 1 concluída (base) — publicada em https://moto-passaporte.vercel.app. Próxima: Fase 2 (histórico e arquivos).
 
 Legenda de estados (seção 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 
@@ -66,9 +66,9 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access`, `mainte
 | Módulo | Fase | Situação |
 |---|---|---|
 | Fundação SaaS, auth, papéis, organizações, RLS, auditoria (banco) | 1 | `testado` (Supabase dev) |
-| Site público | 1 | `planejado` |
+| Site público (início, FAQ, contato, termos, privacidade) | 1 | `implementado` |
 | Cadastro de moto, ID permanente (banco) | 1 | `testado` (Supabase dev) |
-| QR Code e telas da Fase 1 | 1 | `planejado` |
+| QR Code, painéis do proprietário, oficina (base) e admin (base) | 1 | `implementado` |
 | Linha do tempo, manutenção, quilometragem, anexos, diário | 2 | `planejado` |
 | Oficinas, membros, pesquisa por placa, autorizações | 3 | `planejado` |
 | Transferência e compartilhamento público | 4 | `planejado` |
@@ -85,8 +85,7 @@ Ainda por criar: `transfer_requests` (F4), `motorcycle_workshop_access`, `mainte
 
 ## 7. Pendências imediatas
 
-- Interface: em construção direto neste repositório (ADR-011). Próximo: FAQ/contato e bases dos painéis de oficina e admin. Ver `PROJECT_STATUS.md`.
-- Configurar URLs de autenticação no Supabase (KI-012) e variáveis na Vercel.
+- Próximo item: Fase 2 — linha do tempo e registros de manutenção. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 

@@ -20,6 +20,7 @@ export function PublicLayout() {
             <a href="/#como-funciona" className="hover:underline underline-offset-4">Como funciona</a>
             <a href="/#oficinas" className="hover:underline underline-offset-4">Para oficinas</a>
             <a href="/#planos" className="hover:underline underline-offset-4">Planos</a>
+            <Link to="/perguntas-frequentes" className="hover:underline underline-offset-4">Dúvidas</Link>
           </nav>
           <div className="flex items-center gap-1 sm:gap-2">
             {user ? (
@@ -41,7 +42,9 @@ export function PublicLayout() {
       <footer className="border-t border-rule">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 text-sm text-muted md:flex-row md:items-center md:justify-between">
           <p>Moto Passaporte. A identidade digital e o histórico de vida da sua motocicleta.</p>
-          <nav aria-label="Documentos" className="flex gap-5">
+          <nav aria-label="Links do rodapé" className="flex flex-wrap gap-x-5 gap-y-2">
+            <Link to="/perguntas-frequentes" className="hover:text-ink hover:underline underline-offset-4">Perguntas frequentes</Link>
+            <Link to="/contato" className="hover:text-ink hover:underline underline-offset-4">Contato</Link>
             <Link to="/termos" className="hover:text-ink hover:underline underline-offset-4">Termos de uso</Link>
             <Link to="/privacidade" className="hover:text-ink hover:underline underline-offset-4">Política de privacidade</Link>
           </nav>

@@ -2,15 +2,24 @@ import { createBrowserRouter, Link, RouterProvider, ScrollRestoration, Outlet } 
 import { PublicLayout } from '@/modules/public_site/PublicLayout'
 import { HomePage } from '@/modules/public_site/HomePage'
 import { LegalPage } from '@/modules/public_site/LegalPage'
+import { FaqPage } from '@/modules/public_site/FaqPage'
+import { ContactPage } from '@/modules/public_site/ContactPage'
 import { SignUpPage } from '@/modules/auth/SignUpPage'
 import { SignInPage } from '@/modules/auth/SignInPage'
 import { ForgotPasswordPage } from '@/modules/auth/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/modules/auth/ResetPasswordPage'
-import { OwnerLayout } from '@/modules/owner/OwnerLayout'
+import { AppLayout } from '@/components/AppLayout'
 import { DashboardPage } from '@/modules/owner/DashboardPage'
 import { RegisterMotorcyclePage } from '@/modules/owner/RegisterMotorcyclePage'
 import { MotorcyclePage } from '@/modules/owner/MotorcyclePage'
 import { PublicPassportPage } from '@/modules/sharing/PublicPassportPage'
+import { WorkshopIndexPage } from '@/modules/workshop/WorkshopIndexPage'
+import { CreateWorkshopPage } from '@/modules/workshop/CreateWorkshopPage'
+import { WorkshopDashboardPage } from '@/modules/workshop/WorkshopDashboardPage'
+import { WorkshopProfilePage } from '@/modules/workshop/WorkshopProfilePage'
+import { PublicWorkshopPage } from '@/modules/workshop/PublicWorkshopPage'
+import { RequireAdmin } from '@/modules/admin/RequireAdmin'
+import { AdminDashboardPage } from '@/modules/admin/AdminDashboardPage'
 import { RequireAuth } from '@/core/auth/RequireAuth'
 
 function Root() {
@@ -40,6 +49,8 @@ export const routes = [
         element: <PublicLayout />,
         children: [
           { path: '/', element: <HomePage /> },
+          { path: '/perguntas-frequentes', element: <FaqPage /> },
+          { path: '/contato', element: <ContactPage /> },
           { path: '/criar-conta', element: <SignUpPage /> },
           { path: '/entrar', element: <SignInPage /> },
           { path: '/recuperar-senha', element: <ForgotPasswordPage /> },
@@ -47,20 +58,32 @@ export const routes = [
           { path: '/termos', element: <LegalPage kind="terms" /> },
           { path: '/privacidade', element: <LegalPage kind="privacy" /> },
           { path: '/p/:publicId', element: <PublicPassportPage /> },
+          { path: '/oficinas/:slug', element: <PublicWorkshopPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },
       {
-        path: '/painel',
         element: (
           <RequireAuth>
-            <OwnerLayout />
+            <AppLayout />
           </RequireAuth>
         ),
         children: [
-          { index: true, element: <DashboardPage /> },
-          { path: 'motos/nova', element: <RegisterMotorcyclePage /> },
-          { path: 'motos/:id', element: <MotorcyclePage /> },
+          { path: '/painel', element: <DashboardPage /> },
+          { path: '/painel/motos/nova', element: <RegisterMotorcyclePage /> },
+          { path: '/painel/motos/:id', element: <MotorcyclePage /> },
+          { path: '/oficina', element: <WorkshopIndexPage /> },
+          { path: '/oficina/nova', element: <CreateWorkshopPage /> },
+          { path: '/oficina/:orgId', element: <WorkshopDashboardPage /> },
+          { path: '/oficina/:orgId/perfil', element: <WorkshopProfilePage /> },
+          {
+            path: '/admin',
+            element: (
+              <RequireAdmin>
+                <AdminDashboardPage />
+              </RequireAdmin>
+            ),
+          },
         ],
       },
     ],
