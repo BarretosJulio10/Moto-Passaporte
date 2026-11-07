@@ -4,6 +4,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 
 ## [Não publicado]
 
+### Operação
+- Conta do responsável pelo produto recebeu o papel `admin` (inserção interna em `user_roles`, auditada).
+- `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
+- Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
+
 ## [0.7.0] — 06/11/2026 — Fase 2: linha do tempo e manutenção
 
 ### Adicionado

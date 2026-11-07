@@ -29,7 +29,7 @@
 
 Concluído em 0.7.0: linha do tempo e registros de manutenção com peças, correção e anulação.
 
-1. **Responsável pelo produto:** criar a conta no site e informar o e-mail para receber o papel admin; definir canais de contato (KI-015).
+1. **Responsável pelo produto:** conta criada e com papel admin (06/11/2026); WhatsApp de atendimento configurado. Falta o e-mail de atendimento (KI-015).
 2. Fase 2, item 2.4 — anexos e cotas: bucket privado no Supabase Storage, fotos/notas fiscais nos registros (origem "com comprovante"), compressão de imagens, limites por plano, URLs temporárias.
 3. Fase 2, item 2.6 — diário da moto (privado/compartilhável).
 4. Fechar a Fase 2 no `PRD_CHECKLIST.md`; depois, Fase 3 (oficinas e autorizações).
