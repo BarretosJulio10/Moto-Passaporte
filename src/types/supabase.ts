@@ -784,6 +784,38 @@ export type Database = {
       get_public_plans: { Args: never; Returns: Json }
       get_payment_public_config: { Args: never; Returns: Json }
       get_my_subscription: { Args: never; Returns: Json }
+      get_motorcycle_reminders: { Args: { p_motorcycle_id: string }; Returns: Json }
+      get_my_due_reminders: { Args: never; Returns: Json }
+      create_reminder: {
+        Args: {
+          p_base_date?: string | null
+          p_base_mileage?: number | null
+          p_category?: Database['public']['Enums']['maintenance_category'] | null
+          p_due_date?: string | null
+          p_every_km?: number | null
+          p_every_months?: number | null
+          p_motorcycle_id: string
+          p_notes?: string | null
+          p_title: string
+        }
+        Returns: string
+      }
+      update_reminder: {
+        Args: {
+          p_category: Database['public']['Enums']['maintenance_category'] | null
+          p_due_date: string | null
+          p_every_km: number | null
+          p_every_months: number | null
+          p_notes: string | null
+          p_reminder_id: string
+          p_title: string
+        }
+        Returns: undefined
+      }
+      set_reminder_paused: { Args: { p_paused: boolean; p_reminder_id: string }; Returns: undefined }
+      complete_reminder: { Args: { p_date?: string | null; p_mileage?: number | null; p_reminder_id: string }; Returns: undefined }
+      delete_reminder: { Args: { p_reminder_id: string }; Returns: undefined }
+      register_motorcycle_report: { Args: { p_motorcycle_id: string }; Returns: Json }
       get_my_payments: {
         Args: never
         Returns: { amount_cents: number; created_at: string; currency: string; id: string; paid_at: string | null; plan_name: string; status: string }[]
@@ -852,6 +884,8 @@ export type Database = {
             created_at: string
             updated_at: string
             updated_by: string | null
+            entitlements: string[]
+            max_share_links: number
           }[]
       }
       admin_save_plan: {
@@ -873,6 +907,10 @@ export type Database = {
           p_trial_days: number
         }
         Returns: string
+      }
+      admin_set_plan_benefits: {
+        Args: { p_entitlements: string[]; p_id: string; p_max_share_links: number | null }
+        Returns: undefined
       }
       admin_set_plan_active: { Args: { p_active: boolean; p_id: string }; Returns: undefined }
       admin_get_plan_history: {

@@ -12,6 +12,7 @@ import { RecentRecords } from '@/modules/maintenance/RecentRecords'
 import { OwnerAccessSection } from '@/modules/workshop_access/OwnerAccessSection'
 import { TransferSection } from '@/modules/transfers/TransferSection'
 import { ShareSection } from '@/modules/sharing/ShareSection'
+import { RemindersSection } from '@/modules/reminders/RemindersSection'
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
@@ -81,6 +82,12 @@ export function MotorcyclePage() {
             <ChassisSection motorcycleId={motoId} />
           </div>
           <RecentRecords motorcycleId={motoId} />
+          <p className="-mt-4 text-sm">
+            <Link to={`/painel/motos/${motoId}/relatorio`} className="font-semibold text-ink underline underline-offset-4">
+              Relatório do histórico em PDF
+            </Link>
+          </p>
+          <RemindersSection motorcycleId={motoId} />
           <ShareSection motorcycleId={motoId} />
           <OwnerAccessSection motorcycleId={motoId} />
           <TransferSection motorcycleId={motoId} />

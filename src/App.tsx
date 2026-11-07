@@ -33,6 +33,7 @@ import { AdminPlansPage } from '@/modules/admin/AdminPlansPage'
 import { AdminPaymentsPage } from '@/modules/admin/AdminPaymentsPage'
 import { AdminSubscriptionsPage } from '@/modules/admin/AdminSubscriptionsPage'
 import { MyPlanPage } from '@/modules/plans/MyPlanPage'
+import { ReportPage } from '@/modules/reports/ReportPage'
 import { RequireAuth } from '@/core/auth/RequireAuth'
 
 function Root() {
@@ -88,6 +89,7 @@ export const routes = [
           { path: '/painel/plano', element: <MyPlanPage /> },
           { path: '/painel/motos/:id', element: <MotorcyclePage /> },
           { path: '/painel/motos/:id/historico', element: <TimelinePage /> },
+          { path: '/painel/motos/:id/relatorio', element: <ReportPage /> },
           { path: '/painel/motos/:id/historico/novo', element: <RecordFormPage /> },
           { path: '/painel/motos/:id/diario', element: <DiaryPage /> },
           { path: '/painel/motos-anteriores/:id', element: <PreviousDiaryPage /> },

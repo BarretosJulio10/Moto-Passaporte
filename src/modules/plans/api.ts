@@ -19,6 +19,15 @@ export type PublicPlan = {
   features: string[]
   trial_days: number
   cancellation_text: string | null
+  entitlements: Entitlement[]
+  max_share_links: number
+}
+
+export type Entitlement = 'pdf_reports' | 'maintenance_reminders'
+
+export const ENTITLEMENT_LABEL: Record<Entitlement, string> = {
+  pdf_reports: 'Relatórios em PDF',
+  maintenance_reminders: 'Lembretes de manutenção',
 }
 
 export type MyPlan = {
@@ -30,6 +39,8 @@ export type MyPlan = {
   storage_quota_mb: number
   motorcycles_used: number
   features: string[]
+  entitlements: Entitlement[]
+  max_share_links: number
 }
 
 export type AdminPlan = Database['public']['Functions']['admin_list_plans']['Returns'][number]
@@ -92,6 +103,8 @@ export type PlanInput = {
   cancellation_text: string
   is_public: boolean
   sort_order: number
+  entitlements: Entitlement[]
+  max_share_links: number
 }
 
 export async function adminSavePlan(p: PlanInput): Promise<string> {
@@ -113,6 +126,13 @@ export async function adminSavePlan(p: PlanInput): Promise<string> {
     p_sort_order: p.sort_order,
   })
   if (error) throw error
+  // Benefícios e limite de links ficam numa função própria (sem versão nova se nada mudou).
+  const { error: e2 } = await getSupabase().rpc('admin_set_plan_benefits', {
+    p_id: data,
+    p_entitlements: p.entitlements,
+    p_max_share_links: p.max_share_links,
+  })
+  if (e2) throw e2
   return data
 }
 
@@ -125,4 +145,8 @@ export async function adminPlanHistory(id: string): Promise<PlanHistoryEntry[]> 
   const { data, error } = await getSupabase().rpc('admin_get_plan_history', { p_id: id })
   if (error) throw error
   return data ?? []
+}
+
+export function hasEntitlement(plan: Pick<MyPlan, 'entitlements'> | undefined | null, key: Entitlement): boolean {
+  return Boolean(plan?.entitlements?.includes(key))
 }

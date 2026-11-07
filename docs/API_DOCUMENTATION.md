@@ -222,6 +222,12 @@ Implementação em `src/modules/admin/paymentsApi.ts`.
 - Público: `rpc('get_payment_public_config')` → `{ billing_enabled, environment, public_key }` (chave só com a contratação liberada).
 - Servidor (`service_role`): `payment_access_token()`, `payment_webhook_secret()`, `record_payment_check(...)`.
 
+## Benefícios Premium (Fase 5.4, ADR-021)
+
+- Plano: `get_my_plan()` e `get_public_plans()` trazem `entitlements` (`pdf_reports`, `maintenance_reminders`) e `max_share_links`. Admin: `admin_set_plan_benefits({ p_id, p_entitlements, p_max_share_links })`.
+- Lembretes (`src/modules/reminders/api.ts`): `get_motorcycle_reminders({ p_motorcycle_id })` → lista com `status` (`due`, `soon`, `ok`, `paused`, `done`), `km_left`, `days_left`; `get_my_due_reminders()`; `create_reminder({ p_motorcycle_id, p_title, p_category?, p_every_km?, p_every_months?, p_due_date?, p_notes?, p_base_mileage?, p_base_date? })`; `update_reminder(...)`; `complete_reminder({ p_reminder_id, p_mileage?, p_date? })`; `set_reminder_paused`; `delete_reminder`.
+- Relatório: `register_motorcycle_report({ p_motorcycle_id })` → `{ reference, generated_at }` (exige o recurso; até 30 por hora).
+
 ## Assinaturas (Fase 5, ADR-020)
 
 Implementação em `src/modules/plans/billingApi.ts`.

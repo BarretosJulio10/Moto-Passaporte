@@ -26,7 +26,7 @@ vi.mock('./api', async () => {
     ],
     fetchMyPlan: async () => ({
       code: 'gratuito', kind: 'free', name: 'Gratuito', billing_period: 'none', max_motorcycles: 1, storage_quota_mb: 100,
-      motorcycles_used: 1, features: [],
+      motorcycles_used: 1, features: [], entitlements: [], max_share_links: 3,
     }),
   }
 })
@@ -43,7 +43,7 @@ function wrap(node: React.ReactNode) {
 
 const pub = (over: Partial<PublicPlan>): PublicPlan => ({
   code: 'x', kind: 'premium', billing_period: 'monthly', name: 'X', description: null, price_cents: 990, currency: 'BRL',
-  price_note: null, max_motorcycles: 3, storage_quota_mb: 500, features: [], trial_days: 0, cancellation_text: null, ...over,
+  price_note: null, max_motorcycles: 3, storage_quota_mb: 500, features: [], trial_days: 0, cancellation_text: null, entitlements: [], max_share_links: 3, ...over,
 })
 
 const PUBLIC: PublicPlan[] = [
@@ -56,13 +56,14 @@ const PUBLIC: PublicPlan[] = [
 const admin = (over: Partial<AdminPlan>): AdminPlan => ({
   id: 'p1', code: 'premium_mensal', kind: 'premium', billing_period: 'monthly', name: 'Premium mensal', description: null, price_cents: 990,
   currency: 'BRL', price_note: null, max_motorcycles: 3, storage_quota_mb: 500, features: ['Relatórios em PDF'], trial_days: 0,
-  cancellation_text: null, is_active: true, is_public: true, sort_order: 20, version: 1, created_at: '', updated_at: '', updated_by: null, ...over,
+  cancellation_text: null, is_active: true, is_public: true, sort_order: 20, version: 1, created_at: '', updated_at: '', updated_by: null,
+  entitlements: ['pdf_reports'], max_share_links: 10, ...over,
 })
 
 const draft = (over: Partial<Draft> = {}): Draft => ({
   id: null, code: 'premium_promo', kind: 'premium', billing_period: 'annual', name: 'Promo', description: '', price: '79,90',
   price_note: '', max_motorcycles: '3', storage_quota_mb: '500', features: 'Um\n\n  Dois  ', trial_days: '0',
-  cancellation_text: '', is_public: true, sort_order: '45', ...over,
+  cancellation_text: '', is_public: true, sort_order: '45', entitlements: [], max_share_links: '10', ...over,
 })
 
 beforeEach(() => {

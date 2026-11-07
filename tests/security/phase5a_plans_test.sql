@@ -45,16 +45,17 @@ select id as free from public.subscription_plans where code = 'gratuito' \gset
 select set_config('request.jwt.claim.sub', :'D', false);
 set role authenticated;
 select tests.ok((select count(*) = 4 from public.admin_list_plans()), 'admin lista os planos');
+select version as v0 from public.admin_list_plans() where id = :'mensal' \gset
 select public.admin_save_plan(:'mensal', null, null, null, 'Premium mensal', 'Novo texto', 1290, null, 3, 500,
   array['Mais espaço', '  ', 'Relatórios em PDF'], 7, 'Cancele quando quiser.', true, 20);
 reset role;
-select tests.ok((select price_cents = 1290 and version = 2 and features = array['Mais espaço', 'Relatórios em PDF']
+select tests.ok((select price_cents = 1290 and version = :v0 + 1 and features = array['Mais espaço', 'Relatórios em PDF']
                  and trial_days = 7 and updated_by = :'D' from public.subscription_plans where id = :'mensal'),
                 'admin altera preço, textos e benefícios (vazios descartados); versão sobe');
 select set_config('request.jwt.claim.sub', :'D', false);
 set role authenticated;
-select tests.ok((select count(*) = 2 and bool_or(version = 2 and (snapshot ->> 'price_cents')::int = 1290)
-                        and bool_or(version = 1 and (snapshot ->> 'price_cents')::int = 990)
+select tests.ok((select count(*) = :v0 + 1 and bool_or(version = :v0 + 1 and (snapshot ->> 'price_cents')::int = 1290)
+                        and bool_or(version = :v0 and (snapshot ->> 'price_cents')::int = 990)
                  from public.admin_get_plan_history(:'mensal')), 'histórico guarda as duas versões (antes e depois)');
 select tests.must_fail(format($$select public.admin_save_plan(%L, null, null, null, 'Premium mensal', null, 0, null, 3, 500, null, 0, null, true, 20)$$, :'mensal'), 'Premium não fica com preço zero');
 select tests.must_fail(format($$select public.admin_save_plan(%L, null, null, null, 'Gratuito', null, 500, null, 1, 100, null, 0, null, true, 10)$$, :'free'), 'gratuito não passa a cobrar');

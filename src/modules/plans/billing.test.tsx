@@ -39,14 +39,14 @@ vi.mock('./api', async () => {
   const actual = await vi.importActual<typeof import('./api')>('./api')
   return {
     ...actual,
-    fetchMyPlan: async () => ({ code: 'gratuito', kind: 'free', name: 'Gratuito', billing_period: 'none', max_motorcycles: 1, storage_quota_mb: 100, motorcycles_used: 1, features: [] }),
+    fetchMyPlan: async () => ({ code: 'gratuito', kind: 'free', name: 'Gratuito', billing_period: 'none', max_motorcycles: 1, storage_quota_mb: 100, motorcycles_used: 1, features: [], entitlements: [], max_share_links: 3 }),
   }
 })
 vi.mock('@/modules/attachments/api', () => ({ getStorageUsage: async () => ({ used_bytes: 0, quota_bytes: 104857600, max_file_bytes: 1 }) }))
 vi.mock('@/core/auth/AuthProvider', () => ({ useAuth: () => ({ user: { id: 'u1', user_metadata: {} } }) }))
 const PLANS: PublicPlan[] = [
-  { code: 'gratuito', kind: 'free', billing_period: 'none', name: 'Gratuito', description: null, price_cents: 0, currency: 'BRL', price_note: null, max_motorcycles: 1, storage_quota_mb: 100, features: [], trial_days: 0, cancellation_text: null },
-  { code: 'premium_mensal', kind: 'premium', billing_period: 'monthly', name: 'Premium mensal', description: null, price_cents: 990, currency: 'BRL', price_note: null, max_motorcycles: 3, storage_quota_mb: 500, features: [], trial_days: 0, cancellation_text: null },
+  { code: 'gratuito', kind: 'free', billing_period: 'none', name: 'Gratuito', description: null, price_cents: 0, currency: 'BRL', price_note: null, max_motorcycles: 1, storage_quota_mb: 100, features: [], trial_days: 0, cancellation_text: null, entitlements: [], max_share_links: 3 },
+  { code: 'premium_mensal', kind: 'premium', billing_period: 'monthly', name: 'Premium mensal', description: null, price_cents: 990, currency: 'BRL', price_note: null, max_motorcycles: 3, storage_quota_mb: 500, features: [], trial_days: 0, cancellation_text: null, entitlements: ['pdf_reports', 'maintenance_reminders'], max_share_links: 10 },
 ]
 vi.mock('@/modules/public_site/usePublicSettings', () => ({
   usePublicSettings: () => ({ data: { plans: PLANS, billingEnabled, freePlanMaxMotorcycles: 1, supportEmail: null, supportWhatsapp: null } }),

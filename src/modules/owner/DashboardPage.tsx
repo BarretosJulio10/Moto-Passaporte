@@ -9,6 +9,7 @@ import { fetchPendingRequests } from '@/modules/workshop_access/api'
 import { PendingRequestsNotice } from '@/modules/workshop_access/OwnerAccessSection'
 import { IncomingTransfers, PreviousMotorcycles } from '@/modules/transfers/IncomingTransfers'
 import { PlanSummary } from '@/modules/plans/MyPlanPage'
+import { DueReminders } from '@/modules/reminders/DueReminders'
 
 export function DashboardPage() {
   const { user } = useAuth()
@@ -43,6 +44,7 @@ export function DashboardPage() {
       <div className="mt-1">
         <PlanSummary />
       </div>
+      <DueReminders />
 
       <div className="mt-4">
         {motorcycles.isLoading && <p className="text-muted" role="status">Carregando suas motos…</p>}

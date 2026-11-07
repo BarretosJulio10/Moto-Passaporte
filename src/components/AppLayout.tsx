@@ -39,7 +39,7 @@ export function AppLayout() {
       >
         Pular para o conteúdo
       </a>
-      <header className="border-b border-rule bg-sheet">
+      <header className="border-b border-rule bg-sheet print:hidden">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 pt-3 sm:px-5">
           <Logo to="/painel" />
           <div className="flex items-center gap-3">
@@ -62,7 +62,7 @@ export function AppLayout() {
           {isAdmin && <NavLink to="/admin" className={tab}>Administração</NavLink>}
         </nav>
       </header>
-      <main id="conteudo" className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-5">
+      <main id="conteudo" className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-5 print:max-w-none print:p-0">
         <Outlet />
       </main>
     </div>

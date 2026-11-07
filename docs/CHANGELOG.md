@@ -9,6 +9,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.19.0] — 07/11/2026 — Fase 5.4: benefícios Premium
+
+### Adicionado
+- Migração `premium_benefits` (ADR-021): recursos e limite de links por plano (e na assinatura), `admin_set_plan_benefits`, `maintenance_reminders` com `create/update/complete/delete_reminder`, `set_reminder_paused`, `get_motorcycle_reminders`, `get_my_due_reminders`; `motorcycle_reports` e `register_motorcycle_report`; limite de links de compartilhamento passa a vir do plano.
+- Lembretes de manutenção na página da moto e aviso no painel (vencidos e próximos).
+- Relatório do histórico para imprimir ou salvar em PDF, com opções (placa, comprovantes, valores, observações) e referência.
+- Administração: recursos liberados e links por moto no formulário de planos.
+- Testes: banco 48 (local) + 13 (Supabase, transação desfeita); interface 156 no total (12 novos).
+
+### Alterado
+- Gratuito: até 3 links de compartilhamento ativos por moto (antes 10 para todos).
+
 ## [0.18.0] — 07/11/2026 — Fase 5.2 a 5.5: assinaturas Premium pelo Mercado Pago
 
 ### Adicionado

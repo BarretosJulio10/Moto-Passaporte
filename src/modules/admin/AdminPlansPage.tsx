@@ -13,8 +13,10 @@ import {
   adminSetPlanActive,
   formatPlanPrice,
   formatQuota,
+  ENTITLEMENT_LABEL,
   PERIOD_LABEL,
   type AdminPlan,
+  type Entitlement,
   type BillingPeriod,
   type PlanInput,
   type PlanKind,
@@ -33,11 +35,14 @@ const FIELD_LABEL: Record<string, string> = {
   trial_days: 'teste grátis',
   cancellation_text: 'regras de cancelamento',
   is_active: 'ativo',
+  entitlements: 'recursos',
+  max_share_links: 'links de compartilhamento',
   is_public: 'visível no site',
   sort_order: 'ordem',
 }
 
-export type Draft = Omit<PlanInput, 'price_cents' | 'features' | 'max_motorcycles' | 'storage_quota_mb' | 'trial_days' | 'sort_order'> & {
+export type Draft = Omit<PlanInput, 'price_cents' | 'features' | 'max_motorcycles' | 'storage_quota_mb' | 'trial_days' | 'sort_order' | 'max_share_links'> & {
+  max_share_links: string
   price: string
   features: string
   max_motorcycles: string
@@ -51,7 +56,7 @@ function toDraft(p: AdminPlan | null): Draft {
     return {
       id: null, code: '', kind: 'premium', billing_period: 'monthly', name: '', description: '', price: '',
       price_note: '', max_motorcycles: '3', storage_quota_mb: '500', features: '', trial_days: '0',
-      cancellation_text: '', is_public: true, sort_order: '100',
+      cancellation_text: '', is_public: true, sort_order: '100', entitlements: ['pdf_reports', 'maintenance_reminders'], max_share_links: '10',
     }
   }
   return {
@@ -70,6 +75,8 @@ function toDraft(p: AdminPlan | null): Draft {
     cancellation_text: p.cancellation_text ?? '',
     is_public: p.is_public,
     sort_order: String(p.sort_order),
+    entitlements: (p.entitlements ?? []) as Entitlement[],
+    max_share_links: String(p.max_share_links ?? 3),
   }
 }
 
@@ -89,6 +96,8 @@ export function parseDraft(d: Draft): PlanInput | string {
   if (!(quota >= 1 && quota <= 100000)) return 'Espaço: de 1 a 100.000 MB.'
   if (!(trial >= 0 && trial <= 90)) return 'Teste grátis: de 0 a 90 dias.'
   if (!(sort >= 0 && sort <= 999)) return 'Ordem: de 0 a 999.'
+  const links = int(d.max_share_links)
+  if (!(links >= 1 && links <= 50)) return 'Links de compartilhamento: de 1 a 50.'
   const features = d.features.split('\n').map((f) => f.trim()).filter(Boolean)
   if (features.length > 12) return 'No máximo 12 benefícios.'
   if (features.some((f) => f.length > 120)) return 'Cada benefício pode ter até 120 caracteres.'
@@ -108,6 +117,8 @@ export function parseDraft(d: Draft): PlanInput | string {
     cancellation_text: d.cancellation_text,
     is_public: isFree ? true : d.is_public,
     sort_order: sort,
+    entitlements: d.entitlements,
+    max_share_links: links,
   }
 }
 
@@ -166,7 +177,24 @@ function PlanForm({ plan, onDone }: { plan: AdminPlan | null; onDone: () => void
         {!isFree && <TextField label="Teste grátis (dias)" value={d.trial_days} onChange={(e) => set('trial_days', e.target.value)} inputMode="numeric" />}
         <TextField label="Ordem no site" value={d.sort_order} onChange={(e) => set('sort_order', e.target.value)} inputMode="numeric" />
       </div>
-      <TextAreaField label="Benefícios (um por linha)" value={d.features} onChange={(e) => set('features', e.target.value)} rows={4} />
+      <fieldset>
+        <legend className="text-sm font-semibold text-graphite">Recursos liberados</legend>
+        <div className="mt-2 flex flex-wrap gap-5">
+          {(Object.keys(ENTITLEMENT_LABEL) as Entitlement[]).map((k) => (
+            <CheckboxField
+              key={k}
+              label={ENTITLEMENT_LABEL[k]}
+              checked={d.entitlements.includes(k)}
+              onChange={(e) => set('entitlements', e.target.checked ? [...d.entitlements, k] : d.entitlements.filter((x) => x !== k))}
+            />
+          ))}
+        </div>
+        <div className="mt-3 max-w-xs">
+          <TextField label="Links de compartilhamento ativos por moto" value={d.max_share_links}
+            onChange={(e) => set('max_share_links', e.target.value)} inputMode="numeric" />
+        </div>
+      </fieldset>
+      <TextAreaField label="Textos de benefícios no site (um por linha)" value={d.features} onChange={(e) => set('features', e.target.value)} rows={4} />
       {!isFree && (
         <TextAreaField label="Regras de cancelamento" value={d.cancellation_text} onChange={(e) => set('cancellation_text', e.target.value)} rows={3} maxLength={1000} />
       )}
@@ -254,7 +282,8 @@ export function AdminPlansPage() {
                 <p className="text-sm text-muted">
                   {formatPlanPrice(p.price_cents)} · {PERIOD_LABEL[p.billing_period as BillingPeriod]} · {p.max_motorcycles}{' '}
                   {p.max_motorcycles === 1 ? 'moto' : 'motos'} · {formatQuota(p.storage_quota_mb)}
-                  {p.trial_days > 0 ? ` · ${p.trial_days} dias grátis` : ''} · versão {p.version}
+                  {p.trial_days > 0 ? ` · ${p.trial_days} dias grátis` : ''} · {p.max_share_links} links
+                  {p.entitlements.length > 0 ? ` · ${p.entitlements.map((e) => ENTITLEMENT_LABEL[e as Entitlement] ?? e).join(', ')}` : ''} · versão {p.version}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">

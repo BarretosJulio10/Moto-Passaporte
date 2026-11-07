@@ -110,3 +110,23 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Relatório impresso / PDF (PRD 5.9) */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 14mm 16mm;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  .report-sheet {
+    box-shadow: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+  }
+  .report-break-avoid {
+    break-inside: avoid;
+  }
+}
