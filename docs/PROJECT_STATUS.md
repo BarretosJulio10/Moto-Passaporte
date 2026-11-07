@@ -8,7 +8,7 @@
 
 | Ambiente | URL | Banco | Situação |
 |---|---|---|---|
-| Desenvolvimento | — | Supabase `ripgenhykaajcnzdxoid` (MOTO_Passaporte, us-east-1, PG 17) | banco da Fase 1 aplicado |
+| Desenvolvimento | Vercel (conectando ao GitHub — ADR-012; sem frontend ainda) | Supabase `ripgenhykaajcnzdxoid` (MOTO_Passaporte, us-east-1, PG 17) | banco da Fase 1 aplicado |
 | Homologação | — | — | não configurado |
 | Produção | — | — | não configurado |
 

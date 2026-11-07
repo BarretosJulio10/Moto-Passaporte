@@ -6,6 +6,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 
 ### Adicionado
 - ADR-011: interface construída direto no repositório; stack do frontend definida.
+- ADR-012: hospedagem do frontend na Vercel (configuração prevista).
 - Plano ordenado da interface da Fase 1 em `PROJECT_STATUS.md`.
 
 ## [0.3.1] — 06/11/2026

@@ -64,6 +64,17 @@ O responsável pelo produto escolheu que a interface seja desenvolvida diretamen
 - Vitest + Testing Library (unitários) e Playwright (E2E, já disponível no ambiente)
 Organização de pastas conforme PRD 16.3 (`src/core`, `src/modules/...`), sem criar diretórios vazios.
 
+### ADR-012 — Hospedagem do frontend na Vercel
+**Data:** 06/11/2026 · **Status:** aceita
+O site/aplicação será publicado pela Vercel, conectada ao repositório GitHub `BarretosJulio10/Moto-Passaporte` (deploy automático a cada push na `main`; pré-visualização por branch quando houver).
+Configuração prevista (aplicar quando o frontend existir — ADR-011):
+- Framework: Vite · Build: `npm run build` · Saída: `dist`
+- Variáveis de ambiente na Vercel: `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` (somente a chave pública; **nunca** a service role)
+- Reescrita de rotas para `index.html` (SPA), via `vercel.json`
+- Após o primeiro deploy: cadastrar a URL da Vercel em Supabase → Auth → URL Configuration (Site URL e Redirect URLs)
+- Região de funções (se usadas): próxima de us-east-1, onde está o Supabase (ADR-009)
+Até o frontend existir, um deploy na Vercel não terá o que publicar — isso é esperado.
+
 ---
 
 ## Pendentes — técnicas
