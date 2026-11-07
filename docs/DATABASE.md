@@ -16,6 +16,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 | `20261107014505_maintenance.sql` | Fase 2: `maintenance_records`, `maintenance_items`, categorias, `create_maintenance_record`, `void_maintenance_record`, view `maintenance_timeline` |
 | `20261107101141_workshop_access.sql` | Fase 3: `plate_search_log`, `motorcycle_workshop_access`, pesquisa por placa, pedido, decisão, revogação e leituras por papel |
 | `20261107101234_workshop_access_indexes.sql` | Índices de `decided_by` e `ended_by` |
+| `20261107153512_subscriptions.sql` | Assinaturas (ADR-020): `subscriptions`, `payments`, `payment_events`, funções `billing_*` do servidor, leitura do usuário e do admin, `user_plan` pela assinatura vigente |
 | `20261107151926_payment_settings.sql` | Mercado Pago (ADR-019): `payment_gateway_settings`, segredos no Vault, funções do admin e do servidor |
 | `20261107130815_subscription_plans.sql` | Planos (ADR-018): `subscription_plans`, `subscription_plan_versions`, leitura pública, gestão pelo admin, limites pelo plano vigente |
 | `20261107110633_passport_shares.sql` | Compartilhamento (ADR-017): `passport_shares`, `passport_settings`, criação, revogação, leitura pública pelo código, página básica desativável |
@@ -69,6 +70,9 @@ Configurações existentes: `registration_rate_limit_per_hour`, `support_email`,
 | Tabela | Conteúdo | Regras |
 |---|---|---|
 | `plate_search_log` | Pesquisas por placa: oficina, usuário, hash sha256 da placa, encontrou ou não | Imutável; só admin lê; base do limite de tentativas |
+| `subscriptions` | Assinaturas: plano, preço/periodicidade/limites contratados, estado, período pago, vínculo com o Mercado Pago | Sem acesso direto; muda só pelas funções do servidor; não é excluída |
+| `payments` | Cobranças com estado próprio e se já concederam período | Sem acesso direto; usuário vê só as suas por função; não é excluída |
+| `payment_events` | Avisos recebidos: tipo, recurso, request-id, assinatura válida, resultado | Sem acesso direto; admin lê por função; não é excluído |
 | `payment_gateway_settings` | Conta do Mercado Pago: ambiente, chave pública, 4 últimos caracteres dos segredos, último teste | Sem acesso direto; segredos no Supabase Vault; leitura dos segredos só pelo servidor |
 | `subscription_plans` | Catálogo de planos: preço, periodicidade, limites, benefícios, visibilidade | Sem acesso direto; só funções; código/tipo/periodicidade imutáveis; não é excluído; um único gratuito, sempre ativo |
 | `subscription_plan_versions` | Versões de cada alteração de plano | Sem acesso direto; imutável |

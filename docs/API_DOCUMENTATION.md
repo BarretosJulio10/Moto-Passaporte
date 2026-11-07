@@ -222,6 +222,16 @@ Implementação em `src/modules/admin/paymentsApi.ts`.
 - Público: `rpc('get_payment_public_config')` → `{ billing_enabled, environment, public_key }` (chave só com a contratação liberada).
 - Servidor (`service_role`): `payment_access_token()`, `payment_webhook_secret()`, `record_payment_check(...)`.
 
+## Assinaturas (Fase 5, ADR-020)
+
+Implementação em `src/modules/plans/billingApi.ts`.
+
+- Usuário: `rpc('get_my_subscription')` → assinatura mais recente (`status`, `current_period_end`, `grace_until`, `has_access`…) ou `null`; `rpc('get_my_payments')` → histórico.
+- Edge Function `POST /functions/v1/mercadopago-billing` (login): `{ action: 'subscribe', plan_code }` → `{ checkout_url }` (redirecionar); `{ action: 'sync' }`; `{ action: 'cancel' }`; `{ action: 'reconcile' }` (admin) → `{ checked, synced, failures }`.
+- Webhook `POST /functions/v1/mercadopago-webhook` (Mercado Pago; cabeçalhos `x-signature` e `x-request-id`). Tipos tratados: `subscription_preapproval`, `subscription_authorized_payment`, `payment`.
+- Admin: `admin_list_subscriptions`, `admin_list_payment_events`, `admin_set_billing_enabled({ p_enabled })`.
+- Servidor (`service_role`): `billing_prepare_subscription`, `billing_attach_checkout`, `billing_fail_checkout`, `billing_apply_subscription_state`, `billing_apply_payment`, `billing_log_event`, `billing_finish_event`, `billing_user_subscription`, `billing_cancel_local`, `billing_reconcile_targets`.
+
 ## Compartilhamento (Fase 4, ADR-017)
 
 Implementação em `src/modules/sharing/sharesApi.ts`.

@@ -58,6 +58,9 @@
 | Supabase real — planos, em transação desfeita | `tests/security/supabase/phase5a_plans_rollback.sql` | 19 aprovadas |
 | PostgreSQL 16 local — credenciais do Mercado Pago | `tests/security/phase5b_payment_settings_test.sql` | 29 aprovadas |
 | Supabase real — credenciais do Mercado Pago, em transação desfeita | `tests/security/supabase/phase5b_payment_settings_rollback.sql` | 18 aprovadas |
+| PostgreSQL 16 local — assinaturas e pagamentos | `tests/security/phase5c_subscriptions_test.sql` | 52 aprovadas |
+| Supabase real — assinaturas e pagamentos, em transação desfeita | `tests/security/supabase/phase5c_subscriptions_rollback.sql` | 17 aprovadas |
+| Tipos das Edge Functions | `scripts/validation/check_edge_functions.sh` | OK |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
 
@@ -127,6 +130,14 @@ Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalad
 - Nenhuma função devolve os segredos ao navegador, nem ao administrador; só os 4 últimos caracteres.
 - Leitura dos segredos apenas por `service_role` (Edge Functions). A Edge Function `mercadopago-check` exige login de administrador e não registra o token em logs.
 - Gravações auditadas sem os valores.
+
+## Assinaturas e Webhook (ADR-020)
+
+- Premium só com cobrança aprovada consultada na API do Mercado Pago; navegador e conteúdo do aviso nunca ativam nada.
+- Webhook público valida a assinatura HMAC-SHA256 (`x-signature`, `x-request-id`) com a assinatura secreta do Vault, em comparação de tempo constante; aviso sem assinatura válida é registrado e recusado (401).
+- Idempotência: cada cobrança concede período uma vez; aviso repetido já processado é ignorado; aviso que falhou é reprocessado.
+- Funções `billing_*` só para `service_role`; tabelas de cobrança sem acesso direto e sem exclusão; nenhum dado de cartão é armazenado.
+- `back_url` do checkout só aceita a origem HTTPS do próprio site (ou localhost) e a interface só redireciona para domínios do Mercado Pago.
 
 ## Advisors do Supabase (06/11/2026, após o reforço)
 

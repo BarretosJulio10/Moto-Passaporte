@@ -783,6 +783,45 @@ export type Database = {
       get_storage_usage: { Args: never; Returns: Json }
       get_public_plans: { Args: never; Returns: Json }
       get_payment_public_config: { Args: never; Returns: Json }
+      get_my_subscription: { Args: never; Returns: Json }
+      get_my_payments: {
+        Args: never
+        Returns: { amount_cents: number; created_at: string; currency: string; id: string; paid_at: string | null; plan_name: string; status: string }[]
+      }
+      admin_set_billing_enabled: { Args: { p_enabled: boolean }; Returns: undefined }
+      admin_list_subscriptions: {
+        Args: { p_limit?: number }
+        Returns: {
+          billing_period: string
+          created_at: string
+          current_period_end: string | null
+          environment: string
+          id: string
+          last_synced_at: string | null
+          payments_approved: number
+          plan_name: string
+          price_cents: number
+          provider_status: string | null
+          status: string
+          user_name: string
+        }[]
+      }
+      admin_list_payment_events: {
+        Args: { p_limit?: number }
+        Returns: {
+          action: string | null
+          detail: string | null
+          event_type: string | null
+          id: number
+          processed_at: string | null
+          provider: string
+          received_at: string
+          request_id: string | null
+          resource_id: string | null
+          result: string
+          signature_valid: boolean
+        }[]
+      }
       admin_get_payment_settings: { Args: never; Returns: Json }
       admin_save_payment_settings: {
         Args: { p_access_token?: string | null; p_environment: string; p_public_key: string | null; p_webhook_secret?: string | null }

@@ -1,4 +1,4 @@
-import { ButtonLink } from '@/components/Button'
+import { Button, ButtonLink } from '@/components/Button'
 import { formatPlanPrice, formatQuota, PERIOD_LABEL, PERIOD_SUFFIX, type PublicPlan } from './api'
 
 function Features({ items }: { items: string[] }) {
@@ -20,10 +20,15 @@ export function PlansGrid({
   plans,
   billingEnabled,
   showSignup = true,
+  onSubscribe,
+  subscribingCode,
 }: {
   plans: PublicPlan[]
   billingEnabled: boolean
   showSignup?: boolean
+  /** No painel: assinar um plano Premium (só com a contratação liberada). */
+  onSubscribe?: (code: string) => void
+  subscribingCode?: string | null
 }) {
   const free = plans.find((p) => p.kind === 'free')
   const premium = plans.filter((p) => p.kind === 'premium')
@@ -55,6 +60,12 @@ export function PlansGrid({
                   <span className="text-sm text-muted">{PERIOD_SUFFIX[p.billing_period]}</span>
                   {p.price_note && <span className="block text-sm text-muted">{p.price_note}</span>}
                 </span>
+                {billingEnabled && onSubscribe && (
+                  <Button size="sm" className="mt-1 w-full" loading={subscribingCode === p.code} disabled={Boolean(subscribingCode)}
+                    onClick={() => onSubscribe(p.code)} aria-label={`Assinar ${p.name}`}>
+                    Assinar {p.name.replace(/^Premium\s*/i, '').toLowerCase() || 'Premium'}
+                  </Button>
+                )}
               </li>
             ))}
           </ul>
@@ -64,6 +75,14 @@ export function PlansGrid({
           </p>
           <Features items={lead.features} />
           {!billingEnabled && <p className="mt-4 text-sm font-semibold text-muted">Contratação em breve.</p>}
+          {billingEnabled && !onSubscribe && (
+            <ButtonLink to="/painel/plano" className="mt-5">Assinar o Premium</ButtonLink>
+          )}
+          {billingEnabled && (
+            <p className="mt-3 text-sm text-muted">
+              Pagamento pelo Mercado Pago, renovação automática. Cancele quando quiser: o Premium continua até o fim do período pago.
+            </p>
+          )}
         </div>
       )}
       {showSignup && (

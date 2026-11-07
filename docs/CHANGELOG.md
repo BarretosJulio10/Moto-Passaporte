@@ -9,6 +9,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.18.0] — 07/11/2026 — Fase 5.2 a 5.5: assinaturas Premium pelo Mercado Pago
+
+### Adicionado
+- Migração `subscriptions` (ADR-020): `subscriptions`, `payments`, `payment_events`; funções do servidor `billing_*` (preparar, vincular checkout, aplicar estado da assinatura e do pagamento, registrar avisos, cancelar, alvos de conciliação); `get_my_subscription`, `get_my_payments`, `admin_list_subscriptions`, `admin_list_payment_events`, `admin_set_billing_enabled`; `user_plan` passa a considerar a assinatura com direito vigente (tolerância de atraso configurável).
+- Edge Functions `mercadopago-billing` (assinar, conferir, cancelar, conciliar) e `mercadopago-webhook` (valida a assinatura HMAC e consulta a API antes de aplicar). Camada isolada em `supabase/functions/_shared/mercadopago.ts`.
+- Painel: assinar o Premium (vai ao Mercado Pago), situação da assinatura, aviso de atraso, cancelamento com confirmação, histórico de pagamentos, confirmação ao voltar do Mercado Pago.
+- Administração: liberar/desligar a contratação; página "Assinaturas e avisos" (`/admin/assinaturas`) com conciliação.
+- `scripts/validation/check_edge_functions.sh` (tipos das Edge Functions).
+- Testes: banco 52 (local) + 17 (Supabase, transação desfeita); interface 144 no total (8 novos); validação da assinatura do Webhook testada.
+
 ## [0.17.0] — 07/11/2026 — Fase 5.2 (parte 1): conta do Mercado Pago no painel do admin
 
 ### Adicionado

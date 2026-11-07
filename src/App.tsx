@@ -31,6 +31,7 @@ import { RequireAdmin } from '@/modules/admin/RequireAdmin'
 import { AdminDashboardPage } from '@/modules/admin/AdminDashboardPage'
 import { AdminPlansPage } from '@/modules/admin/AdminPlansPage'
 import { AdminPaymentsPage } from '@/modules/admin/AdminPaymentsPage'
+import { AdminSubscriptionsPage } from '@/modules/admin/AdminSubscriptionsPage'
 import { MyPlanPage } from '@/modules/plans/MyPlanPage'
 import { RequireAuth } from '@/core/auth/RequireAuth'
 
@@ -121,6 +122,14 @@ export const routes = [
             element: (
               <RequireAdmin>
                 <AdminPaymentsPage />
+              </RequireAdmin>
+            ),
+          },
+          {
+            path: '/admin/assinaturas',
+            element: (
+              <RequireAdmin>
+                <AdminSubscriptionsPage />
               </RequireAdmin>
             ),
           },

@@ -10,6 +10,7 @@ import {
   checkPaymentConnection,
   fetchPaymentSettings,
   savePaymentSettings,
+  setBillingEnabled,
   validatePaymentInput,
   type CheckResult,
   type PaymentEnvironment,
@@ -87,6 +88,14 @@ export function AdminPaymentsPage() {
     save.mutate(input)
   }
 
+  const billing = useMutation({
+    mutationFn: setBillingEnabled,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['payment-settings'] })
+      qc.invalidateQueries({ queryKey: ['public-settings'] })
+    },
+  })
+
   const webhookUrl = env.supabaseUrl ? `${env.supabaseUrl}/functions/v1/mercadopago-webhook` : null
   const s = settings.data
 
@@ -106,9 +115,28 @@ export function AdminPaymentsPage() {
         <>
           <div className="mt-6 max-w-2xl space-y-3">
             <Status s={s} />
-            {!s.billing_enabled && (
-              <p className="text-sm text-muted">A contratação pelo site continua desligada até o fluxo de pagamento ser testado de ponta a ponta.</p>
-            )}
+            <div className="rounded-doc border border-rule bg-sheet px-4 py-3">
+              <p className="text-sm font-semibold text-graphite">
+                Contratação pelo site: {s.billing_enabled ? 'liberada' : 'desligada'}
+              </p>
+              <p className="mt-1 text-sm text-muted">
+                {s.billing_enabled
+                  ? 'Usuários podem assinar o Premium no painel.'
+                  : 'Para liberar: token cadastrado, conexão testada com sucesso e assinatura secreta do Webhook cadastrada. Em ambiente de teste, só usuários de teste do Mercado Pago conseguem pagar.'}
+              </p>
+              <Button size="sm" variant={s.billing_enabled ? 'quiet' : 'secondary'} className="mt-2" loading={billing.isPending}
+                onClick={() => billing.mutate(!s.billing_enabled)}>
+                {s.billing_enabled ? 'Desligar contratação' : 'Liberar contratação'}
+              </Button>
+              {billing.isError && (
+                <div className="mt-2">
+                  <Notice tone="error">{translateDbError(billing.error as { code?: string; message?: string })}</Notice>
+                </div>
+              )}
+            </div>
+            <p className="text-sm">
+              <Link to="/admin/assinaturas" className="font-semibold text-ink underline underline-offset-4">Assinaturas, avisos e conciliação</Link>
+            </p>
             <div className="flex flex-wrap items-center gap-3">
               <Button variant="secondary" onClick={() => test.mutate()} loading={test.isPending} disabled={!s.access_token_configured}>
                 Testar conexão
@@ -156,7 +184,10 @@ export function AdminPaymentsPage() {
               <div className="text-sm">
                 <p className="font-semibold text-graphite">Endereço para avisos (Webhooks)</p>
                 <p className="mt-1 break-all font-mono text-muted">{webhookUrl}</p>
-                <p className="mt-1 text-muted">Cadastre no Mercado Pago quando a etapa de assinaturas estiver pronta (eventos de pagamentos e assinaturas).</p>
+                <p className="mt-1 text-muted">
+                  Cadastre este endereço no Mercado Pago (Suas integrações → Webhooks) com os eventos de Pagamentos, Planos e assinaturas.
+                  Depois copie a assinatura secreta gerada lá para o campo acima.
+                </p>
               </div>
             )}
             {error && <Notice tone="error">{error}</Notice>}

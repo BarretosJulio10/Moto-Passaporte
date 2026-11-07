@@ -72,3 +72,23 @@ export function validatePaymentInput(i: SavePaymentInput): string | null {
   if (secret && !/^[A-Za-z0-9_-]{16,200}$/.test(secret)) return 'Assinatura secreta inválida. Copie o valor completo do painel do Mercado Pago.'
   return null
 }
+
+export async function setBillingEnabled(enabled: boolean): Promise<void> {
+  const { error } = await getSupabase().rpc('admin_set_billing_enabled', { p_enabled: enabled })
+  if (error) throw error
+}
+
+export type AdminSubscription = import('@/types/supabase').Database['public']['Functions']['admin_list_subscriptions']['Returns'][number]
+export type PaymentEvent = import('@/types/supabase').Database['public']['Functions']['admin_list_payment_events']['Returns'][number]
+
+export async function adminListSubscriptions(): Promise<AdminSubscription[]> {
+  const { data, error } = await getSupabase().rpc('admin_list_subscriptions', { p_limit: 200 })
+  if (error) throw error
+  return data ?? []
+}
+
+export async function adminListPaymentEvents(): Promise<PaymentEvent[]> {
+  const { data, error } = await getSupabase().rpc('admin_list_payment_events', { p_limit: 50 })
+  if (error) throw error
+  return data ?? []
+}

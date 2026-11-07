@@ -35,6 +35,8 @@ const ENTITY_LABEL: Record<string, string> = {
   system_settings: 'configuração',
   subscription_plans: 'plano',
   payment_gateway_settings: 'pagamentos',
+  subscriptions: 'assinatura',
+  payments: 'pagamento',
 }
 
 /** Painel administrativo base (PRD 7.1). Indicadores financeiros entram com a Fase 5. */

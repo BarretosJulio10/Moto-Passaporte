@@ -109,6 +109,16 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-020 — Assinaturas pelo Mercado Pago: estado confirmado no servidor (PRD 8)
+**Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; políticas comerciais provisórias até P-3, P-4 e P-5)
+- **Modelo (P-5, provisório):** assinatura avulsa do Mercado Pago (`/preapproval`, sem plano no provedor), criada pela Edge Function `mercadopago-billing` com o preço e a periodicidade contratados; o usuário paga na página segura do Mercado Pago (`init_point`). Assim o preço fica gravado em cada contrato e o catálogo continua só no nosso banco.
+- **Fonte da verdade:** o Premium só é liberado quando uma cobrança aparece como aprovada **na API do Mercado Pago**. O retorno do navegador só dispara uma consulta; o Webhook (`mercadopago-webhook`, sem login, protegido pela assinatura HMAC) também só dispara consulta. Cada cobrança aprovada concede um período uma única vez (`period_granted`), então avisos repetidos não duplicam nada.
+- **Estados:** assinatura `pending → active → past_due/paused → canceled/expired`, `rejected` quando o checkout falha; pagamento `pending/approved/rejected/canceled/refunded/charged_back`.
+- **Políticas provisórias:** tolerância de 7 dias após cobrança recusada (`billing_grace_days`, P-3); cancelamento mantém o Premium até o fim do período pago, sem reembolso proporcional (P-4); reembolso ou contestação encerram o Premium na hora. Direito de arrependimento (7 dias, CDC art. 49) atendido manualmente pelo suporte até haver fluxo próprio (KI-025).
+- **Rebaixamento:** ao voltar ao gratuito, nada é apagado; o usuário só não cadastra motos nem anexos acima do limite.
+- **Conciliação:** botão "Conciliar agora" no admin consulta cada assinatura em andamento no Mercado Pago. Execução automática periódica fica pendente (KI-024).
+- Liberação da contratação (`billing_enabled`) só pelo admin e só com token testado e assinatura do Webhook cadastrada.
+
 ### ADR-019 — Credenciais do Mercado Pago gerenciadas pelo administrador (PRD 8, 15.2)
 **Data:** 07/11/2026 · **Status:** aceita (pedido do responsável: trocar de conta do Mercado Pago pelo painel, sem mexer em código)
 - Token de acesso e assinatura secreta do Webhook são cadastrados na página "Pagamentos" do admin e guardados **criptografados no Supabase Vault**. A tabela `payment_gateway_settings` guarda só a referência, os 4 últimos caracteres, o ambiente (teste/produção), a chave pública e o resultado do último teste.
