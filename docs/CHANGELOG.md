@@ -9,6 +9,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.50.0] — 08/11/2026 — Premium de boas-vindas no cadastro
+
+### Adicionado
+- **Toda conta nova ganha 3 meses de Premium**, sem cartão e sem cobrança (configurável pelo admin em Configurações → Cobrança: "Premium grátis para contas novas"; 0 desliga).
+- No fim do período, a pessoa assina ou paga um período para continuar (assinando durante o bônus, a 1ª cobrança só acontece quando ele acaba); se não, a conta volta ao gratuito **sem perder motos nem histórico** (só não cadastra acima do limite gratuito).
+- Avisos: boas-vindas com a data final; 7 dias antes, 1 dia antes e no fim (rotina já existente).
+- Página inicial, planos e criar conta mostram a oferta; Meu plano mostra "Premium (boas-vindas) até DD/MM/AAAA".
+
+### Testes
+- Banco: 12 verificações novas (`phase8a_welcome_premium_test.sql`) — 1053 OK. Fumaça em produção (transação desfeita): conta nova com Premium mensal até 06/02/2027.
+- Tela: 1 novo — 243.
+
 ## [0.49.0] — 08/11/2026 — Módulo Oficina (PRD 2.1), Fase 5.1: cliente com conta, avisos e logotipo
 
 ### Adicionado

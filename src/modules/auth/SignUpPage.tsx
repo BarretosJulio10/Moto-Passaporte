@@ -8,8 +8,10 @@ import { signUpSchema, validate, type FieldErrors } from '@/core/auth/schemas'
 import { translateAuthError } from '@/core/auth/authErrors'
 import { getSupabase } from '@/lib/supabase'
 import { isSupabaseConfigured, LEGAL_VERSIONS } from '@/core/config/env'
+import { usePublicSettings, welcomeLabel } from '@/modules/public_site/usePublicSettings'
 
 export function SignUpPage() {
+  const welcome = usePublicSettings().data?.welcomePremiumDays ?? 0
   const [errors, setErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [sentTo, setSentTo] = useState<string | null>(null)
@@ -71,7 +73,7 @@ export function SignUpPage() {
   return (
     <AuthLayout
       title="Criar conta"
-      intro="Crie o passaporte da sua moto. É grátis."
+      intro={welcome > 0 ? `Crie o passaporte da sua moto. É grátis, e os primeiros ${welcomeLabel(welcome)} vêm com Premium, sem cartão.` : 'Crie o passaporte da sua moto. É grátis.'}
       footer={
         <>
           Já tem conta? <Link to="/entrar" className="font-semibold text-ink underline underline-offset-4">Entrar</Link>

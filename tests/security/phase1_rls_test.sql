@@ -41,6 +41,8 @@ grant execute on all functions in schema tests to anon, authenticated;
 \set D '44444444-4444-4444-4444-444444444444'
 
 \echo '--- Cadastro de usuários'
+-- As suítes antigas tratam contas novas como plano gratuito; o bônus de boas-vindas é testado em phase8a.
+update public.system_settings set value = '0'::jsonb where key = 'welcome_premium_days';
 insert into auth.users (id, email, raw_user_meta_data) values
   (:'A', 'ana@teste.local',    '{"full_name":"Ana","terms_accepted":true,"terms_version":"1.0","privacy_version":"1.0"}'),
   (:'B', 'bruno@teste.local',  '{"full_name":"Bruno","terms_accepted":true,"terms_version":"1.0","privacy_version":"1.0"}'),

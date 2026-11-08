@@ -9,6 +9,14 @@ export type PublicSettings = {
   billingEnabled: boolean
   supportEmail: string | null
   supportWhatsapp: string | null
+  /** Dias de Premium grátis para contas novas (0 = sem bônus). */
+  welcomePremiumDays: number
+}
+
+/** "3 meses", "1 mês" ou "45 dias". */
+export function welcomeLabel(days: number): string {
+  if (days > 0 && days % 30 === 0) return days === 30 ? '1 mês' : `${days / 30} meses`
+  return `${days} dias`
 }
 
 const asText = (v: unknown) => (typeof v === 'string' && v.trim() !== '' ? v.trim() : null)
@@ -33,6 +41,7 @@ export function usePublicSettings() {
         billingEnabled: map.get('billing_enabled') === true,
         supportEmail: asText(map.get('support_email')),
         supportWhatsapp: asText(map.get('support_whatsapp'))?.replace(/\D/g, '') || null,
+        welcomePremiumDays: typeof map.get('welcome_premium_days') === 'number' ? Math.max(0, map.get('welcome_premium_days') as number) : 0,
       }
     },
   })

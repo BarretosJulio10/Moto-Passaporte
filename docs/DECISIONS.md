@@ -109,6 +109,14 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-049 — Premium de boas-vindas no cadastro
+**Data:** 08/11/2026 · **Status:** aceita (pedido do responsável: "3 meses de Premium no cadastro; depois paga ou volta ao free")
+- Implementado como **bônus** (`premium_grants`, `source = 'welcome'`), o mesmo mecanismo da cortesia (ADR-037) e do bônus com cobrança adiada (ADR-038): sem cartão, sem fatura. Criado por gatilho ao nascer o perfil; erro no bônus nunca impede o cadastro.
+- Uma vez por conta, nunca por cima de assinatura, período pago ou cortesia. Plano usado: Premium mensal ativo (limites e benefícios dele). Prazo em dias configurável (`welcome_premium_days`, padrão 90, 0 desliga), até o fim do último dia no horário de Brasília.
+- **Só para contas criadas a partir desta versão.** Contas antigas não recebem automaticamente; o admin pode dar cortesia manual.
+- Fim do bônus: plano gratuito sem apagar nada (regra de rebaixamento já existente). Avisos de 7 dias, 1 dia e fim já existiam para qualquer bônus com prazo.
+- Risco aceito: alguém criar várias contas para repetir o bônus (cada conta exige e-mail confirmado; o Premium é por conta e a moto só tem um titular).
+
 ### ADR-048 — Módulo Oficina (PRD 2.1), Fase 5.1: o cliente liga o próprio cadastro; avisos pelo vínculo
 **Data:** 08/11/2026 · **Status:** aceita ("ok continue")
 - **Prova do vínculo = link que a oficina enviou ao cliente + conta logada + confirmação.** Aceitos: convite (novo, uso único, 30 dias), link do orçamento e link da OS. Nunca por placa, telefone ou e-mail iguais (§4.3). Cadastro já ligado a outra conta é recusado; o responsável ou o cliente desfazem.

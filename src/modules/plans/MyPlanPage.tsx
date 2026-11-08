@@ -224,7 +224,7 @@ export function MyPlanPage() {
           {plan.data.bonus && (
             <p className="mt-1 text-sm text-graphite">
               {plan.data.bonus_until
-                ? <>Bônus Premium sem cobrança até <strong>{bonusLastDay(plan.data.bonus_until)}</strong>. Depois disso a conta volta ao gratuito, a não ser que você assine. Se assinar agora, a primeira cobrança só acontece quando o bônus terminar.</>
+                ? <>{plan.data.bonus_source === 'welcome' ? 'Premium de boas-vindas' : 'Bônus Premium'} sem cobrança até <strong>{bonusLastDay(plan.data.bonus_until)}</strong>. Depois disso a conta volta ao gratuito, a não ser que você assine. Se assinar agora, a primeira cobrança só acontece quando o bônus terminar.</>
                 : 'Bônus Premium sem cobrança, sem prazo para terminar.'}
             </p>
           )}

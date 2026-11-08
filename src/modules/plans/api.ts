@@ -44,6 +44,7 @@ export type MyPlan = {
   /** Premium por cortesia (bônus) em vigor e quando termina (ADR-037). */
   bonus?: boolean
   bonus_until?: string | null
+  bonus_source?: 'admin' | 'welcome' | null
   /** Premium pago por período (Pix/débito/boleto): até quando (ADR-039). */
   paid_until?: string | null
 }

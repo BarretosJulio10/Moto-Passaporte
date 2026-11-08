@@ -1,6 +1,6 @@
 import { ButtonLink } from '@/components/Button'
 import { PassportSpecimen } from './PassportSpecimen'
-import { usePublicSettings } from './usePublicSettings'
+import { usePublicSettings, welcomeLabel } from './usePublicSettings'
 import { PlansGrid } from '@/modules/plans/PlansGrid'
 
 const STEPS = [
@@ -80,6 +80,7 @@ export function HomePage() {
           {freeLimit !== null && (
             <p className="mt-4 text-sm text-muted">
               Grátis para {freeLimit} {freeLimit === 1 ? 'moto' : 'motos'}. Sem cartão de crédito.
+              {(settings?.welcomePremiumDays ?? 0) > 0 && <> Quem cria a conta ganha {welcomeLabel(settings!.welcomePremiumDays)} de Premium.</>}
             </p>
           )}
         </div>
@@ -167,6 +168,11 @@ export function HomePage() {
       <section id="planos" className="scroll-mt-20 border-t border-rule bg-sheet">
         <div className="mx-auto max-w-6xl px-5 py-16">
           <h2 className="heading text-3xl text-ink">Planos</h2>
+          {(settings?.welcomePremiumDays ?? 0) > 0 && (
+            <p className="mt-2 max-w-2xl text-graphite">
+              Toda conta nova começa com <strong>{welcomeLabel(settings!.welcomePremiumDays)} de Premium grátis</strong>, sem cartão. Depois você escolhe: assina para continuar ou segue no plano gratuito, sem perder motos nem histórico.
+            </p>
+          )}
           {plans.length > 0 ? (
             <PlansGrid plans={plans} billingEnabled={settings?.billingEnabled ?? false} />
           ) : (
