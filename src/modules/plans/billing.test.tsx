@@ -9,6 +9,7 @@ import type { PublicPlan } from './api'
 const calls: string[] = []
 let sub: MySubscription | null = null
 let billingEnabled = true
+let passes: unknown[] = []
 
 vi.mock('./billingApi', async () => {
   const actual = await vi.importActual<typeof import('./billingApi')>('./billingApi')
@@ -29,6 +30,15 @@ vi.mock('./billingApi', async () => {
       period_end: '2026-12-07T12:00:00Z', amount_cents: 990, currency: 'BRL', paid_at: '2026-11-07T12:00:00Z', environment: 'test',
       payment_reference: 'ap:123', customer_name: 'Ana Souza', customer_email: 'ana@exemplo.com',
     }),
+    fetchMyPasses: async () => passes,
+    startPassPayment: async (code: string) => {
+      calls.push(`pass:${code}`)
+      return 'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=x'
+    },
+    syncPassPayments: async () => {
+      calls.push('sync_pass')
+      return { ok: true }
+    },
     startSubscription: async (code: string) => {
       calls.push(`subscribe:${code}`)
       return 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_id=x'
@@ -75,7 +85,8 @@ vi.mock('@/modules/admin/paymentsApi', async () => {
   }
 })
 
-import { MyPlanPage } from './MyPlanPage'
+import { MyPlanPage, PaidUntil } from './MyPlanPage'
+import { daysLeft } from './billingApi'
 import { PlansGrid } from './PlansGrid'
 import { AdminSubscriptionsPage } from '@/modules/admin/AdminSubscriptionsPage'
 import { ReceiptPage } from './ReceiptPage'
@@ -98,8 +109,50 @@ const active = (over: Partial<MySubscription> = {}): MySubscription => ({
 beforeEach(() => {
   calls.length = 0
   myPlan = FREE_PLAN
+  passes = []
   sub = null
   billingEnabled = true
+})
+
+describe('Premium por período (Pix, débito, boleto)', () => {
+  it('oferece cartão e Pix lado a lado; Pix leva ao checkout do Mercado Pago', async () => {
+    const assign = vi.fn()
+    vi.stubGlobal('location', { ...window.location, assign })
+    const user = userEvent.setup()
+    wrap(<MyPlanPage />)
+    expect(await screen.findByRole('button', { name: 'Assinar Premium mensal' })).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Pagar Premium mensal com Pix, débito ou boleto' }))
+    expect(calls).toContain('pass:premium_mensal')
+    expect(assign).toHaveBeenCalledWith(expect.stringContaining('mercadopago.com.br/checkout'))
+    expect(screen.getByText(/sem cartão salvo/)).toBeVisible()
+    vi.unstubAllGlobals()
+  })
+
+  it('conta os dias e só convida a renovar perto do fim', () => {
+    const now = new Date('2026-11-08T12:00:00-03:00')
+    expect(daysLeft('2026-11-28T03:00:00Z', now)).toBe(20)
+    const { rerender } = render(<PaidUntil until="2027-01-30T03:00:00Z" now={now} />)
+    expect(screen.getByRole('status')).toHaveTextContent('Premium pago até 29/01/2027.')
+    expect(screen.queryByText('Renovar agora')).toBeNull()
+    rerender(<PaidUntil until="2026-11-23T03:00:00Z" now={now} />)
+    expect(screen.getByRole('status')).toHaveTextContent('faltam 15 dias')
+    expect(screen.getByText('Renovar agora')).toBeVisible()
+    rerender(<PaidUntil until="2026-11-15T03:00:00Z" now={now} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('faltam 7 dias')
+    rerender(<PaidUntil until="2026-11-09T03:00:00Z" now={now} />)
+    expect(screen.getByRole('alert')).toHaveTextContent('Seu Premium vence hoje (08/11/2026).')
+  })
+
+  it('mostra o histórico e confere o pagamento ao voltar do Mercado Pago', async () => {
+    myPlan = { ...FREE_PLAN, kind: 'premium', name: 'Premium semestral', paid_until: '2027-05-09T03:00:00Z' }
+    passes = [{ id: 'x1', plan_name: 'Premium semestral', months: 6, price_cents: 4990, status: 'paid', payment_method: 'bank_transfer',
+      starts_at: '2026-11-08T15:00:00Z', ends_at: '2027-05-09T03:00:00Z', paid_at: '2026-11-08T15:00:00Z', created_at: '2026-11-08T15:00:00Z', checkout_url: null }]
+    wrap(<MyPlanPage />, '/painel/plano?pagamento=retorno')
+    expect(await screen.findByText(/Pix costuma confirmar em segundos/)).toBeVisible()
+    expect(await screen.findByText(/08\/11\/2026 a 08\/05\/2027 · Pix/)).toBeVisible()
+    expect(calls).toContain('sync_pass')
+    expect(screen.getByRole('heading', { name: 'Renovar ou mudar de plano' })).toBeVisible()
+  })
 })
 
 describe('Meu plano — bônus Premium', () => {

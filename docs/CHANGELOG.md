@@ -9,6 +9,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.40.0] — 08/11/2026 — Pix, débito e boleto
+
+### Adicionado
+- Em "Meu plano", cada Premium tem dois botões: **Cartão de crédito** (assinatura automática, como antes) e **Pix, débito ou boleto** (paga o período à vista pelo Mercado Pago, sem cartão salvo) — ADR-039.
+- Avisos do período pago: 30 dias (semestral e anual), 15, 7, vence hoje e venceu. "Meu plano" mostra "Premium pago até…", com "Renovar agora" perto do fim; o painel destaca nos últimos 7 dias. Renovar antes soma ao período atual.
+- Histórico "Pagamentos por Pix, débito ou boleto" para o usuário (com "Continuar pagamento" se ficou pela metade) e lista em /admin/assinaturas.
+- Edge Functions: `mercadopago-billing` v3 (`pay_pass`, `sync_pass`), `mercadopago-webhook` v2 e `scheduled-jobs` v2 (confere pagamentos avulsos pendentes).
+
+### Testes
+- Supabase real (com desfazer): preparar, valor menor recusado, pagamento aplicado e idempotente, renovação somando, avisos 30/15/hoje/venceu, volta ao gratuito, recusado e bloqueio do navegador nas funções de servidor. Tela: 3 novos (198).
+
+### Rollback desta versão
+- `supabase/rollback/20261108165626_premium_passes.down.sql` (ler as instruções no topo: conceder bônus a quem já pagou) e publicar o site e as Edge Functions anteriores.
+
 ## [0.39.0] — 08/11/2026 — Fim do bônus sem surpresa
 
 ### Adicionado

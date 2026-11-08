@@ -18,6 +18,12 @@ import {
   startSubscription,
   STATUS_LABEL,
   syncSubscription,
+  startPassPayment,
+  syncPassPayments,
+  fetchMyPasses,
+  PASS_STATUS_LABEL,
+  PAY_METHOD_LABEL,
+  daysLeft,
   type MySubscription,
 } from './billingApi'
 import { PlansGrid } from './PlansGrid'
@@ -47,7 +53,12 @@ export function PlanSummary() {
     <p className="text-sm text-muted">
       Plano <span className="font-semibold text-graphite">{p.name}</span> · {p.motorcycles_used} de {p.max_motorcycles}{' '}
       {p.max_motorcycles === 1 ? 'moto' : 'motos'} ·{' '}
-      <Link to="/painel/plano" className="font-semibold text-ink underline underline-offset-4">Ver plano</Link>
+      {p.paid_until && daysLeft(p.paid_until) <= 7 && (
+        <span className="font-semibold text-danger">{daysLeft(p.paid_until) <= 1 ? 'vence hoje' : `vence em ${daysLeft(p.paid_until)} dias`} · </span>
+      )}
+      <Link to="/painel/plano" className="font-semibold text-ink underline underline-offset-4">
+        {p.paid_until && daysLeft(p.paid_until) <= 7 ? 'Renovar' : 'Ver plano'}
+      </Link>
     </p>
   )
 }
@@ -55,6 +66,28 @@ export function PlanSummary() {
 const date = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString('pt-BR') : '—')
 /** Último dia do bônus (o fim gravado é a meia-noite seguinte). */
 export const bonusLastDay = (iso: string) => new Date(new Date(iso).getTime() - 1).toLocaleDateString('pt-BR')
+
+/** Premium pago por período: até quando vale e, perto do fim, convite para renovar (30/15/7/hoje). */
+export function PaidUntil({ until, now = new Date() }: { until: string; now?: Date }) {
+  const left = daysLeft(until, now)
+  const last = bonusLastDay(until)
+  const urgent = left <= 7
+  const soon = left <= 30
+  const text =
+    left <= 1 ? `Seu Premium vence hoje (${last}).`
+      : `Premium pago até ${last}${soon ? ` — faltam ${left} dias` : ''}.`
+  return (
+    <div className={`mt-3 rounded-doc border p-3 text-sm ${urgent ? 'border-danger bg-paper text-danger' : 'border-rule bg-paper text-graphite'}`} role={urgent ? 'alert' : 'status'}>
+      <p className="font-semibold">{text}</p>
+      {soon && (
+        <p className="mt-1">
+          Renove por Pix, débito ou boleto: o novo período começa quando o atual terminar, sem perder dias.{' '}
+          <a href="#planos" className="font-semibold text-ink underline underline-offset-4">Renovar agora</a>
+        </p>
+      )}
+    </div>
+  )
+}
 
 function SubscriptionCard({ sub, onCancel, canceling, bonusUntil }: { sub: MySubscription; onCancel: () => void; canceling: boolean; bonusUntil?: string | null }) {
   const open = ['pending', 'active', 'past_due', 'paused'].includes(sub.status)
@@ -107,8 +140,13 @@ export function MyPlanPage() {
   const qc = useQueryClient()
   const [params, setParams] = useSearchParams()
   const returning = params.get('assinatura') === 'retorno'
+  const returningPay = params.get('pagamento') === 'retorno'
   const [message, setMessage] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(
-    returning ? { tone: 'info', text: 'Estamos confirmando seu pagamento com o Mercado Pago. Pode levar alguns minutos.' } : null,
+    returning
+      ? { tone: 'info', text: 'Estamos confirmando seu pagamento com o Mercado Pago. Pode levar alguns minutos.' }
+      : returningPay
+        ? { tone: 'info', text: 'Estamos confirmando seu pagamento. Pix costuma confirmar em segundos; boleto, em até 3 dias úteis. Avisaremos no sino.' }
+        : null,
   )
   const [subscribing, setSubscribing] = useState<string | null>(null)
   const plan = useQuery({ queryKey: ['my-plan', user?.id], enabled: Boolean(user), queryFn: fetchMyPlan })
@@ -116,22 +154,23 @@ export function MyPlanPage() {
   const sub = useQuery({ queryKey: ['my-subscription', user?.id], enabled: Boolean(user), queryFn: fetchMySubscription })
   const payments = useQuery({ queryKey: ['my-payments', user?.id], enabled: Boolean(user), queryFn: fetchMyPayments })
   const invoices = useQuery({ queryKey: ['my-invoices', user?.id], enabled: Boolean(user), queryFn: fetchMyInvoices })
+  const passes = useQuery({ queryKey: ['my-passes', user?.id], enabled: Boolean(user), queryFn: fetchMyPasses })
   const { data: settings } = usePublicSettings()
 
   const refreshAll = () =>
-    Promise.all(['my-plan', 'my-subscription', 'my-payments', 'my-invoices', 'storage-usage'].map((k) => qc.invalidateQueries({ queryKey: [k] })))
+    Promise.all(['my-plan', 'my-subscription', 'my-payments', 'my-invoices', 'my-passes', 'storage-usage'].map((k) => qc.invalidateQueries({ queryKey: [k] })))
 
   const synced = useRef(false)
   useEffect(() => {
-    if (!returning || !user || synced.current) return
+    if ((!returning && !returningPay) || !user || synced.current) return
     synced.current = true
-    syncSubscription()
+    ;(returningPay ? syncPassPayments() : syncSubscription())
       .catch(() => null)
       .finally(() => {
         void refreshAll()
         setParams({}, { replace: true })
       })
-  }, [returning, user])
+  }, [returning, returningPay, user])
 
   const cancel = useMutation({
     mutationFn: cancelSubscription,
@@ -141,6 +180,18 @@ export function MyPlanPage() {
     },
     onError: (e) => setMessage({ tone: 'error', text: e instanceof Error ? e.message : 'Não foi possível cancelar agora.' }),
   })
+
+  async function payOnce(code: string) {
+    setSubscribing(`pass:${code}`)
+    setMessage(null)
+    try {
+      const url = await startPassPayment(code)
+      window.location.assign(url)
+    } catch (e) {
+      setMessage({ tone: 'error', text: e instanceof Error ? e.message : 'Não foi possível abrir o pagamento.' })
+      setSubscribing(null)
+    }
+  }
 
   async function subscribe(code: string) {
     setSubscribing(code)
@@ -167,6 +218,7 @@ export function MyPlanPage() {
       {plan.data && (
         <section className="mt-6 max-w-xl rounded-sheet border border-rule bg-sheet p-5" aria-label="Uso do plano">
           <p className="font-semibold text-ink">{plan.data.name}</p>
+          {plan.data.paid_until && !hasOpen && <PaidUntil until={plan.data.paid_until} />}
           {plan.data.bonus && (
             <p className="mt-1 text-sm text-graphite">
               {plan.data.bonus_until
@@ -222,6 +274,34 @@ export function MyPlanPage() {
         </section>
       )}
 
+      {passes.data && passes.data.length > 0 && (
+        <section className="mt-8 max-w-xl" aria-labelledby="passes-title">
+          <h2 id="passes-title" className="heading text-xl text-ink">Pagamentos por Pix, débito ou boleto</h2>
+          <ul className="mt-3 divide-y divide-rule border-y border-rule text-sm">
+            {passes.data.map((x) => (
+              <li key={x.id} className="flex flex-wrap items-baseline justify-between gap-2 py-2.5">
+                <span className="text-graphite">
+                  {x.plan_name} · {x.months} {x.months === 1 ? 'mês' : 'meses'}
+                  <span className="block text-xs text-muted">
+                    {x.status === 'paid' && x.starts_at && x.ends_at
+                      ? `${date(x.starts_at)} a ${bonusLastDay(x.ends_at)}${x.payment_method ? ` · ${PAY_METHOD_LABEL[x.payment_method] ?? x.payment_method}` : ''}`
+                      : `Pedido em ${date(x.created_at)}`}
+                  </span>
+                </span>
+                <span className="text-right">
+                  <span className="font-semibold text-ink">{formatPlanPrice(x.price_cents)}</span>{' '}
+                  <span className="text-muted">{PASS_STATUS_LABEL[x.status] ?? x.status}</span>
+                  {x.status === 'pending' && x.checkout_url && (
+                    <a href={x.checkout_url} className="ml-2 font-semibold text-ink underline underline-offset-4">Continuar pagamento</a>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-sm text-muted">O comprovante fica na sua conta do Mercado Pago e no e-mail enviado por ele.</p>
+        </section>
+      )}
+
       {payments.data && payments.data.length > 0 && (
         <section className="mt-8 max-w-xl" aria-labelledby="payments-title">
           <h2 id="payments-title" className="heading text-xl text-ink">Tentativas de pagamento</h2>
@@ -241,10 +321,10 @@ export function MyPlanPage() {
       )}
 
       {settings && settings.plans.length > 0 && !hasOpen && (
-        <section className="mt-10" aria-labelledby="options-title">
-          <h2 id="options-title" className="heading text-2xl text-ink">Planos disponíveis</h2>
+        <section className="mt-10" id="planos" aria-labelledby="options-title">
+          <h2 id="options-title" className="heading text-2xl text-ink">{plan.data?.paid_until ? 'Renovar ou mudar de plano' : 'Planos disponíveis'}</h2>
           <PlansGrid plans={settings.plans} billingEnabled={settings.billingEnabled} showSignup={false}
-            onSubscribe={subscribe} subscribingCode={subscribing} />
+            onSubscribe={subscribe} onPayOnce={payOnce} subscribingCode={subscribing} />
         </section>
       )}
     </div>

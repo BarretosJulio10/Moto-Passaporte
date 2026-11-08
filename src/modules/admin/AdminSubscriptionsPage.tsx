@@ -6,7 +6,8 @@ import { Notice } from '@/components/Notice'
 import { formatPlanPrice, PERIOD_LABEL, type BillingPeriod } from '@/modules/plans/api'
 import { reconcileSubscriptions, STATUS_LABEL, type SubscriptionStatus } from '@/modules/plans/billingApi'
 import { INVOICE_STATUS_LABEL } from '@/modules/plans/billingApi'
-import { adminListInvoices, adminListPaymentEvents, adminListSubscriptions } from './paymentsApi'
+import { adminListInvoices, adminListPasses, adminListPaymentEvents, adminListSubscriptions } from './paymentsApi'
+import { PASS_STATUS_LABEL, PAY_METHOD_LABEL } from '@/modules/plans/billingApi'
 
 const RESULT_LABEL: Record<string, string> = {
   received: 'Recebido',
@@ -24,6 +25,7 @@ export function AdminSubscriptionsPage() {
   const subs = useQuery({ queryKey: ['admin-subscriptions'], queryFn: adminListSubscriptions })
   const events = useQuery({ queryKey: ['admin-payment-events'], queryFn: adminListPaymentEvents })
   const invoices = useQuery({ queryKey: ['admin-invoices'], queryFn: adminListInvoices })
+  const passes = useQuery({ queryKey: ['admin-passes'], queryFn: adminListPasses })
   const [summary, setSummary] = useState<{ tone: 'success' | 'error'; text: string } | null>(null)
 
   const reconcile = useMutation({
@@ -77,6 +79,32 @@ export function AdminSubscriptionsPage() {
                   {dt(s.last_synced_at)}
                 </p>
               </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mt-10" aria-labelledby="passes-title">
+        <h2 id="passes-title" className="heading text-2xl text-ink">Pagamentos por período (Pix, débito, boleto)</h2>
+        {passes.data?.length === 0 && <p className="mt-3 text-muted">Nenhum pagamento por período ainda.</p>}
+        <ul className="mt-3 divide-y divide-rule border-y border-rule text-sm">
+          {passes.data?.map((x) => (
+            <li key={x.id} className="flex flex-wrap justify-between gap-2 py-2.5">
+              <span className="text-graphite">
+                {x.user_name ?? 'Sem nome'} · {x.plan_name} · {x.months} {x.months === 1 ? 'mês' : 'meses'}
+                <span className="block text-xs text-muted">
+                  {x.status === 'paid' && x.starts_at && x.ends_at
+                    ? `Vale de ${new Date(x.starts_at).toLocaleDateString('pt-BR')} a ${new Date(new Date(x.ends_at).getTime() - 1).toLocaleDateString('pt-BR')}`
+                    : `Pedido em ${new Date(x.created_at).toLocaleDateString('pt-BR')}`}
+                  {x.payment_method ? ` · ${PAY_METHOD_LABEL[x.payment_method] ?? x.payment_method}` : ''}
+                  {x.provider_payment_id ? ` · MP ${x.provider_payment_id}` : ''}
+                  {x.environment === 'test' ? ' · teste' : ''}
+                </span>
+              </span>
+              <span>
+                <span className="font-semibold text-ink">{formatPlanPrice(x.price_cents)}</span>{' '}
+                <span className={x.status === 'failed' ? 'text-danger' : 'text-muted'}>{PASS_STATUS_LABEL[x.status] ?? x.status}</span>
+              </span>
             </li>
           ))}
         </ul>

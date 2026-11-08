@@ -109,6 +109,14 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-039 — Premium por período pago à vista: Pix, débito ou boleto
+**Data:** 08/11/2026 · **Status:** aceita (pedido do responsável: clientes que não querem informar cartão)
+- Além da assinatura automática no cartão de crédito, cada plano Premium pode ser pago **à vista por período** (mensal = 1 mês, semestral = 6, anual = 12) pelo Checkout do Mercado Pago: Pix, cartão de débito, boleto ou saldo. Nenhum dado de cartão fica salvo. Mesmo preço do plano (desconto para Pix fica para decisão comercial).
+- O Premium é liberado só quando a API do Mercado Pago confirma o pagamento (aviso + conferência no retorno e na conciliação a cada 6 h); valor menor que o do período não libera. Renovar antes do fim soma ao período atual. Pix pago depois de a tentativa expirar ainda é reconhecido (até 10 dias).
+- Avisos: 30 dias antes (só 6 e 12 meses), 15, 7, "vence hoje" e "venceu" (no sino; e-mail se a pessoa ligou). "Meu plano" mostra até quando vale, com "Renovar agora" nos últimos 30 dias; o painel destaca nos últimos 7. Venceu: volta ao gratuito sem perder dados.
+- Ordem do plano vigente: assinatura no cartão > período pago > bônus (cortesia) > gratuito. Quem assina no cartão durante um período pago tem a 1ª cobrança no fim do período. Reembolso e contestação encerram o período na hora.
+- Tabela `premium_passes` sem acesso direto (só funções); limite de 10 tentativas por dia por conta.
+
 ### ADR-038 — Alerta ativo por monitor externo (KI-030)
 **Data:** 08/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - Workflow *Monitor* no GitHub Actions a cada 30 min (fora do Supabase e da Vercel, para avisar mesmo quando eles caem): site, Auth e a função pública `system_health()`.

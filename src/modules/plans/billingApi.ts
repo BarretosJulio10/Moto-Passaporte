@@ -79,6 +79,40 @@ export async function startSubscription(planCode: string): Promise<string> {
 }
 
 export const syncSubscription = () => billing<{ ok: boolean }>({ action: 'sync' })
+
+// Premium por período pago à vista: Pix, débito, boleto ou saldo, sem cartão salvo (ADR-039).
+export async function startPassPayment(planCode: string): Promise<string> {
+  const r = await billing<{ checkout_url: string }>({ action: 'pay_pass', plan_code: planCode })
+  if (!/^https:\/\/([a-z0-9-]+\.)*mercadopago\.com(\.br)?\//.test(r.checkout_url)) throw new Error('Endereço de pagamento inesperado.')
+  return r.checkout_url
+}
+export const syncPassPayments = () => billing<{ ok: boolean }>({ action: 'sync_pass' })
+
+export type MyPass = Database['public']['Functions']['get_my_passes']['Returns'][number]
+export const PASS_STATUS_LABEL: Record<string, string> = {
+  pending: 'Aguardando pagamento',
+  paid: 'Pago',
+  failed: 'Não concluído',
+  expired: 'Não pago',
+  refunded: 'Reembolsado',
+}
+export const PAY_METHOD_LABEL: Record<string, string> = {
+  bank_transfer: 'Pix',
+  ticket: 'Boleto',
+  debit_card: 'Débito',
+  credit_card: 'Cartão',
+  account_money: 'Saldo Mercado Pago',
+}
+export async function fetchMyPasses(): Promise<MyPass[]> {
+  const { data, error } = await getSupabase().rpc('get_my_passes')
+  if (error) throw error
+  return data ?? []
+}
+
+/** Dias inteiros até o fim (último dia incluído). */
+export function daysLeft(endIso: string, now = new Date()): number {
+  return Math.ceil((new Date(endIso).getTime() - now.getTime()) / 86_400_000)
+}
 export const cancelSubscription = () => billing<{ ok: boolean }>({ action: 'cancel' })
 export const reconcileSubscriptions = () =>
   billing<{ ok: boolean; checked: number; synced: number; failures: string[] }>({ action: 'reconcile' })

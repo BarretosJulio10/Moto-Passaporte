@@ -122,11 +122,50 @@ export async function syncAuthorizedPayment(server: SupabaseClient, token: strin
   return await syncPreapproval(server, token, ap.preapproval_id)
 }
 
+type MpPayment = {
+  id: number | string
+  status?: string
+  transaction_amount?: number
+  date_approved?: string | null
+  payment_type_id?: string
+  external_reference?: string | null
+  metadata?: { preapproval_id?: string }
+  point_of_interaction?: { transaction_data?: { subscription_id?: string } }
+}
+
+const PASS_REF = /^pass:([0-9a-f-]{36})$/i
+
+/** Pagamento avulso de período Premium (Pix/débito/boleto — ADR-039). */
+async function applyPassPayment(server: SupabaseClient, passId: string, pay: MpPayment) {
+  const { data, error } = await server.rpc('billing_apply_pass_payment', {
+    p_pass_id: passId,
+    p_provider_payment_id: String(pay.id),
+    p_provider_status: pay.status ?? 'pending',
+    p_amount_cents: Math.round((pay.transaction_amount ?? 0) * 100),
+    p_paid_at: pay.date_approved ?? null,
+    p_payment_method: pay.payment_type_id ?? null,
+  })
+  if (error) throw new Error(`apply_pass: ${error.message}`)
+  return data as { result: string; detail: string }
+}
+
+/** Confere no Mercado Pago os pagamentos de um período (retorno do checkout e conciliação). */
+export async function syncPass(server: SupabaseClient, token: string, passId: string) {
+  const search = await mp<{ results?: MpPayment[] }>(
+    token,
+    `/v1/payments/search?external_reference=${encodeURIComponent(`pass:${passId}`)}&sort=date_created&criteria=desc&limit=20`,
+  )
+  const list = search.results ?? []
+  // Um aprovado basta; senão aplica o mais recente (pendente, recusado…).
+  const pick = list.find((p) => p.status === 'approved') ?? list[0]
+  if (!pick) return { result: 'processed', detail: 'Nenhum pagamento ainda' }
+  return await applyPassPayment(server, passId, pick)
+}
+
 export async function syncPayment(server: SupabaseClient, token: string, id: string) {
-  const pay = await mp<{
-    metadata?: { preapproval_id?: string }
-    point_of_interaction?: { transaction_data?: { subscription_id?: string } }
-  }>(token, `/v1/payments/${encodeURIComponent(id)}`)
+  const pay = await mp<MpPayment>(token, `/v1/payments/${encodeURIComponent(id)}`)
+  const passRef = PASS_REF.exec(pay.external_reference ?? '')
+  if (passRef) return await applyPassPayment(server, passRef[1]!, pay)
   const pre = pay.metadata?.preapproval_id ?? pay.point_of_interaction?.transaction_data?.subscription_id
   if (!pre) return { result: 'ignored', detail: 'Pagamento sem assinatura (não é do Moto Passaporte ou ainda sem vínculo)' }
   return await syncPreapproval(server, token, pre)

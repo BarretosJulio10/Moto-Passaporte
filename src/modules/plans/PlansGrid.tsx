@@ -21,6 +21,7 @@ export function PlansGrid({
   billingEnabled,
   showSignup = true,
   onSubscribe,
+  onPayOnce,
   subscribingCode,
 }: {
   plans: PublicPlan[]
@@ -28,6 +29,8 @@ export function PlansGrid({
   showSignup?: boolean
   /** No painel: assinar um plano Premium (só com a contratação liberada). */
   onSubscribe?: (code: string) => void
+  /** No painel: pagar um período à vista (Pix, débito ou boleto), sem cartão salvo. */
+  onPayOnce?: (code: string) => void
   subscribingCode?: string | null
 }) {
   const free = plans.find((p) => p.kind === 'free')
@@ -61,10 +64,18 @@ export function PlansGrid({
                   {p.price_note && <span className="block text-sm text-muted">{p.price_note}</span>}
                 </span>
                 {billingEnabled && onSubscribe && (
-                  <Button size="sm" className="mt-1 w-full" loading={subscribingCode === p.code} disabled={Boolean(subscribingCode)}
-                    onClick={() => onSubscribe(p.code)} aria-label={`Assinar ${p.name}`}>
-                    Assinar {p.name.replace(/^Premium\s*/i, '').toLowerCase() || 'Premium'}
-                  </Button>
+                  <div className="mt-1 grid w-full gap-2 sm:grid-cols-2">
+                    <Button size="sm" loading={subscribingCode === p.code} disabled={Boolean(subscribingCode)}
+                      onClick={() => onSubscribe(p.code)} aria-label={`Assinar ${p.name}`}>
+                      Cartão de crédito
+                    </Button>
+                    {onPayOnce && (
+                      <Button size="sm" variant="secondary" loading={subscribingCode === `pass:${p.code}`} disabled={Boolean(subscribingCode)}
+                        onClick={() => onPayOnce(p.code)} aria-label={`Pagar ${p.name} com Pix, débito ou boleto`}>
+                        Pix, débito ou boleto
+                      </Button>
+                    )}
+                  </div>
                 )}
               </li>
             ))}
@@ -79,9 +90,10 @@ export function PlansGrid({
             <ButtonLink to="/painel/plano" className="mt-5">Assinar o Premium</ButtonLink>
           )}
           {billingEnabled && (
-            <p className="mt-3 text-sm text-muted">
-              Pagamento pelo Mercado Pago, renovação automática. Cancele quando quiser: o Premium continua até o fim do período pago.
-            </p>
+            <div className="mt-3 space-y-1.5 text-sm text-muted">
+              <p><span className="font-semibold text-graphite">Cartão de crédito:</span> renova sozinho pelo Mercado Pago. Cancele quando quiser: o Premium continua até o fim do período pago.</p>
+              <p><span className="font-semibold text-graphite">Pix, débito ou boleto:</span> você paga o período à vista, sem cartão salvo. Avisamos antes de vencer para você renovar; renovando antes, o novo período começa quando o atual terminar.</p>
+            </div>
           )}
         </div>
       )}

@@ -1,7 +1,7 @@
 // Rotinas agendadas pelo pg_cron (ADR-029): conciliação com o Mercado Pago e limpeza de arquivos
 // sem vínculo. Sem login de usuário: autenticada pelo segredo do Vault no cabeçalho x-job-secret.
 // Resultado vai para job_runs, sem dados pessoais nem segredos.
-import { CORS, MpError, accessToken, reply, serverClient, syncPreapproval } from '../_shared/mercadopago.ts'
+import { CORS, MpError, accessToken, reply, serverClient, syncPass, syncPreapproval } from '../_shared/mercadopago.ts'
 
 const BUCKET = 'attachments'
 type Server = ReturnType<typeof serverClient>
@@ -19,11 +19,27 @@ async function reconcile(server: Server): Promise<Outcome> {
   const { data: targets, error } = await server.rpc('billing_reconcile_targets', { p_limit: 200 })
   if (error) throw new Error(`Falha ao listar assinaturas: ${error.message}`)
   const list = (targets ?? []) as { id: string; provider_subscription_id: string }[]
+  // Pagamentos avulsos (Pix/boleto) ainda pendentes: o aviso pode ter se perdido (ADR-039).
+  const { data: passTargets } = await server.rpc('billing_pass_targets', { p_user: null, p_limit: 100 })
+  const passes = (passTargets ?? []) as { id: string }[]
+  const failures: string[] = []
+  let passOk = 0
+  for (const t of passes) {
+    try {
+      await syncPass(server, token, t.id)
+      passOk++
+    } catch (e) {
+      failures.push(`pix ${t.id.slice(0, 8)}: ${e instanceof Error ? e.message.slice(0, 120) : 'erro'}`)
+    }
+  }
+  const passNote = passes.length ? ` ${passOk} de ${passes.length} pagamento(s) avulso(s).` : ''
   if (list.length === 0) {
-    return { status: 'ok', detail: `Nenhuma assinatura para conferir${settings?.value === true ? '' : ' (contratação desligada)'}.` }
+    return {
+      status: failures.length ? 'failed' : 'ok',
+      detail: `Nenhuma assinatura para conferir${settings?.value === true ? '' : ' (contratação desligada)'}.${passNote}` + (failures.length ? ` Falhas: ${failures.slice(0, 5).join('; ')}` : ''),
+    }
   }
   let ok = 0
-  const failures: string[] = []
   for (const t of list) {
     try {
       await syncPreapproval(server, token, t.provider_subscription_id)
@@ -32,7 +48,7 @@ async function reconcile(server: Server): Promise<Outcome> {
       failures.push(`${t.id.slice(0, 8)}: ${e instanceof Error ? e.message.slice(0, 120) : 'erro'}`)
     }
   }
-  const detail = `${ok} de ${list.length} assinatura(s) conferida(s).` + (failures.length ? ` Falhas: ${failures.slice(0, 5).join('; ')}` : '')
+  const detail = `${ok} de ${list.length} assinatura(s) conferida(s).${passNote}` + (failures.length ? ` Falhas: ${failures.slice(0, 5).join('; ')}` : '')
   return { status: failures.length ? 'failed' : 'ok', detail }
 }
 

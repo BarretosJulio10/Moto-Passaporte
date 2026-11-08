@@ -44,6 +44,8 @@ export type MyPlan = {
   /** Premium por cortesia (bônus) em vigor e quando termina (ADR-037). */
   bonus?: boolean
   bonus_until?: string | null
+  /** Premium pago por período (Pix/débito/boleto): até quando (ADR-039). */
+  paid_until?: string | null
 }
 
 export type AdminPlan = Database['public']['Functions']['admin_list_plans']['Returns'][number]

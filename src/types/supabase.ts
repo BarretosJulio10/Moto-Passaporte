@@ -990,6 +990,14 @@ export type Database = {
         }[]
       }
       admin_get_user: { Args: { p_reason: string; p_user_id: string }; Returns: Json }
+      get_my_passes: {
+        Args: Record<PropertyKey, never>
+        Returns: { checkout_url: string | null; created_at: string; ends_at: string | null; id: string; months: number; paid_at: string | null; payment_method: string | null; plan_name: string; price_cents: number; starts_at: string | null; status: string }[]
+      }
+      admin_list_passes: {
+        Args: { p_limit?: number }
+        Returns: { created_at: string; ends_at: string | null; environment: string; id: string; months: number; paid_at: string | null; payment_method: string | null; plan_name: string; price_cents: number; provider_payment_id: string | null; starts_at: string | null; status: string; user_name: string | null }[]
+      }
       admin_grant_premium: { Args: { p_plan_id: string; p_reason: string; p_until: string | null; p_user_id: string }; Returns: string }
       admin_revoke_premium: { Args: { p_reason: string; p_user_id: string }; Returns: undefined }
       admin_get_premium_grant: {

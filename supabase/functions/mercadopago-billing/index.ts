@@ -1,15 +1,15 @@
 // Ações de assinatura do usuário e conciliação do admin (PRD 8.2, 8.3; ADR-020).
 // O estado só muda a partir do que o Mercado Pago confirma.
 import {
-  CORS, MpError, accessToken, mp, reply, serverClient, syncPreapproval, userClient,
+  CORS, MpError, accessToken, mp, reply, serverClient, syncPass, syncPreapproval, userClient,
 } from '../_shared/mercadopago.ts'
 
 const MONTHS: Record<string, number> = { monthly: 1, semiannual: 6, annual: 12 }
 
-function backUrl(req: Request): string | null {
+function backUrl(req: Request, kind: 'assinatura' | 'pagamento' = 'assinatura'): string | null {
   const origin = req.headers.get('Origin') ?? ''
   if (/^https:\/\/[a-z0-9.-]+$/i.test(origin) || /^http:\/\/localhost(:\d+)?$/.test(origin)) {
-    return `${origin}/painel/plano?assinatura=retorno`
+    return `${origin}/painel/plano?${kind}=retorno`
   }
   return null
 }
@@ -80,6 +80,53 @@ Deno.serve(async (req) => {
         await server.rpc('billing_fail_checkout', { p_subscription_id: p.subscription_id, p_reason: `Mercado Pago: ${msg}` })
         return reply(502, { message: 'O Mercado Pago não aceitou a assinatura agora. Tente de novo em alguns minutos.' })
       }
+    }
+
+    // Período pago à vista: Pix, débito, boleto ou saldo, sem cartão salvo (ADR-039).
+    if (body.action === 'pay_pass') {
+      if (!body.plan_code || !/^[a-z0-9_]{2,40}$/.test(body.plan_code)) return reply(400, { message: 'Plano inválido.' })
+      const back = backUrl(req, 'pagamento')
+      if (!back) return reply(400, { message: 'Origem do pedido não reconhecida.' })
+      const { data: prep, error } = await server.rpc('billing_prepare_pass', { p_user: user.id, p_plan_code: body.plan_code })
+      if (error) return reply(409, { message: error.message })
+      const p = prep as { pass_id: string; payer_email: string; plan_name: string; months: number; price_cents: number; currency: string }
+      const token = await accessToken(server)
+      try {
+        const pref = await mp<{ id: string; init_point: string }>(token, '/checkout/preferences', {
+          method: 'POST',
+          headers: { 'X-Idempotency-Key': p.pass_id },
+          body: JSON.stringify({
+            items: [{
+              id: body.plan_code,
+              title: `Moto Passaporte — ${p.plan_name} (${p.months} ${p.months === 1 ? 'mês' : 'meses'})`,
+              quantity: 1,
+              unit_price: p.price_cents / 100,
+              currency_id: p.currency,
+            }],
+            payer: { email: p.payer_email },
+            external_reference: `pass:${p.pass_id}`,
+            back_urls: { success: back, pending: back, failure: back },
+            auto_return: 'approved',
+            payment_methods: { installments: 1 },
+            statement_descriptor: 'MOTOPASSAPORTE',
+          }),
+        })
+        await server.rpc('billing_attach_pass_checkout', { p_pass_id: p.pass_id, p_preference_id: pref.id, p_checkout_url: pref.init_point })
+        return reply(200, { checkout_url: pref.init_point })
+      } catch (e) {
+        const msg = e instanceof MpError ? e.message : 'falha de comunicação'
+        await server.rpc('billing_fail_pass_checkout', { p_pass_id: p.pass_id })
+        return reply(502, { message: `O Mercado Pago não abriu o pagamento agora (${msg}). Tente de novo em alguns minutos.` })
+      }
+    }
+
+    if (body.action === 'sync_pass') {
+      const { data: targets } = await server.rpc('billing_pass_targets', { p_user: user.id, p_limit: 5 })
+      const list = (targets ?? []) as { id: string }[]
+      if (list.length === 0) return reply(200, { ok: true, detail: 'Nada pendente.' })
+      const token = await accessToken(server)
+      for (const t of list) await syncPass(server, token, t.id)
+      return reply(200, { ok: true, detail: `${list.length} pagamento(s) conferido(s).` })
     }
 
     if (body.action === 'sync' || body.action === 'cancel') {
