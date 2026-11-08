@@ -175,6 +175,12 @@ export function AdminDashboardPage() {
             </Link>
           </li>
           <li>
+            <Link to="/admin/privacidade" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
+              <span className="font-semibold text-ink">Pedidos de privacidade</span>
+              <span className="block text-sm text-muted">Exclusão, correção e dúvidas dos titulares (LGPD), com prazo de 15 dias.</span>
+            </Link>
+          </li>
+          <li>
             <Link to="/admin/armazenamento" className="block py-3 hover:bg-sheet focus-visible:bg-sheet">
               <span className="font-semibold text-ink">Armazenamento</span>
               <span className="block text-sm text-muted">Consumo por categoria, conta, moto e oficina; alertas de limite; limpeza de envios sem registro.</span>

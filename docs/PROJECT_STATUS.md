@@ -1,15 +1,15 @@
 # PROJECT_STATUS — Moto Passaporte
 
-**Versão atual:** 0.34.0
-**Data:** 07/11/2026
+**Versão atual:** 0.35.0
+**Data:** 08/11/2026
 **Fase:** Fases 1 a 4 concluídas. Fases 1 a 5 concluídas (Mercado Pago aguardando teste ponta a ponta). Fase 6 em andamento: painel administrativo
-**Progresso geral:** 87,5% (35 de 40 itens do PRD — quadro em `PRD_CHECKLIST.md`)
+**Progresso geral:** 97,5% (39 de 40 itens do PRD — quadro em `PRD_CHECKLIST.md`)
 
 ## Ambientes
 
 | Ambiente | URL | Banco | Situação |
 |---|---|---|---|
-| Desenvolvimento | https://moto-passaporte.vercel.app (Vercel, deploy automático da `main`) | Supabase `ripgenhykaajcnzdxoid` (MOTO_Passaporte, us-east-1, PG 17) | migrações até `public_rate_limit` aplicadas; Edge Functions `mercadopago-check`, `mercadopago-billing`, `mercadopago-webhook`, `storage-cleanup`, `scheduled-jobs`, `attachment-check` e `shared-file` publicadas; rotinas agendadas no pg_cron |
+| Desenvolvimento | https://moto-passaporte.vercel.app (Vercel, deploy automático da `main`) | Supabase `ripgenhykaajcnzdxoid` (MOTO_Passaporte, us-east-1, PG 17) | migrações até `privacy_rights` aplicadas; Edge Functions `mercadopago-check`, `mercadopago-billing`, `mercadopago-webhook`, `storage-cleanup`, `scheduled-jobs`, `attachment-check` e `shared-file` publicadas; rotinas agendadas no pg_cron |
 | Homologação | — | — | não configurado |
 | Produção | — | — | não configurado |
 

@@ -109,6 +109,13 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-036 — Direitos do titular: cópia dos dados, pedidos e exclusão por anonimização (LGPD art. 18; PRD 15.6)
+**Data:** 08/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável; texto jurídico pendente de revisão)
+- Em "Minha conta" o usuário baixa a cópia dos seus dados (JSON: conta, motos atuais com placas, km, manutenções e lembretes, motos anteriores, diário, links, transferências, oficinas, assinaturas, faturas, pagamentos, avisos e pedidos). Ficam de fora caminhos de arquivo, códigos de links, chassi (cifrado) e dados de terceiros.
+- Pedidos de exclusão, correção, acesso ou outro: o usuário abre (até 3 em andamento), acompanha e cancela enquanto pendente. A equipe responde em /admin/privacidade com motivo auditado; o titular recebe aviso.
+- Exclusão = **anonimização**: o histórico pertence à moto (PRD 10), então a conta não é apagada do Auth. Apaga nome, e-mail, telefone, diário e fotos do diário, avisos, lembretes e pedidos de placa; bloqueia o login. Mantém, sem identificação, histórico das motos, transferências, cobranças e auditoria (obrigação legal). Só depois de transferir ou arquivar as motos, encerrar assinatura e sair de oficinas.
+- Tabela `privacy_requests` sem acesso direto (só por funções). Procedimento e bases legais em `docs/LGPD.md`.
+
 ### ADR-035 — Limite de consultas anônimas por conexão (KI-003)
 **Data:** 08/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - Passaporte público e passaporte compartilhado: até 120 consultas por hora por conexão, cada um com o seu limite (configurações `public_passport_views_per_hour` e `shared_passport_views_per_hour`).

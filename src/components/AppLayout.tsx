@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Logo } from '@/components/Logo'
 import { Button } from '@/components/Button'
@@ -36,6 +36,7 @@ export function AppLayout() {
   })
   const count = unread.data ?? 0
 
+  const { pathname } = useLocation()
   const tab = ({ isActive }: { isActive: boolean }) =>
     `whitespace-nowrap border-b-2 px-1 pb-2.5 pt-1 text-sm font-semibold ${
       isActive ? 'border-ink text-ink' : 'border-transparent text-muted hover:text-ink'
@@ -82,8 +83,9 @@ export function AppLayout() {
           </div>
         </div>
         <nav aria-label="Áreas da conta" className="mx-auto mt-3 flex max-w-5xl gap-6 overflow-x-auto px-4 sm:px-5">
-          <NavLink to="/painel" className={tab}>Minhas motos</NavLink>
+          <NavLink to="/painel" className={({ isActive }) => tab({ isActive: isActive && !pathname.startsWith('/painel/conta') })}>Minhas motos</NavLink>
           <NavLink to="/oficina" className={tab}>Minha oficina</NavLink>
+          <NavLink to="/painel/conta" className={tab}>Minha conta</NavLink>
           {isAdmin && <NavLink to="/admin" className={tab}>Administração</NavLink>}
         </nav>
       </header>

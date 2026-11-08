@@ -42,6 +42,8 @@ const AdminSettingsPage = lazy(() => import('@/modules/admin/AdminSettingsPage')
 const AdminAuditPage = lazy(() => import('@/modules/admin/AdminAuditPage').then((m) => ({ default: m.AdminAuditPage })))
 const AdminClaimsPage = lazy(() => import('@/modules/admin/AdminClaimsPage').then((m) => ({ default: m.AdminClaimsPage })))
 const AdminStoragePage = lazy(() => import('@/modules/admin/AdminStoragePage').then((m) => ({ default: m.AdminStoragePage })))
+const AccountPage = lazy(() => import('@/modules/account/AccountPage').then((m) => ({ default: m.AccountPage })))
+const AdminPrivacyPage = lazy(() => import('@/modules/admin/AdminPrivacyPage').then((m) => ({ default: m.AdminPrivacyPage })))
 const NotificationsPage = lazy(() => import('@/modules/notifications/NotificationsPage').then((m) => ({ default: m.NotificationsPage })))
 const AdminWorkshopsPage = lazy(() => import('@/modules/admin/AdminWorkshopsPage').then((m) => ({ default: m.AdminWorkshopsPage })))
 const MyPlanPage = lazy(() => import('@/modules/plans/MyPlanPage').then((m) => ({ default: m.MyPlanPage })))
@@ -100,6 +102,7 @@ export const routes = [
           { path: '/painel/motos/nova', element: <RegisterMotorcyclePage /> },
           { path: '/painel/plano', element: <MyPlanPage /> },
           { path: '/painel/notificacoes', element: <NotificationsPage /> },
+          { path: '/painel/conta', element: <AccountPage /> },
           { path: '/painel/plano/recibo/:id', element: <ReceiptPage /> },
           { path: '/painel/motos/:id', element: <MotorcyclePage /> },
           { path: '/painel/motos/:id/historico', element: <TimelinePage /> },
@@ -178,6 +181,14 @@ export const routes = [
             element: (
               <RequireAdmin>
                 <AdminAuditPage />
+              </RequireAdmin>
+            ),
+          },
+          {
+            path: '/admin/privacidade',
+            element: (
+              <RequireAdmin>
+                <AdminPrivacyPage />
               </RequireAdmin>
             ),
           },

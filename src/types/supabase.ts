@@ -837,6 +837,31 @@ export type Database = {
       admin_send_notice: { Args: { p_user_id: string; p_title: string; p_body: string; p_reason: string }; Returns: undefined }
       get_my_chassis: { Args: { p_motorcycle_id: string }; Returns: string | null }
       set_my_chassis: { Args: { p_motorcycle_id: string; p_chassis: string }; Returns: undefined }
+      export_my_data: { Args: Record<PropertyKey, never>; Returns: Json }
+      create_privacy_request: { Args: { p_kind: string; p_details?: string | null }; Returns: string }
+      cancel_my_privacy_request: { Args: { p_id: string }; Returns: undefined }
+      get_my_privacy_requests: {
+        Args: Record<PropertyKey, never>
+        Returns: { id: string; kind: string; details: string | null; status: string; reply: string | null; created_at: string; resolved_at: string | null }[]
+      }
+      admin_list_privacy_requests: {
+        Args: { p_status?: string; p_limit?: number }
+        Returns: {
+          id: string
+          user_id: string
+          full_name: string | null
+          email_masked: string | null
+          kind: string
+          details: string | null
+          status: string
+          reply: string | null
+          created_at: string
+          resolved_at: string | null
+          motorcycles: number
+        }[]
+      }
+      admin_anonymize_account: { Args: { p_request_id: string; p_reason: string }; Returns: Json }
+      admin_resolve_privacy_request: { Args: { p_id: string; p_status: string; p_reply: string; p_reason: string }; Returns: undefined }
       my_admin_access: { Args: Record<PropertyKey, never>; Returns: Json }
       session_aal: { Args: Record<PropertyKey, never>; Returns: string }
       admin_job_status: {

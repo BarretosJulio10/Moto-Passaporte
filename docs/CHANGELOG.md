@@ -9,6 +9,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.35.0] — 08/11/2026 — Direitos do titular (LGPD)
+
+### Adicionado
+- Aba "Minha conta" (/painel/conta): dados da conta, botão "Baixar cópia dos meus dados" e pedidos de privacidade (exclusão, correção, acesso, outro), com acompanhamento e cancelamento (ADR-036).
+- /admin/privacidade: fila de pedidos, resposta ao titular com motivo auditado e exclusão por anonimização com conferências (motos, assinatura, oficina, transferência pendente).
+- `docs/LGPD.md`: dados tratados, finalidades, bases legais, retenção e procedimento de atendimento (rascunho para revisão jurídica).
+
+### Operação
+- `support_email` definido (KI-015). MFA do administrador ativado. Contratação pelo site liberada após teste de conexão com sucesso em produção.
+
+### Testes
+- Banco local: 38 verificações (phase6m). Supabase real (com desfazer): permissões fechadas para visitantes, RLS ligado, cópia com 17 blocos, criar/listar/cancelar pedido e bloqueio da anonimização de pedido que não é de exclusão.
+
+### Rollback desta versão
+- `supabase/rollback/20261108161525_privacy_rights.down.sql` e publicar o site anterior.
+
 ## [0.34.0] — 08/11/2026 — Limite de consultas anônimas
 
 ### Segurança
