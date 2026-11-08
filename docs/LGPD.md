@@ -19,6 +19,7 @@ PRD 15.6 · ADR-036 · **Rascunho técnico: precisa de revisão jurídica antes 
 | Assinaturas, faturas, pagamentos | Cobrança e obrigações fiscais | Obrigação legal | 5 anos (fiscal), sem dados de contato após exclusão |
 | Transferências (inclui e-mail do comprador informado pelo vendedor) | Prova da transferência de titularidade | Exercício regular de direitos | Mantido (histórico da moto) |
 | Auditoria (quem fez o quê) | Segurança e prova | Legítimo interesse / exercício de direitos | Mantida; acesso só de administradores com MFA |
+| Aparelhos com notificação no celular (endereço de push do navegador, chaves públicas, nome do aparelho como "Android · Chrome") | Enviar os avisos ao celular | Consentimento (o titular ativa e desativa) | Até desativar, desinstalar ou 5 falhas seguidas; apagados com a conta. O texto vai criptografado (ADR-040) |
 | Resumo do IP com chave diária (limite de consultas) | Segurança contra abuso | Legítimo interesse | 2 dias (ADR-035) |
 | Pesquisas de placa por oficinas (placa em resumo) | Segurança e limite | Legítimo interesse | Ver `plate_search_log` |
 

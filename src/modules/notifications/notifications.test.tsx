@@ -6,8 +6,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const calls: Array<{ fn: string; args: unknown[] }> = []
 let prefs = [
-  { kind: 'payment_failed', optional: false, in_app: true, email: false },
-  { kind: 'reminder_due', optional: true, in_app: true, email: false },
+  { kind: 'payment_failed', optional: false, in_app: true, email: false, push: true },
+  { kind: 'reminder_due', optional: true, in_app: true, email: false, push: false },
 ]
 
 vi.mock('./api', async () => {
@@ -24,11 +24,23 @@ vi.mock('./api', async () => {
     fetchPreferences: async () => prefs,
     setPreference: async (...args: unknown[]) => {
       calls.push({ fn: 'setPreference', args })
-      prefs = prefs.map((p) => (p.kind === args[0] ? { ...p, in_app: args[1] as boolean, email: args[2] as boolean } : p))
+      prefs = prefs.map((p) => (p.kind === args[0] ? { ...p, in_app: args[1] as boolean, email: args[2] as boolean, push: args[3] as boolean } : p))
     },
     fetchUnreadCount: async () => 3,
   }
 })
+
+let support = 'ok'
+let subscribed: string | null = null
+vi.mock('./push', () => ({
+  pushSupport: () => support,
+  currentSubscription: async () => (subscribed ? { endpoint: subscribed } : null),
+  enablePush: async () => { calls.push({ fn: 'enablePush', args: [] }); subscribed = 'https://fcm.googleapis.com/fcm/send/abc123456789' },
+  disablePush: async () => { calls.push({ fn: 'disablePush', args: [] }); subscribed = null },
+  sendTestPush: async () => { calls.push({ fn: 'sendTestPush', args: [] }) },
+  fetchMyDevices: async () => (subscribed ? [{ id: 'd1', label: 'Android · Chrome', created_at: '2026-11-08T12:00:00Z', last_used_at: null, endpoint_hint: 'abc123456789' }] : []),
+  removeDevice: async () => undefined,
+}))
 
 import { NotificationsPage } from './NotificationsPage'
 
@@ -38,6 +50,8 @@ function wrap(node: React.ReactNode) {
 }
 
 beforeEach(() => {
+  support = 'ok'
+  subscribed = null
   calls.length = 0
   prefs = prefs.map((p) => ({ ...p, in_app: true, email: false }))
 })
@@ -58,8 +72,34 @@ describe('NotificationsPage', () => {
     const table = await screen.findByRole('table')
     expect(within(table).getByLabelText(/Falhas e atrasos de pagamento no site \(essencial\)/)).toBeDisabled()
     await user.click(within(table).getByLabelText('Lembretes de manutenção no site'))
-    await waitFor(() => expect(calls.find((c) => c.fn === 'setPreference')?.args).toEqual(['reminder_due', false, false]))
+    await waitFor(() => expect(calls.find((c) => c.fn === 'setPreference')?.args).toEqual(['reminder_due', false, false, false]))
     await user.click(within(table).getByLabelText('Falhas e atrasos de pagamento por e-mail'))
-    await waitFor(() => expect(calls.filter((c) => c.fn === 'setPreference')[1]?.args).toEqual(['payment_failed', true, true]))
+    await waitFor(() => expect(calls.filter((c) => c.fn === 'setPreference')[1]?.args).toEqual(['payment_failed', true, true, true]))
+    await user.click(within(table).getByLabelText('Lembretes de manutenção no celular'))
+    await waitFor(() => expect(calls.filter((c) => c.fn === 'setPreference')[2]?.args).toEqual(['reminder_due', false, false, true]))
+  })
+
+  it('ativa o celular com um toque, envia teste e lista o aparelho', async () => {
+    const user = userEvent.setup()
+    wrap(<NotificationsPage />)
+    await user.click(await screen.findByRole('button', { name: 'Ativar notificações neste aparelho' }))
+    expect(await screen.findByText(/Enviamos um aviso de teste/)).toBeVisible()
+    expect(calls.map((c) => c.fn)).toEqual(expect.arrayContaining(['enablePush', 'sendTestPush']))
+    expect(await screen.findByText('✓ Ativadas neste aparelho')).toBeVisible()
+    expect(await screen.findByText(/Android · Chrome \(este\)/)).toBeVisible()
+  })
+
+  it('iPhone sem instalar: explica como instalar em vez de pedir permissão', async () => {
+    support = 'ios-needs-install'
+    wrap(<NotificationsPage />)
+    expect(await screen.findByText('No iPhone, instale o app primeiro.')).toBeVisible()
+    expect(screen.queryByRole('button', { name: /Ativar notificações/ })).toBeNull()
+    expect(screen.getByRole('link', { name: 'Ver o passo a passo' })).toHaveAttribute('href', '/instalar')
+  })
+
+  it('bloqueado no aparelho: orienta a liberar', async () => {
+    support = 'blocked'
+    wrap(<NotificationsPage />)
+    expect(await screen.findByText(/estão bloqueadas para o Moto Passaporte/)).toBeVisible()
   })
 })

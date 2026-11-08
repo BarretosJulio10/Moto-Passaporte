@@ -1,0 +1,25 @@
+{
+  "name": "Moto Passaporte",
+  "short_name": "Moto Passaporte",
+  "description": "O histórico da sua moto: manutenções, quilometragem, comprovantes e oficinas.",
+  "id": "/painel",
+  "start_url": "/painel?origem=app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EEF1EA",
+  "theme_color": "#1C2B4A",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": ["auto", "productivity", "utilities"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Minhas motos", "url": "/painel", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Notificações", "url": "/painel/notificacoes", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Minha oficina", "url": "/oficina", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

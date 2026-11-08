@@ -47,7 +47,7 @@ export async function fetchPreferences(): Promise<NotificationPreference[]> {
   return data ?? []
 }
 
-export async function setPreference(kind: string, inApp: boolean, email: boolean): Promise<void> {
-  const { error } = await getSupabase().rpc('set_my_notification_preference', { p_kind: kind, p_in_app: inApp, p_email: email })
+export async function setPreference(kind: string, inApp: boolean, email: boolean, push?: boolean): Promise<void> {
+  const { error } = await getSupabase().rpc('set_my_notification_preference', { p_kind: kind, p_in_app: inApp, p_email: email, p_push: push ?? null })
   if (error) throw error
 }

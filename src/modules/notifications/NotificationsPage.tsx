@@ -4,6 +4,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 import { Button } from '@/components/Button'
 import { Notice } from '@/components/Notice'
 import { translateDbError } from '@/core/shared/dbErrors'
+import { PushCard } from './PushCard'
 import { KIND_LABEL, fetchNotifications, fetchPreferences, markRead, setPreference, type NotificationPreference } from './api'
 
 const when = (iso: string) => new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
@@ -13,7 +14,7 @@ function Preferences() {
   const prefs = useQuery({ queryKey: ['notification-prefs'], queryFn: fetchPreferences })
   const [error, setError] = useState<string | null>(null)
   const save = useMutation({
-    mutationFn: (p: NotificationPreference) => setPreference(p.kind, p.in_app, p.email),
+    mutationFn: (p: NotificationPreference) => setPreference(p.kind, p.in_app, p.email, p.push),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['notification-prefs'] }),
     onError: (e) => setError(translateDbError(e as { code?: string; message?: string })),
   })
@@ -22,14 +23,14 @@ function Preferences() {
     <section className="mt-12" aria-labelledby="prefs-title">
       <h2 id="prefs-title" className="heading text-2xl text-ink">Preferências</h2>
       <p className="mt-1 max-w-2xl text-sm text-muted">
-        Avisos sobre pagamentos, oficinas e transferências são essenciais e sempre aparecem aqui. O envio por e-mail ainda não está ativo: se marcar,
-        você passa a receber quando for ligado.
+        Avisos sobre pagamentos, oficinas e transferências são essenciais e sempre aparecem aqui. "No celular" vale para os aparelhos com
+        notificação ativada. O envio por e-mail ainda não está ativo: se marcar, você passa a receber quando for ligado.
       </p>
       {error && <div className="mt-3"><Notice tone="error">{error}</Notice></div>}
       <div className="mt-4 overflow-x-auto">
         <table className="w-full min-w-[22rem] text-sm">
           <thead className="text-left text-muted">
-            <tr><th className="py-2 pr-3 font-normal">Aviso</th><th className="py-2 pr-3 font-normal">No site</th><th className="py-2 font-normal">Por e-mail</th></tr>
+            <tr><th className="py-2 pr-3 font-normal">Aviso</th><th className="py-2 pr-3 font-normal">No site</th><th className="py-2 pr-3 font-normal">No celular</th><th className="py-2 font-normal">Por e-mail</th></tr>
           </thead>
           <tbody className="divide-y divide-rule border-y border-rule">
             {prefs.data.map((p) => (
@@ -39,6 +40,11 @@ function Preferences() {
                   <input type="checkbox" className="h-4 w-4 accent-ink" checked={p.in_app} disabled={!p.optional || save.isPending}
                     aria-label={`${KIND_LABEL[p.kind] ?? p.kind} no site${p.optional ? '' : ' (essencial)'}`}
                     onChange={(e) => save.mutate({ ...p, in_app: e.target.checked })} />
+                </td>
+                <td className="py-2 pr-3">
+                  <input type="checkbox" className="h-4 w-4 accent-ink" checked={p.push} disabled={save.isPending}
+                    aria-label={`${KIND_LABEL[p.kind] ?? p.kind} no celular`}
+                    onChange={(e) => save.mutate({ ...p, push: e.target.checked })} />
                 </td>
                 <td className="py-2">
                   <input type="checkbox" className="h-4 w-4 accent-ink" checked={p.email} disabled={save.isPending}
@@ -78,6 +84,7 @@ export function NotificationsPage() {
     <div>
       <h1 className="heading text-3xl text-ink">Notificações</h1>
       <p className="mt-1 text-muted">Avisos sobre suas motos, sua oficina e sua assinatura.</p>
+      <PushCard />
       {list.isError && <div className="mt-6"><Notice tone="error">Não foi possível carregar as notificações.</Notice></div>}
       {list.isSuccess && items.length === 0 && <p className="mt-8 text-muted">Nenhuma notificação por enquanto.</p>}
       {items.length > 0 && (

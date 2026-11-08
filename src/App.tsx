@@ -6,6 +6,8 @@ import { HomePage } from '@/modules/public_site/HomePage'
 import { LegalPage } from '@/modules/public_site/LegalPage'
 import { FaqPage } from '@/modules/public_site/FaqPage'
 import { ContactPage } from '@/modules/public_site/ContactPage'
+import { InstallPage } from '@/modules/public_site/InstallPage'
+import { UpdateBanner } from '@/core/pwa/PwaBanners'
 import { SignUpPage } from '@/modules/auth/SignUpPage'
 import { SignInPage } from '@/modules/auth/SignInPage'
 import { ForgotPasswordPage } from '@/modules/auth/ForgotPasswordPage'
@@ -57,6 +59,7 @@ function Root() {
     <>
       <ScrollRestoration />
       <Outlet />
+      <UpdateBanner />
     </>
   )
 }
@@ -105,6 +108,7 @@ export const routes = [
           { path: '/', element: <HomePage /> },
           { path: '/perguntas-frequentes', element: <FaqPage /> },
           { path: '/contato', element: <ContactPage /> },
+          { path: '/instalar', element: <InstallPage /> },
           { path: '/criar-conta', element: <SignUpPage /> },
           { path: '/entrar', element: <SignInPage /> },
           { path: '/recuperar-senha', element: <ForgotPasswordPage /> },

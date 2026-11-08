@@ -831,9 +831,9 @@ export type Database = {
       mark_my_notifications_read: { Args: { p_ids?: string[] }; Returns: number }
       get_my_notification_preferences: {
         Args: Record<PropertyKey, never>
-        Returns: { kind: string; optional: boolean; in_app: boolean; email: boolean }[]
+        Returns: { kind: string; optional: boolean; in_app: boolean; email: boolean; push: boolean }[]
       }
-      set_my_notification_preference: { Args: { p_kind: string; p_in_app: boolean; p_email: boolean }; Returns: undefined }
+      set_my_notification_preference: { Args: { p_kind: string; p_in_app: boolean; p_email: boolean; p_push?: boolean | null }; Returns: undefined }
       admin_send_notice: { Args: { p_user_id: string; p_title: string; p_body: string; p_reason: string }; Returns: undefined }
       get_my_chassis: { Args: { p_motorcycle_id: string }; Returns: string | null }
       set_my_chassis: { Args: { p_motorcycle_id: string; p_chassis: string }; Returns: undefined }
@@ -990,6 +990,15 @@ export type Database = {
         }[]
       }
       admin_get_user: { Args: { p_reason: string; p_user_id: string }; Returns: Json }
+      get_push_public_key: { Args: Record<PropertyKey, never>; Returns: string | null }
+      register_push_subscription: { Args: { p_auth: string; p_endpoint: string; p_label?: string | null; p_p256dh: string }; Returns: string }
+      unregister_push_subscription: { Args: { p_endpoint: string }; Returns: undefined }
+      get_my_push_devices: {
+        Args: Record<PropertyKey, never>
+        Returns: { created_at: string; endpoint_hint: string; id: string; label: string | null; last_used_at: string | null }[]
+      }
+      delete_my_push_device: { Args: { p_id: string }; Returns: undefined }
+      send_my_test_push: { Args: Record<PropertyKey, never>; Returns: undefined }
       get_my_passes: {
         Args: Record<PropertyKey, never>
         Returns: { checkout_url: string | null; created_at: string; ends_at: string | null; id: string; months: number; paid_at: string | null; payment_method: string | null; plan_name: string; price_cents: number; starts_at: string | null; status: string }[]

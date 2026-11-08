@@ -9,6 +9,7 @@ import { fetchPendingRequests } from '@/modules/workshop_access/api'
 import { PendingRequestsNotice } from '@/modules/workshop_access/OwnerAccessSection'
 import { IncomingTransfers, PreviousMotorcycles } from '@/modules/transfers/IncomingTransfers'
 import { PlanSummary } from '@/modules/plans/MyPlanPage'
+import { PushPrompt } from '@/modules/notifications/PushPrompt'
 import { DueReminders } from '@/modules/reminders/DueReminders'
 import { MyClaims, OwnershipNotices } from '@/modules/claims/MyClaims'
 
@@ -37,6 +38,7 @@ export function DashboardPage() {
       <div className="mt-6">
         <IncomingTransfers />
       </div>
+      {hasMotos && <PushPrompt />}
 
       <div className="mt-10 flex flex-wrap items-baseline justify-between gap-3">
         <h2 className="font-semibold text-ink">Minhas motos</h2>

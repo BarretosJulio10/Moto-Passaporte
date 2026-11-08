@@ -1,11 +1,12 @@
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Logo } from '@/components/Logo'
 import { Button } from '@/components/Button'
 import { useAuth } from '@/core/auth/AuthProvider'
 import { getSupabase } from '@/lib/supabase'
 import { fetchUnreadCount } from '@/modules/notifications/api'
+import { InstallBanner } from '@/core/pwa/PwaBanners'
 
 /**
  * Layout da área autenticada. A mesma conta pode alternar entre contextos
@@ -35,6 +36,24 @@ export function AppLayout() {
     refetchOnWindowFocus: true,
   })
   const count = unread.data ?? 0
+  const qc = useQueryClient()
+  // Aviso chegou no celular com o app aberto: atualiza o sino e a lista.
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return
+    const onMsg = (e: MessageEvent) => {
+      if ((e.data as { type?: string } | null)?.type === 'push-received') {
+        void qc.invalidateQueries({ queryKey: ['notifications-unread'] })
+        void qc.invalidateQueries({ queryKey: ['notifications'] })
+      }
+    }
+    navigator.serviceWorker.addEventListener('message', onMsg)
+    return () => navigator.serviceWorker.removeEventListener('message', onMsg)
+  }, [qc])
+  // Ao abrir o app, zera o número no ícone (os avisos continuam no sino).
+  useEffect(() => {
+    const nav = navigator as Navigator & { clearAppBadge?: () => Promise<void> }
+    nav.clearAppBadge?.().catch(() => {})
+  }, [])
 
   const { pathname } = useLocation()
   const tab = ({ isActive }: { isActive: boolean }) =>
@@ -90,6 +109,7 @@ export function AppLayout() {
         </nav>
       </header>
       <main id="conteudo" className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-5 print:max-w-none print:p-0">
+        <InstallBanner />
         <Suspense fallback={<p className="text-muted" role="status">Carregando…</p>}>
           <Outlet />
         </Suspense>

@@ -9,6 +9,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.41.0] — 08/11/2026 — App instalável e notificações no celular
+
+### Adicionado
+- PWA: ícone na tela inicial (Android e iPhone), abre em tela cheia, página "Sem conexão", aviso "Nova versão disponível · Atualizar" e convite para instalar no painel. Página /instalar com o passo a passo do iPhone e do Android (ADR-040).
+- Notificações no celular, mesmo com o app fechado: card "Avisos no celular" em Notificações (ativar, enviar teste, aparelhos da conta, remover) e convite no painel depois da primeira moto. Coluna "No celular" nas preferências.
+- Envio pela Edge Function `push-send` (Web Push padrão, sem serviço pago), silêncio das 22h às 8h exceto pedidos de oficina, limpeza automática de aparelhos que saíram.
+- Número de avisos no ícone do app (quando o aparelho permite); o sino atualiza na hora quando chega um aviso com o app aberto.
+
+### Testes
+- Criptografia e assinatura VAPID conferidas contra a implementação de referência (descriptografia como o celular faria). Supabase real: cadeia completa aviso → função → servidor de push do Google → aparelho inexistente removido; padrões por tipo, preferência desligada, silêncio, bloqueio do navegador. Navegador real: service worker ativo, manifesto e ícones, página sem conexão e fluxo "Atualizar". Tela: 6 novos (204).
+
+### Rollback desta versão
+- `supabase/rollback/20261108172328_web_push.down.sql` (ler o topo) e publicar o site anterior. Quem já instalou continua com o ícone, que abre o site normal.
+
 ## [0.40.0] — 08/11/2026 — Pix, débito e boleto
 
 ### Adicionado

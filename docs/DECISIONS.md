@@ -109,6 +109,15 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-040 — App instalável (PWA) com notificações no celular (Web Push)
+**Data:** 08/11/2026 · **Status:** aceita (pedido do responsável)
+- O site é instalável (manifesto, ícones, service worker): Android pelo botão "Instalar"; iPhone por Safari → Compartilhar → "Adicionar à Tela de Início" (página /instalar). É o mesmo site: tudo que muda no sistema aparece no app. Versão nova: aviso "Atualizar" e recarga.
+- Cache só da "casca" (arquivos com hash, ícones, página sem conexão). Nada vindo do Supabase vai para o cache: dados pessoais sempre ao vivo e com login. Sem internet: página "Sem conexão".
+- Notificações no celular pelo padrão Web Push (sem Firebase nem serviço pago): chaves VAPID geradas no próprio servidor (privada só no Vault), conteúdo criptografado para cada aparelho (aes128gcm), implementação própria testada contra a referência. Chega com o app fechado; no iPhone exige iOS 16.4+ e o app instalado.
+- Todo aviso do sino pode ir ao celular. Coluna "No celular" nas preferências: ligada por padrão nos avisos importantes; lembretes de manutenção e espaço desligados até a pessoa ligar. Silêncio das 22h às 8h (Brasília), exceto pedidos de acesso de oficina. Avisos com mais de 2 dias não são mais enviados.
+- Envio pela Edge Function `push-send`, chamada pelo banco logo após o aviso (pg_net, no máximo 1 chamada a cada 5 s) e a cada 5 min pelo pg_cron. Aparelho que não existe mais (404/410) ou com 5 falhas seguidas é removido. Até 10 aparelhos por conta.
+- Pedido de permissão só por toque do usuário: em Notificações e num convite no painel depois da primeira moto ("Agora não" esconde por 14 dias).
+
 ### ADR-039 — Premium por período pago à vista: Pix, débito ou boleto
 **Data:** 08/11/2026 · **Status:** aceita (pedido do responsável: clientes que não querem informar cartão)
 - Além da assinatura automática no cartão de crédito, cada plano Premium pode ser pago **à vista por período** (mensal = 1 mês, semestral = 6, anual = 12) pelo Checkout do Mercado Pago: Pix, cartão de débito, boleto ou saldo. Nenhum dado de cartão fica salvo. Mesmo preço do plano (desconto para Pix fica para decisão comercial).
