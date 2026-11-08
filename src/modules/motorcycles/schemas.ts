@@ -61,6 +61,12 @@ export const registerMotorcycleSchema = z
       .transform((v) => (v === '' ? undefined : v))
       .optional(),
     initialNotes: optionalText(2000, 'Observações'),
+    oilIntervalKm: requiredInt(300, 20000, 'Informe de quantos em quantos km você troca o óleo.', 'Use um intervalo entre 300 e 20.000 km.'),
+    lastOilKm: optionalInt(0, 2_000_000, 'Km da última troca inválido.'),
+  })
+  .refine((v) => v.lastOilKm === undefined || !(v.currentMileage >= 0) || v.lastOilKm <= v.currentMileage, {
+    path: ['lastOilKm'],
+    message: 'A última troca não pode ter km maior que o atual.',
   })
   .refine(
     (v) =>

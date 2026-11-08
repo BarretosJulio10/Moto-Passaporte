@@ -9,6 +9,7 @@ import { translateDbError } from '@/core/shared/dbErrors'
 import { todayISO } from '@/core/shared/format'
 import { registerMotorcycleSchema } from '@/modules/motorcycles/schemas'
 import { registerMotorcycle } from '@/modules/motorcycles/api'
+import { OIL_SUGGESTED_KM, setCare } from '@/modules/motorcycles/careApi'
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -44,6 +45,8 @@ export function RegisterMotorcyclePage() {
       const outcome = await registerMotorcycle(result.data)
       await queryClient.invalidateQueries({ queryKey: ['my-motorcycles'] })
       if (outcome.status === 'created') {
+        // Troca de óleo: o aviso sai 500 km antes (ADR-041). Falha aqui não impede o cadastro.
+        await setCare(outcome.motorcycle_id, 'oil_change', result.data.oilIntervalKm, true, result.data.lastOilKm ?? null).catch(() => undefined)
         navigate(`/painel/motos/${outcome.motorcycle_id}`, { replace: true, state: { created: true } })
       } else {
         setClaimed(true)
@@ -125,6 +128,26 @@ export function RegisterMotorcyclePage() {
             maxLength={2000}
             placeholder="Ex.: moto de segundo dono, revisões feitas na concessionária até 2023."
             error={errors.initialNotes}
+          />
+        </Group>
+
+        <Group title="Troca de óleo">
+          <TextField
+            label="Trocar o óleo a cada (km)"
+            name="oilIntervalKm"
+            required
+            inputMode="numeric"
+            defaultValue={String(OIL_SUGGESTED_KM)}
+            hint="Veja no manual da moto. Avisamos no celular 500 km antes."
+            error={errors.oilIntervalKm}
+          />
+          <TextField
+            label="Km da última troca (opcional)"
+            name="lastOilKm"
+            inputMode="numeric"
+            placeholder="Ex.: 11800"
+            hint="Se não souber, contamos a partir do km atual."
+            error={errors.lastOilKm}
           />
         </Group>
 

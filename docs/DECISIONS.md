@@ -109,6 +109,13 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-041 — Rotinas de cuidado: check-up semanal, troca de óleo por km e corrente
+**Data:** 08/11/2026 · **Status:** aceita (pedido do responsável; grátis para todos por enquanto)
+- **Check-up semanal** no sábado às 10h (Brasília), um aviso por moto, só com o que está pendente: atualizar o km (se a última leitura tem 6 dias ou mais), óleo chegando/vencido (ou intervalo não definido) e corrente. Abre /painel/motos/:id/checkup com km, óleo e corrente numa tela só.
+- **Troca de óleo por km**: intervalo pedido no cadastro da moto (sugestão 1.000 km, faixa 300–20.000; km da última troca opcional). Aviso **500 km antes** e quando vence, **na hora** em que o km é atualizado (gatilho em `mileage_records`), um aviso por ciclo. A última troca vem do histórico (categoria "Troca de óleo" vigente) ou do km informado; registrar a troca reinicia a contagem. Sem informação: conta a partir da primeira leitura e pede para confirmar.
+- **Corrente** (folga e lubrificação): toda semana (padrão), a cada 15 dias ou desligado; "Conferi e lubrifiquei" registra a data.
+- Catálogo `care_routines` para incluir novas rotinas (pneu, freio, bateria…) sem refazer a estrutura. Tipos de aviso novos `care_checkup` e `oil_change`, opcionais e ligados no celular por padrão.
+
 ### ADR-040 — App instalável (PWA) com notificações no celular (Web Push)
 **Data:** 08/11/2026 · **Status:** aceita (pedido do responsável)
 - O site é instalável (manifesto, ícones, service worker): Android pelo botão "Instalar"; iPhone por Safari → Compartilhar → "Adicionar à Tela de Início" (página /instalar). É o mesmo site: tudo que muda no sistema aparece no app. Versão nova: aviso "Atualizar" e recarga.

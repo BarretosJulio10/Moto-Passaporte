@@ -44,12 +44,14 @@ export function RecordFormPage() {
     )
   }
 
-  return <RecordForm key={correctingId || 'novo'} motorcycleId={id} original={original} onDone={async (state) => {
+  const initialCategory = params.get('categoria') ?? undefined
+  return <RecordForm key={correctingId || 'novo'} motorcycleId={id} original={original} initialCategory={initialCategory} onDone={async (state) => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ['timeline', id] }),
       queryClient.invalidateQueries({ queryKey: ['mileage', id] }),
       queryClient.invalidateQueries({ queryKey: ['motorcycle', id] }),
       queryClient.invalidateQueries({ queryKey: ['my-motorcycles'] }),
+      queryClient.invalidateQueries({ queryKey: ['care', id] }),
       queryClient.invalidateQueries({ queryKey: ['storage-usage'] }),
     ])
     navigate(`/painel/motos/${id}/historico`, { replace: true, state })
@@ -68,17 +70,19 @@ type FormProps = {
   usage?: { key: unknown[]; fn: () => Promise<StorageUsage> }
   hideWorkshopName?: boolean
   newTitle?: string
+  /** Categoria já escolhida (ex.: vindo do check-up: troca de óleo). */
+  initialCategory?: string
 }
 
-export function RecordForm({ motorcycleId, original, onDone, header, intro, submit, upload, usage: usageSource, hideWorkshopName, newTitle = 'Novo registro' }: FormProps) {
+export function RecordForm({ motorcycleId, original, onDone, header, intro, submit, upload, usage: usageSource, hideWorkshopName, newTitle = 'Novo registro', initialCategory }: FormProps) {
   const [errors, setErrors] = useState<FieldErrors>({})
   const [itemErrors, setItemErrors] = useState<Record<number, string>>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [pending, setPending] = useState<PendingAttachment[]>([])
   const usage = useQuery({ queryKey: usageSource?.key ?? ['storage-usage'], queryFn: usageSource?.fn ?? getStorageUsage, retry: false })
-  const [category, setCategory] = useState<string>(original?.category ?? '')
-  const [title, setTitle] = useState(original?.title ?? '')
+  const [category, setCategory] = useState<string>(original?.category ?? initialCategory ?? '')
+  const [title, setTitle] = useState(original?.title ?? (initialCategory ? CATEGORY_TITLE_SUGGESTION[initialCategory as MaintenanceCategory] ?? '' : ''))
   const [titleTouched, setTitleTouched] = useState(Boolean(original))
   const [rows, setRows] = useState<ItemRow[]>(
     original?.items.map((i) => ({

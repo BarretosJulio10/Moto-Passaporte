@@ -64,6 +64,8 @@ const base = {
   currentMileage: '12.400',
   acquisitionDate: '',
   initialNotes: '',
+  oilIntervalKm: '1.000',
+  lastOilKm: '',
 }
 
 describe('registerMotorcycleSchema', () => {
@@ -96,6 +98,19 @@ describe('registerMotorcycleSchema', () => {
     expect(r.errors.modelYear).toMatch(/ano do modelo/i)
     expect(r.errors.plate).toMatch(/Placa inválida/)
     expect(r.errors.acquisitionDate).toMatch(/futuro/)
+  })
+})
+
+describe('troca de óleo no cadastro (ADR-041)', () => {
+  it('pede o intervalo, aceita a última troca e recusa valores fora da faixa', () => {
+    const ok = validate(registerMotorcycleSchema, { ...base, lastOilKm: '11.800' })
+    expect(ok.ok && ok.data.oilIntervalKm === 1000 && ok.data.lastOilKm === 11800).toBe(true)
+    const r = validate(registerMotorcycleSchema, { ...base, oilIntervalKm: '100', lastOilKm: '13000' })
+    expect(r.ok).toBe(false)
+    if (r.ok) return
+    expect(r.errors.oilIntervalKm).toMatch(/300 e 20.000/)
+    const r2 = validate(registerMotorcycleSchema, { ...base, lastOilKm: '13000' })
+    expect(!r2.ok && r2.errors.lastOilKm).toMatch(/maior que o atual/)
   })
 })
 

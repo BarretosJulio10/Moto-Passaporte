@@ -19,6 +19,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 | `20261107205649_admin_audit_settings.sql` | Configurações por catálogo (sem escrita direta), busca e consulta de auditoria (ADR-024) |
 | `20261107211016_plate_claims.sql` | Pedidos de verificação de placa: acompanhamento pelo solicitante, fila e decisão do admin, aviso anônimo ao titular (ADR-025) |
 | `20261107211152_plate_claims_notice_fix.sql` | Aviso ao titular aparece também quando titularidade e aviso têm o mesmo instante |
+| `20261108175020_care_routines.sql` | Rotinas de cuidado (`care_routines`, `motorcycle_care`, `care_status`, aviso de óleo no km, `system_weekly_checkup` sábado 10h) — ADR-041 |
 | `20261108172328_web_push.sql` | Notificações no celular (`push_subscriptions`, `push_config`, preferência `push`, fila `push_pending`, silêncio 22h–8h, gatilho e rotina que chamam `push-send`) — ADR-040 |
 | `20261108165626_premium_passes.sql` | Premium por período à vista (`premium_passes`, `billing_prepare_pass`, `billing_apply_pass_payment`, `get_my_passes`, `admin_list_passes`; plano vigente, avisos 30/15/7/hoje/venceu) — ADR-039 |
 | `20261108164415_bonus_billing.sql` | Avisos de fim do bônus, 1ª cobrança após o bônus (`billing_prepare_subscription.first_charge_at`), `bonus_until` em `get_my_plan` — ADR-037 |

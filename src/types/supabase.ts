@@ -990,6 +990,9 @@ export type Database = {
         }[]
       }
       admin_get_user: { Args: { p_reason: string; p_user_id: string }; Returns: Json }
+      get_motorcycle_care: { Args: { p_motorcycle_id: string }; Returns: Json }
+      set_motorcycle_care: { Args: { p_motorcycle_id: string; p_routine: string; p_interval: number | null; p_enabled?: boolean; p_last_done_km?: number | null }; Returns: Json }
+      mark_care_done: { Args: { p_motorcycle_id: string; p_routine: string }; Returns: Json }
       get_push_public_key: { Args: Record<PropertyKey, never>; Returns: string | null }
       register_push_subscription: { Args: { p_auth: string; p_endpoint: string; p_label?: string | null; p_p256dh: string }; Returns: string }
       unregister_push_subscription: { Args: { p_endpoint: string }; Returns: undefined }

@@ -20,6 +20,7 @@ import { RequireAuth } from '@/core/auth/RequireAuth'
 // Páginas carregadas sob demanda (KI-010): o site público abre sem baixar painel, oficina e admin.
 const DashboardPage = lazy(() => import('@/modules/owner/DashboardPage').then((m) => ({ default: m.DashboardPage })))
 const RegisterMotorcyclePage = lazy(() => import('@/modules/owner/RegisterMotorcyclePage').then((m) => ({ default: m.RegisterMotorcyclePage })))
+const CheckupPage = lazy(() => import('@/modules/owner/CheckupPage').then((m) => ({ default: m.CheckupPage })))
 const MotorcyclePage = lazy(() => import('@/modules/owner/MotorcyclePage').then((m) => ({ default: m.MotorcyclePage })))
 const TimelinePage = lazy(() => import('@/modules/maintenance/TimelinePage').then((m) => ({ default: m.TimelinePage })))
 const RecordFormPage = lazy(() => import('@/modules/maintenance/RecordFormPage').then((m) => ({ default: m.RecordFormPage })))
@@ -135,6 +136,7 @@ export const routes = [
           { path: '/painel/conta', element: <AccountPage /> },
           { path: '/painel/plano/recibo/:id', element: <ReceiptPage /> },
           { path: '/painel/motos/:id', element: <MotorcyclePage /> },
+          { path: '/painel/motos/:id/checkup', element: <CheckupPage /> },
           { path: '/painel/motos/:id/historico', element: <TimelinePage /> },
           { path: '/painel/motos/:id/relatorio', element: <ReportPage /> },
           { path: '/painel/motos/:id/historico/novo', element: <RecordFormPage /> },

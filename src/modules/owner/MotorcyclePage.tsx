@@ -1,6 +1,7 @@
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Notice } from '@/components/Notice'
+import { ButtonLink } from '@/components/Button'
 import { formatDate, formatKm } from '@/core/shared/format'
 import { fetchMotorcycle } from '@/modules/motorcycles/api'
 import { PlateSection } from '@/modules/motorcycles/PlateSection'
@@ -65,6 +66,13 @@ export function MotorcyclePage() {
           </Notice>
         </div>
       )}
+
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-doc border border-rule bg-sheet p-4">
+        <p className="text-sm text-graphite">
+          <span className="font-semibold text-ink">Check-up da moto:</span> km, troca de óleo e corrente numa tela só. Avisamos todo sábado às 10h.
+        </p>
+        <ButtonLink to={`/painel/motos/${motoId}/checkup`} size="sm">Abrir check-up</ButtonLink>
+      </div>
 
       {/* Celular: dados → QR Code → quilometragem. Computador: QR Code na coluna da direita. */}
       <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_17rem]">

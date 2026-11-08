@@ -9,6 +9,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.42.0] — 08/11/2026 — Check-up semanal, troca de óleo e corrente
+
+### Adicionado
+- **Check-up da moto** (/painel/motos/:id/checkup, botão "Abrir check-up" na página da moto): atualizar o km com um campo, situação da troca de óleo (faltam X km / vencida) e corrente (conferida, toda semana, a cada 15 dias ou desligado) — ADR-041.
+- **Aviso semanal no celular** todo sábado às 10h, por moto, só com o que estiver pendente.
+- **Troca de óleo por km**: intervalo pedido no cadastro da moto (sugestão 1.000 km) e km da última troca; aviso 500 km antes e quando vence, na hora em que o km é atualizado. Registrar "Troca de óleo" no histórico reinicia a contagem ("Registrar troca de óleo" já abre o formulário com a categoria).
+- Preferências: "Check-up semanal da moto" e "Troca de óleo", ligados no celular por padrão.
+
+### Testes
+- Supabase real (com desfazer): intervalo e km da última troca, corrente só 7 ou 15 dias, aviso de óleo imediato ao registrar km (faltam 400 km, com push), check-up semanal com óleo e corrente, corrente conferida. Tela: 4 novos (208).
+
+### Rollback desta versão
+- `supabase/rollback/20261108175020_care_routines.down.sql` e publicar o site anterior.
+
 ## [0.41.0] — 08/11/2026 — App instalável e notificações no celular
 
 ### Adicionado

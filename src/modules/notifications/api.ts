@@ -7,6 +7,8 @@ export type NotificationPreference = Fn['get_my_notification_preferences']['Retu
 
 /** Rótulos dos tipos de aviso (PRD 12, ADR-031). */
 export const KIND_LABEL: Record<string, string> = {
+  care_checkup: 'Check-up semanal da moto (sábado)',
+  oil_change: 'Troca de óleo chegando ou vencida',
   workshop_access_request: 'Pedidos de acesso de oficinas',
   workshop_access_decided: 'Respostas aos pedidos da minha oficina',
   workshop_access_revoked: 'Acessos revogados da minha oficina',
