@@ -170,8 +170,9 @@ export function AppLayout() {
             <Logo to="/painel" />
             <div className="flex items-center gap-1">
               {isAdmin && (
-                <Link to="/admin" aria-label="Administração" className={`inline-flex h-10 w-10 items-center justify-center rounded-doc ${inAdmin ? 'bg-ink text-sheet' : 'text-ink hover:bg-paper'}`}>
-                  <Icon d={I.admin} />
+                <Link to="/admin" aria-label="Administração" className={`inline-flex h-10 items-center gap-1.5 rounded-doc border px-3 text-sm font-semibold ${inAdmin ? 'border-ink bg-ink text-sheet' : 'border-rule text-ink hover:bg-paper'}`}>
+                  <Icon d={I.admin} className="h-4 w-4" />
+                  Admin
                 </Link>
               )}
               <button type="button" onClick={logout} className="rounded-doc px-3 py-2 text-sm font-semibold text-ink hover:bg-paper">Sair</button>

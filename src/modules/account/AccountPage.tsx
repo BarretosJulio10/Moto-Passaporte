@@ -3,6 +3,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/core/auth/AuthProvider'
+import { getSupabase } from '@/lib/supabase'
 import { Button } from '@/components/Button'
 import { SelectField, TextAreaField, TextField } from '@/components/Field'
 import { Notice } from '@/components/Notice'
@@ -194,6 +195,27 @@ function PrivacySection() {
   )
 }
 
+/** Atalho para a administração, só para quem tem o papel de admin. */
+function AdminShortcut({ userId }: { userId: string }) {
+  const roles = useQuery({
+    queryKey: ['my-roles', userId],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await getSupabase().from('user_roles').select('role')
+      if (error) throw error
+      return new Set(data.map((r) => r.role))
+    },
+  })
+  if (!roles.data?.has('admin')) return null
+  return (
+    <Link to="/admin" className="mt-6 flex items-center justify-between gap-3 rounded-sheet border border-ink/30 bg-sheet p-4 hover:border-ink">
+      <span><span className="font-semibold text-ink">Administração do Moto Passaporte</span>
+        <span className="block text-sm text-muted">Usuários, oficinas, planos, pagamentos e configurações. Pede o código do aplicativo autenticador.</span></span>
+      <span className="font-semibold text-ink" aria-hidden>→</span>
+    </Link>
+  )
+}
+
 /** /painel/conta — dados pessoais, senha e direitos do titular (LGPD, ADR-036). */
 export function AccountPage() {
   const { user } = useAuth()
@@ -201,6 +223,7 @@ export function AccountPage() {
   return (
     <div>
       <PageHeader title="Minha conta" intro="Seus dados, senha e privacidade." />
+      <AdminShortcut userId={user.id} />
       <div className="mt-8 grid items-start gap-6 xl:grid-cols-2">
         <div className="flex min-w-0 flex-col gap-6">
           <Section id="profile-title" title="Dados pessoais"><ProfileForm userId={user.id} /></Section>
