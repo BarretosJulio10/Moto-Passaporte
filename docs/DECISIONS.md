@@ -109,6 +109,12 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-038 — Alerta ativo por monitor externo (KI-030)
+**Data:** 08/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- Workflow *Monitor* no GitHub Actions a cada 30 min (fora do Supabase e da Vercel, para avisar mesmo quando eles caem): site, Auth e a função pública `system_health()`.
+- `system_health()` devolve só sim/não por verificação (sem contagens, nomes ou dados): rotinas sem falha em 24 h, conciliação e limpeza recentes, nenhuma rotina travada, Webhook sem erros em série e sem avisos parados.
+- Aviso por e-mail do próprio GitHub (execução com falha) e por alerta em *Issues*, fechado sozinho quando normaliza. Sem segredos no workflow: só a chave pública. Canal por WhatsApp fica para depois, se o volume pedir.
+
 ### ADR-037 — Premium por cortesia
 **Data:** 08/11/2026 · **Status:** aceita (pedido do responsável: liberar o Premium para a conta admin)
 - O administrador libera um plano Premium sem cobrança para uma conta, em /admin → Usuários → detalhe → "Premium por cortesia", com motivo auditado e prazo opcional (vale até o fim do dia escolhido, horário de Brasília). Uma cortesia em vigor por conta; trocar encerra a anterior. A pessoa recebe aviso.

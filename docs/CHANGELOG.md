@@ -9,6 +9,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.37.0] — 08/11/2026 — Alerta ativo
+
+### Adicionado
+- Workflow *Monitor* (a cada 30 min): site, login e saúde do banco/rotinas/Webhook; em falha, e-mail do GitHub e alerta em *Issues*, fechado sozinho ao normalizar (ADR-038; KI-030).
+- Função pública `system_health()` (só sim/não por verificação, sem dados).
+
+### Rollback desta versão
+- `supabase/rollback/20261108162247_system_health.down.sql` e apagar `.github/workflows/monitor.yml`.
+
 ## [0.36.0] — 08/11/2026 — Premium por cortesia
 
 ### Adicionado

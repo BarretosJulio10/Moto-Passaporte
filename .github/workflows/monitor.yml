@@ -1,0 +1,80 @@
+# Monitor de disponibilidade e saúde (KI-030; ADR-038). Ver docs/OPERATIONS.md §5.
+# A cada 30 minutos confere o site, o login (Auth), o banco e as rotinas automáticas.
+# Se algo falhar: a execução fica vermelha (o GitHub manda e-mail) e abre um alerta em Issues.
+# Quando tudo volta ao normal, o alerta é fechado sozinho. Não usa segredos: só a chave pública do site.
+name: Monitor
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+env:
+  SITE_URL: https://moto-passaporte.vercel.app
+  SUPABASE_URL: https://ripgenhykaajcnzdxoid.supabase.co
+  # Chave pública (a mesma que vai no site). Nunca colocar a chave secreta aqui.
+  SUPABASE_PUBLISHABLE_KEY: sb_publishable_lfnqyVtIUo7fs91Sft-NIg_BlJhGMwt
+  ALERT_TITLE: 'Alerta do monitor: Moto Passaporte com problema'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Conferir
+        id: run
+        run: |
+          set -u
+          problems=""
+          try() { for i in 1 2 3; do out=$(curl -sS -m 20 "$@" 2>&1) && { echo "$out"; return 0; }; sleep 10; done; echo "$out"; return 1; }
+
+          code=$(curl -s -o /tmp/site.html -w '%{http_code}' -m 20 "$SITE_URL/" || echo 000)
+          if [ "$code" != "200" ] || ! grep -q 'Moto Passaporte' /tmp/site.html; then
+            sleep 20; code=$(curl -s -o /tmp/site.html -w '%{http_code}' -m 20 "$SITE_URL/" || echo 000)
+            if [ "$code" != "200" ] || ! grep -q 'Moto Passaporte' /tmp/site.html; then problems="$problems\n- Site fora do ar (HTTP $code)"; fi
+          fi
+
+          auth=$(curl -s -o /dev/null -w '%{http_code}' -m 20 "$SUPABASE_URL/auth/v1/health" -H "apikey: $SUPABASE_PUBLISHABLE_KEY" || echo 000)
+          [ "$auth" = "200" ] || problems="$problems\n- Login (Supabase Auth) não responde (HTTP $auth)"
+
+          health=$(try -X POST "$SUPABASE_URL/rest/v1/rpc/system_health" -H "apikey: $SUPABASE_PUBLISHABLE_KEY" -H 'Content-Type: application/json' -d '{}') || true
+          echo "$health"
+          if ! echo "$health" | jq -e '.ok == true' >/dev/null 2>&1; then
+            failed=$(echo "$health" | jq -r '.checks | to_entries[] | select(.value == false) | .key' 2>/dev/null | tr '\n' ' ')
+            problems="$problems\n- Banco ou rotinas com problema: ${failed:-sem resposta do banco}"
+          fi
+
+          if [ -n "$problems" ]; then
+            printf "Problemas encontrados:$problems\n" | tee /tmp/problems.txt
+            echo "failed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Tudo certo."
+            echo "failed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Abrir ou atualizar alerta
+        if: steps.run.outputs.failed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          body=$(printf "%s\n\nQuando: %s (UTC)\nExecução: %s/%s/actions/runs/%s\n\nO que fazer: ver docs/OPERATIONS.md §5." "$(cat /tmp/problems.txt)" "$(date -u '+%d/%m/%Y %H:%M')" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID")
+          n=$(gh issue list -R "$GITHUB_REPOSITORY" --state open --search "\"$ALERT_TITLE\" in:title" --json number -q '.[0].number')
+          if [ -n "$n" ]; then gh issue comment "$n" -R "$GITHUB_REPOSITORY" --body "$body"
+          else gh issue create -R "$GITHUB_REPOSITORY" --title "$ALERT_TITLE" --body "$body"; fi
+          exit 1
+
+      - name: Fechar alerta resolvido
+        if: steps.run.outputs.failed == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          n=$(gh issue list -R "$GITHUB_REPOSITORY" --state open --search "\"$ALERT_TITLE\" in:title" --json number -q '.[0].number')
+          [ -z "$n" ] || gh issue close "$n" -R "$GITHUB_REPOSITORY" --comment "Normalizado em $(date -u '+%d/%m/%Y %H:%M') (UTC)."

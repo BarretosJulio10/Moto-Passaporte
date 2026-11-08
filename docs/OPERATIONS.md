@@ -78,7 +78,17 @@ Cada release registra no `CHANGELOG.md` o que precisa para voltar; a nota "Rollb
 | Avisos aos usuários | Gerados pelo banco; rotina diária às 08:07 (*Supabase → Integrations → Cron*: `moto-passaporte-notifications`) |
 | Conciliação e limpeza automáticas | `/admin` → "Rotinas automáticas" (última execução, falhas em 24 h); detalhes em `job_runs` e em *Supabase → Integrations → Cron* |
 
-Ainda não há alerta ativo (e-mail/WhatsApp) para erro de aplicação, falha de login em massa ou indisponibilidade (KI-030). Alertas não devem conter dados pessoais.
+**Alerta ativo (ADR-038):** o workflow *Monitor* do GitHub roda a cada 30 minutos e confere o site, o login (Auth) e `system_health()` (banco, rotinas sem falha nem atraso, Webhook de pagamentos sem erros em série). Se algo falhar, a execução fica vermelha (o GitHub manda e-mail a quem cuida do repositório) e abre o alerta "Alerta do monitor: Moto Passaporte com problema" em *Issues*, comentando a cada nova falha; ao normalizar, o alerta é fechado sozinho. O alerta não leva dados pessoais.
+
+| Problema no alerta | O que olhar primeiro |
+|---|---|
+| Site fora do ar | Vercel → *Deployments* (promover a versão anterior se a nova quebrou) e status da Vercel |
+| Login não responde | Supabase → status do projeto (pausado? plano?) e *Logs → Auth* |
+| `jobs_no_failures_24h`, `jobs_not_stuck` | `/admin` → "Rotinas automáticas" e tabela `job_runs` |
+| `reconcile_recent`, `cleanup_recent` | *Supabase → Integrations → Cron* (rotina desligada ou sem execução) |
+| `payments_webhook_ok`, `payments_not_stuck` | `/admin/assinaturas` → avisos com erro ou assinatura inválida; conferir a assinatura secreta do Webhook no Mercado Pago |
+
+Para receber o e-mail: GitHub → *Settings → Notifications → Actions* ligado ("Notify me: Email" / "Only notify for failed workflows"), e assistir o repositório (*Watch → All Activity* ou *Custom → Issues*). Falhas de login em massa continuam só nos *Logs → Auth* do Supabase (o banco não guarda o registro de tentativas).
 
 ## 6. Acesso de administrador
 
