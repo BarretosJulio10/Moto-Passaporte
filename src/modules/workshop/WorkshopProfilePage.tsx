@@ -59,7 +59,7 @@ export function WorkshopProfilePage() {
   }
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-5xl">
       <Link to={`/oficina/${orgId}`} className="text-sm text-ink underline underline-offset-4">Voltar ao painel da oficina</Link>
       <h1 className="heading mt-3 text-3xl text-ink">Perfil da oficina</h1>
       <form onSubmit={onSubmit} noValidate className="mt-8 flex flex-col gap-6">

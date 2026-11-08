@@ -109,6 +109,12 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-042 — Telas na largura toda: menu lateral no computador, abas no celular
+**Data:** 08/11/2026 · **Status:** aceita (pedido do responsável)
+- Área logada: no computador (≥ 1024 px), menu fixo à esquerda (Minhas motos, Minha oficina, Notificações com contador, Meu plano, Minha conta e Administração com submenu) e conteúdo ocupando o resto da tela (até 1.680 px, com margens confortáveis). No celular e no app instalado, barra de abas embaixo (Motos, Oficina, Avisos, Plano, Conta), respeitando a área segura do iPhone.
+- A largura vira colunas, não texto esticado: painel com cartões de moto (km, óleo, corrente e atalhos) e coluna de pendências; página da moto em 2 colunas (notebook) e 3 (monitor); Notificações com a lista à esquerda e "Avisos no celular" e preferências à direita; Meu plano com uso e histórico à esquerda e planos à direita; Minha conta em 2 colunas; formulários em 2–3 colunas. Parágrafos continuam com largura de leitura.
+- Conferência visual em 4 tamanhos (celular 390 px, tablet 820 px, notebook 1366 px, monitor 1920 px) a cada mudança de tela.
+
 ### ADR-041 — Rotinas de cuidado: check-up semanal, troca de óleo por km e corrente
 **Data:** 08/11/2026 · **Status:** aceita (pedido do responsável; grátis para todos por enquanto)
 - **Check-up semanal** no sábado às 10h (Brasília), um aviso por moto, só com o que está pendente: atualizar o km (se a última leitura tem 6 dias ou mais), óleo chegando/vencido (ou intervalo não definido) e corrente. Abre /painel/motos/:id/checkup com km, óleo e corrente numa tela só.

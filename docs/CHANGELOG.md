@@ -9,6 +9,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.43.0] — 08/11/2026 — Telas na largura toda
+
+### Alterado
+- Nova estrutura da área logada: menu lateral fixo no computador e barra de abas embaixo no celular e no app (ADR-042). Sair fica no rodapé do menu (computador) ou no topo (celular).
+- Painel: cartões das motos com km, situação do óleo e da corrente e atalhos (Check-up, Registrar serviço, Abrir); coluna lateral com lembretes, avisos e atalhos.
+- Página da moto em colunas (dados e quilometragem | lembretes, compartilhamento, oficinas e venda | QR Code).
+- Notificações, Meu plano e Minha conta em duas colunas; cadastro de moto e perfil da oficina mais largos.
+
+### Testes
+- Conferência visual em celular, tablet, notebook e monitor. Tela: 2 novos (estrutura e menu de administração) — 210.
+
 ## [0.42.0] — 08/11/2026 — Check-up semanal, troca de óleo e corrente
 
 ### Adicionado

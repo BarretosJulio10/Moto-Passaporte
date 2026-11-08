@@ -27,6 +27,7 @@ import {
   type MySubscription,
 } from './billingApi'
 import { PlansGrid } from './PlansGrid'
+import { PageHeader } from '@/components/AppLayout'
 
 function Meter({ label, used, total, text }: { label: string; used: number; total: number; text: string }) {
   const pct = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0
@@ -92,7 +93,7 @@ export function PaidUntil({ until, now = new Date() }: { until: string; now?: Da
 function SubscriptionCard({ sub, onCancel, canceling, bonusUntil }: { sub: MySubscription; onCancel: () => void; canceling: boolean; bonusUntil?: string | null }) {
   const open = ['pending', 'active', 'past_due', 'paused'].includes(sub.status)
   return (
-    <section className="mt-6 max-w-xl rounded-sheet border border-rule bg-sheet p-5" aria-label="Assinatura">
+    <section className="mt-6 rounded-sheet border border-rule bg-sheet p-5" aria-label="Assinatura">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <p className="font-semibold text-ink">{sub.plan_name}</p>
         <span className="rounded-doc bg-paper px-2 py-0.5 text-sm text-graphite">{STATUS_LABEL[sub.status]}</span>
@@ -210,13 +211,14 @@ export function MyPlanPage() {
 
   return (
     <div>
-      <Link to="/painel" className="text-sm text-muted underline underline-offset-4">Painel</Link>
-      <h1 className="heading mt-2 text-3xl text-ink">Meu plano</h1>
-      {message && <div className="mt-4 max-w-xl"><Notice tone={message.tone}>{message.text}</Notice></div>}
+      <PageHeader title="Meu plano" intro="Uso, assinatura, pagamentos e opções do Premium." />
+      {message && <div className="mt-4 max-w-3xl"><Notice tone={message.tone}>{message.text}</Notice></div>}
+      <div className="mt-2 grid items-start gap-x-10 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]">
+      <div className="min-w-0">
       {plan.isLoading && <p className="mt-6 text-muted" role="status">Carregando…</p>}
       {plan.isError && <div className="mt-6"><Notice tone="error">Não foi possível carregar seu plano.</Notice></div>}
       {plan.data && (
-        <section className="mt-6 max-w-xl rounded-sheet border border-rule bg-sheet p-5" aria-label="Uso do plano">
+        <section className="mt-6 rounded-sheet border border-rule bg-sheet p-5" aria-label="Uso do plano">
           <p className="font-semibold text-ink">{plan.data.name}</p>
           {plan.data.paid_until && !hasOpen && <PaidUntil until={plan.data.paid_until} />}
           {plan.data.bonus && (
@@ -248,7 +250,7 @@ export function MyPlanPage() {
       {s && <SubscriptionCard sub={s} onCancel={() => cancel.mutate()} canceling={cancel.isPending} bonusUntil={plan.data?.bonus ? plan.data.bonus_until : null} />}
 
       {invoices.data && invoices.data.length > 0 && (
-        <section className="mt-8 max-w-xl" aria-labelledby="invoices-title">
+        <section className="mt-8" aria-labelledby="invoices-title">
           <h2 id="invoices-title" className="heading text-xl text-ink">Faturas</h2>
           <ul className="mt-3 divide-y divide-rule border-y border-rule text-sm">
             {invoices.data.map((i) => (
@@ -275,7 +277,7 @@ export function MyPlanPage() {
       )}
 
       {passes.data && passes.data.length > 0 && (
-        <section className="mt-8 max-w-xl" aria-labelledby="passes-title">
+        <section className="mt-8" aria-labelledby="passes-title">
           <h2 id="passes-title" className="heading text-xl text-ink">Pagamentos por Pix, débito ou boleto</h2>
           <ul className="mt-3 divide-y divide-rule border-y border-rule text-sm">
             {passes.data.map((x) => (
@@ -303,7 +305,7 @@ export function MyPlanPage() {
       )}
 
       {payments.data && payments.data.length > 0 && (
-        <section className="mt-8 max-w-xl" aria-labelledby="payments-title">
+        <section className="mt-8" aria-labelledby="payments-title">
           <h2 id="payments-title" className="heading text-xl text-ink">Tentativas de pagamento</h2>
           <ul className="mt-3 divide-y divide-rule border-y border-rule text-sm">
             {payments.data.map((p) => (
@@ -320,13 +322,17 @@ export function MyPlanPage() {
         </section>
       )}
 
+      </div>
+      <div className="min-w-0">
       {settings && settings.plans.length > 0 && !hasOpen && (
-        <section className="mt-10" id="planos" aria-labelledby="options-title">
+        <section className="mt-8 rounded-sheet border border-rule bg-sheet p-5 sm:p-6" id="planos" aria-labelledby="options-title">
           <h2 id="options-title" className="heading text-2xl text-ink">{plan.data?.paid_until ? 'Renovar ou mudar de plano' : 'Planos disponíveis'}</h2>
           <PlansGrid plans={settings.plans} billingEnabled={settings.billingEnabled} showSignup={false}
             onSubscribe={subscribe} onPayOnce={payOnce} subscribingCode={subscribing} />
         </section>
       )}
+      </div>
+      </div>
     </div>
   )
 }

@@ -38,7 +38,7 @@ export function PlansGrid({
   const lead = premium[0]
 
   return (
-    <div className="mt-10 grid gap-8 md:grid-cols-3">
+    <div className={`mt-10 grid gap-8 ${showSignup ? 'md:grid-cols-3' : 'md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]'}`}>
       {free && (
         <div className="border-t-2 border-ink pt-4">
           <h3 className="font-semibold text-ink">{free.name}</h3>
@@ -64,7 +64,7 @@ export function PlansGrid({
                   {p.price_note && <span className="block text-sm text-muted">{p.price_note}</span>}
                 </span>
                 {billingEnabled && onSubscribe && (
-                  <div className="mt-1 grid w-full gap-2 sm:grid-cols-2">
+                  <div className="mt-1 flex w-full flex-wrap gap-2">
                     <Button size="sm" loading={subscribingCode === p.code} disabled={Boolean(subscribingCode)}
                       onClick={() => onSubscribe(p.code)} aria-label={`Assinar ${p.name}`}>
                       Cartão de crédito

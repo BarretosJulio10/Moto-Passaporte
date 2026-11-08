@@ -1,3 +1,4 @@
+import { PageHeader } from '@/components/AppLayout'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -26,8 +27,8 @@ const errorText = (e: unknown) => translateDbError(e as { code?: string; message
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section aria-labelledby={id} className="mt-10 border-t border-rule pt-8 first:mt-6 first:border-0 first:pt-0">
-      <h2 id={id} className="heading text-2xl text-ink">{title}</h2>
+    <section aria-labelledby={id} className="rounded-sheet border border-rule bg-sheet p-5 sm:p-6">
+      <h2 id={id} className="heading text-xl text-ink">{title}</h2>
       {children}
     </section>
   )
@@ -65,7 +66,7 @@ function ProfileForm({ userId }: { userId: string }) {
   }
   if (profile.isLoading) return <p className="mt-4 text-muted" role="status">Carregando…</p>
   return (
-    <form onSubmit={submit} noValidate className="mt-4 grid max-w-md gap-4" aria-label="Dados pessoais">
+    <form onSubmit={submit} noValidate className="mt-4 grid max-w-lg gap-4" aria-label="Dados pessoais">
       <TextField label="Nome" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" maxLength={120} />
       <TextField label="E-mail" value={profile.data?.email ?? ''} readOnly hint="Para trocar o e-mail, fale com o suporte." />
       <TextField label="Telefone (opcional)" value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" maxLength={20} />
@@ -99,7 +100,7 @@ function PasswordForm() {
     change.mutate()
   }
   return (
-    <form onSubmit={submit} noValidate className="mt-4 grid max-w-md gap-4" aria-label="Trocar senha">
+    <form onSubmit={submit} noValidate className="mt-4 grid max-w-lg gap-4" aria-label="Trocar senha">
       <TextField label="Nova senha" type="password" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="new-password" />
       <TextField label="Repita a nova senha" type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} autoComplete="new-password" />
       {error && <Notice tone="error">{error}</Notice>}
@@ -156,7 +157,7 @@ function PrivacySection() {
         {exportError && <div className="mt-2"><Notice tone="error">{exportError}</Notice></div>}
       </div>
 
-      <form onSubmit={submit} noValidate className="mt-6 grid max-w-md gap-4" aria-label="Pedido de privacidade">
+      <form onSubmit={submit} noValidate className="mt-6 grid max-w-lg gap-4" aria-label="Pedido de privacidade">
         <SelectField label="Pedido" value={kind} onChange={(e) => setKind(e.target.value as PrivacyKind)} options={KINDS} optionLabel={(v) => PRIVACY_KIND_LABEL[v] ?? v} />
         {kind === 'deletion' && (
           <Notice tone="info">
@@ -199,10 +200,14 @@ export function AccountPage() {
   if (!user) return null
   return (
     <div>
-      <h1 className="heading text-3xl text-ink">Minha conta</h1>
-      <Section id="profile-title" title="Dados pessoais"><ProfileForm userId={user.id} /></Section>
-      <Section id="password-title" title="Senha"><PasswordForm /></Section>
-      <Section id="privacy-title" title="Privacidade e meus dados"><PrivacySection /></Section>
+      <PageHeader title="Minha conta" intro="Seus dados, senha e privacidade." />
+      <div className="mt-8 grid items-start gap-6 xl:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-6">
+          <Section id="profile-title" title="Dados pessoais"><ProfileForm userId={user.id} /></Section>
+          <Section id="password-title" title="Senha"><PasswordForm /></Section>
+        </div>
+        <Section id="privacy-title" title="Privacidade e meus dados"><PrivacySection /></Section>
+      </div>
     </div>
   )
 }

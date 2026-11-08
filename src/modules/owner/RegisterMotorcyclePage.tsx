@@ -15,7 +15,7 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
     <fieldset className="border-t border-rule pt-6">
       <legend className="heading -mt-0.5 pr-3 text-lg text-ink">{title}</legend>
-      <div className="mt-4 grid gap-5 sm:grid-cols-2">{children}</div>
+      <div className="mt-4 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{children}</div>
     </fieldset>
   )
 }
@@ -76,7 +76,7 @@ export function RegisterMotorcyclePage() {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-6xl">
       <Link to="/painel" className="text-sm text-ink underline underline-offset-4">Voltar ao painel</Link>
       <h1 className="heading mt-3 text-3xl text-ink">Cadastrar moto</h1>
       <p className="mt-2 max-w-xl text-muted">
@@ -124,7 +124,7 @@ export function RegisterMotorcyclePage() {
           <TextAreaField
             label="Observações (opcional)"
             name="initialNotes"
-            className="sm:col-span-2"
+            className="sm:col-span-2 xl:col-span-3"
             maxLength={2000}
             placeholder="Ex.: moto de segundo dono, revisões feitas na concessionária até 2023."
             error={errors.initialNotes}

@@ -5,6 +5,7 @@ import { Button } from '@/components/Button'
 import { Notice } from '@/components/Notice'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { PushCard } from './PushCard'
+import { PageHeader } from '@/components/AppLayout'
 import { KIND_LABEL, fetchNotifications, fetchPreferences, markRead, setPreference, type NotificationPreference } from './api'
 
 const when = (iso: string) => new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
@@ -20,9 +21,9 @@ function Preferences() {
   })
   if (!prefs.data) return null
   return (
-    <section className="mt-12" aria-labelledby="prefs-title">
-      <h2 id="prefs-title" className="heading text-2xl text-ink">Preferências</h2>
-      <p className="mt-1 max-w-2xl text-sm text-muted">
+    <section className="rounded-sheet border border-rule bg-sheet p-5" aria-labelledby="prefs-title">
+      <h2 id="prefs-title" className="font-semibold text-ink">O que receber</h2>
+      <p className="mt-1 text-sm text-muted">
         Avisos sobre pagamentos, oficinas e transferências são essenciais e sempre aparecem aqui. "No celular" vale para os aparelhos com
         notificação ativada. O envio por e-mail ainda não está ativo: se marcar, você passa a receber quando for ligado.
       </p>
@@ -82,15 +83,15 @@ export function NotificationsPage() {
 
   return (
     <div>
-      <h1 className="heading text-3xl text-ink">Notificações</h1>
-      <p className="mt-1 text-muted">Avisos sobre suas motos, sua oficina e sua assinatura.</p>
-      <PushCard />
+      <PageHeader title="Notificações" intro="Avisos sobre suas motos, sua oficina e sua assinatura." />
+      <div className="mt-8 grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_30rem] 2xl:grid-cols-[minmax(0,1fr)_34rem]">
+      <section aria-label="Avisos" className="min-w-0">
       {list.isError && <div className="mt-6"><Notice tone="error">Não foi possível carregar as notificações.</Notice></div>}
-      {list.isSuccess && items.length === 0 && <p className="mt-8 text-muted">Nenhuma notificação por enquanto.</p>}
+      {list.isSuccess && items.length === 0 && <p className="rounded-sheet border border-dashed border-rule bg-sheet p-8 text-muted">Nenhuma notificação por enquanto.</p>}
       {items.length > 0 && (
-        <ol className="mt-6 divide-y divide-rule border-y border-rule">
+        <ol className="divide-y divide-rule overflow-hidden rounded-sheet border border-rule bg-sheet">
           {items.map((n) => (
-            <li key={n.id} className={`py-4 ${n.read_at ? '' : 'border-l-4 border-l-ink pl-3'}`}>
+            <li key={n.id} className={`px-5 py-4 ${n.read_at ? '' : 'border-l-4 border-l-ink pl-4'}`}>
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                 <p className="font-semibold text-ink">
                   {!n.read_at && <span className="sr-only">Nova: </span>}
@@ -108,7 +109,12 @@ export function NotificationsPage() {
           Ver mais antigas
         </Button>
       )}
-      <Preferences />
+      </section>
+      <aside className="flex min-w-0 flex-col gap-6" aria-label="Configurações dos avisos">
+        <PushCard />
+        <Preferences />
+      </aside>
+      </div>
     </div>
   )
 }

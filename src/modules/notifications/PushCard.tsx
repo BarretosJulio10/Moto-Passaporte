@@ -59,7 +59,7 @@ export function PushCard() {
   const active = Boolean(here)
   const list = devices.data ?? []
   return (
-    <section className="mt-6 max-w-2xl rounded-sheet border border-rule bg-sheet p-5" aria-labelledby="push-title">
+    <section className="rounded-sheet border border-rule bg-sheet p-5" aria-labelledby="push-title">
       <h2 id="push-title" className="font-semibold text-ink">Avisos no celular</h2>
       <p className="mt-1 text-sm text-muted">
         Receba os avisos como notificação, mesmo com o app fechado. Entre 22h e 8h eles esperam até de manhã, exceto pedidos de acesso de oficina.

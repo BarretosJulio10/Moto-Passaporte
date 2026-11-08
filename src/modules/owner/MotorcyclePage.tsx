@@ -74,10 +74,10 @@ export function MotorcyclePage() {
         <ButtonLink to={`/painel/motos/${motoId}/checkup`} size="sm">Abrir check-up</ButtonLink>
       </div>
 
-      {/* Celular: dados → QR Code → quilometragem. Computador: QR Code na coluna da direita. */}
-      <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_17rem]">
-        <div className="flex flex-col gap-8 lg:col-start-1 lg:row-start-1">
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-4 border-y border-rule py-5 sm:grid-cols-4">
+      {/* Celular: tudo em sequência. Notebook: 2 colunas. Monitor: dados | cuidados e compartilhamento | QR Code. */}
+      <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_18rem] 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_19rem]">
+        <div className="flex min-w-0 flex-col gap-8">
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-4 rounded-sheet border border-rule bg-sheet p-5 sm:grid-cols-3">
             <Field label="Ano" value={year} />
             <Field label="Cilindrada" value={m.displacement_cc ? `${m.displacement_cc} cm³` : '—'} />
             <Field label="Cor" value={m.color ?? '—'} />
@@ -95,16 +95,16 @@ export function MotorcyclePage() {
               Relatório do histórico em PDF
             </Link>
           </p>
+          <MileageSection motorcycleId={motoId} />
+        </div>
+        <aside className="flex min-w-0 flex-col gap-8 lg:col-start-2 lg:row-start-1 2xl:col-start-3">
+          <QrCodePanel publicId={publicId} label={`${m.brand}-${m.model}`} motorcycleId={motoId} />
+        </aside>
+        <div className="flex min-w-0 flex-col gap-8 lg:col-span-2 2xl:col-span-1 2xl:col-start-2 2xl:row-start-1">
           <RemindersSection motorcycleId={motoId} />
           <ShareSection motorcycleId={motoId} />
           <OwnerAccessSection motorcycleId={motoId} />
           <TransferSection motorcycleId={motoId} />
-        </div>
-        <aside className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
-          <QrCodePanel publicId={publicId} label={`${m.brand}-${m.model}`} motorcycleId={motoId} />
-        </aside>
-        <div className="lg:col-start-1 lg:row-start-2">
-          <MileageSection motorcycleId={motoId} />
         </div>
       </div>
     </div>
