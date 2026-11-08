@@ -990,6 +990,12 @@ export type Database = {
         }[]
       }
       admin_get_user: { Args: { p_reason: string; p_user_id: string }; Returns: Json }
+      admin_grant_premium: { Args: { p_plan_id: string; p_reason: string; p_until: string | null; p_user_id: string }; Returns: string }
+      admin_revoke_premium: { Args: { p_reason: string; p_user_id: string }; Returns: undefined }
+      admin_get_premium_grant: {
+        Args: { p_user_id: string }
+        Returns: { active: boolean; expires_at: string | null; id: string; plan_name: string; reason: string; starts_at: string }[]
+      }
       admin_set_user_status: { Args: { p_reason: string; p_status: string; p_user_id: string }; Returns: undefined }
       admin_list_workshops: {
         Args: { p_limit?: number; p_search?: string | null }

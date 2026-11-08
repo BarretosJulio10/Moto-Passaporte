@@ -9,6 +9,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.36.0] — 08/11/2026 — Premium por cortesia
+
+### Adicionado
+- /admin → Usuários → detalhe: "Premium por cortesia" para liberar ou retirar um plano Premium sem cobrança, com prazo opcional e motivo auditado; a pessoa recebe aviso (ADR-037).
+
+### Operação
+- Conta do administrador com Premium anual por cortesia, sem prazo.
+
+### Testes
+- Supabase real (com desfazer): permissões fechadas, plano gratuito e data passada recusados, troca de cortesia, plano exibido como "Premium anual (cortesia)" e volta ao gratuito ao retirar.
+
+### Rollback desta versão
+- `supabase/rollback/20261108161839_premium_grants.down.sql` e publicar o site anterior.
+
 ## [0.35.0] — 08/11/2026 — Direitos do titular (LGPD)
 
 ### Adicionado

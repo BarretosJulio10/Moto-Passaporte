@@ -182,3 +182,22 @@ export async function sendNotice(userId: string, title: string, body: string, re
   const { error } = await getSupabase().rpc('admin_send_notice', { p_user_id: userId, p_title: title, p_body: body, p_reason: reason })
   if (error) throw error
 }
+
+// Premium por cortesia (ADR-037)
+export type PremiumGrant = Fn['admin_get_premium_grant']['Returns'][number]
+
+export async function getPremiumGrant(userId: string): Promise<PremiumGrant | null> {
+  const { data, error } = await getSupabase().rpc('admin_get_premium_grant', { p_user_id: userId })
+  if (error) throw error
+  return data?.[0] ?? null
+}
+
+export async function grantPremium(userId: string, planId: string, until: string | null, reason: string): Promise<void> {
+  const { error } = await getSupabase().rpc('admin_grant_premium', { p_user_id: userId, p_plan_id: planId, p_until: until, p_reason: reason })
+  if (error) throw error
+}
+
+export async function revokePremium(userId: string, reason: string): Promise<void> {
+  const { error } = await getSupabase().rpc('admin_revoke_premium', { p_user_id: userId, p_reason: reason })
+  if (error) throw error
+}

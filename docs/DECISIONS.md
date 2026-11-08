@@ -109,6 +109,12 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-037 — Premium por cortesia
+**Data:** 08/11/2026 · **Status:** aceita (pedido do responsável: liberar o Premium para a conta admin)
+- O administrador libera um plano Premium sem cobrança para uma conta, em /admin → Usuários → detalhe → "Premium por cortesia", com motivo auditado e prazo opcional (vale até o fim do dia escolhido, horário de Brasília). Uma cortesia em vigor por conta; trocar encerra a anterior. A pessoa recebe aviso.
+- Ordem do plano vigente: assinatura paga > cortesia > gratuito. A cortesia tem os benefícios e limites do plano escolhido no catálogo, com o nome "(cortesia)" e preço zero. Não gera fatura, pagamento nem cobrança no Mercado Pago.
+- Uso previsto: conta da equipe, parceiros, oficinas convidadas e testes. Tabela `premium_grants` sem acesso direto (só por funções).
+
 ### ADR-036 — Direitos do titular: cópia dos dados, pedidos e exclusão por anonimização (LGPD art. 18; PRD 15.6)
 **Data:** 08/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável; texto jurídico pendente de revisão)
 - Em "Minha conta" o usuário baixa a cópia dos seus dados (JSON: conta, motos atuais com placas, km, manutenções e lembretes, motos anteriores, diário, links, transferências, oficinas, assinaturas, faturas, pagamentos, avisos e pedidos). Ficam de fora caminhos de arquivo, códigos de links, chassi (cifrado) e dados de terceiros.

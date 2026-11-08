@@ -2,11 +2,12 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/Button'
-import { TextAreaField, TextField } from '@/components/Field'
+import { SelectField, TextAreaField, TextField } from '@/components/Field'
 import { Notice } from '@/components/Notice'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { formatPlate } from '@/core/shared/format'
-import { ACCOUNT_STATUS_LABEL, getUserDetail, listUsers, sendNotice, setUserStatus, validReason, type AccountStatus, type AdminUserDetail, type AdminUserRow } from './adminApi'
+import { adminListPlans } from '@/modules/plans/api'
+import { ACCOUNT_STATUS_LABEL, getPremiumGrant, grantPremium, revokePremium, getUserDetail, listUsers, sendNotice, setUserStatus, validReason, type AccountStatus, type AdminUserDetail, type AdminUserRow } from './adminApi'
 import { ReasonForm } from './ReasonForm'
 
 const err = (e: unknown) => translateDbError(e as { code?: string; message?: string })
@@ -43,6 +44,68 @@ function SendNotice({ userId, onDone }: { userId: string; onDone: () => void }) 
         <Button type="button" size="sm" variant="secondary" onClick={onDone}>Cancelar</Button>
       </div>
     </form>
+  )
+}
+
+/** Premium por cortesia: liberado sem cobrança, com motivo auditado (ADR-037). */
+function PremiumCourtesy({ userId }: { userId: string }) {
+  const qc = useQueryClient()
+  const grant = useQuery({ queryKey: ['admin-premium-grant', userId], queryFn: () => getPremiumGrant(userId) })
+  const plans = useQuery({ queryKey: ['admin-plans'], queryFn: adminListPlans })
+  const premium = (plans.data ?? []).filter((p) => p.kind === 'premium' && p.is_active)
+  const [mode, setMode] = useState<'grant' | 'revoke' | null>(null)
+  const [planId, setPlanId] = useState('')
+  const [until, setUntil] = useState('')
+  const [reason, setReason] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const done = () => {
+    setMode(null)
+    setReason('')
+    setUntil('')
+    qc.invalidateQueries({ queryKey: ['admin-premium-grant', userId] })
+    qc.invalidateQueries({ queryKey: ['admin-users'] })
+  }
+  const give = useMutation({ mutationFn: () => grantPremium(userId, planId || premium[0]?.id || '', until || null, reason.trim()), onSuccess: done, onError: (e) => setError(err(e)) })
+  const remove = useMutation({ mutationFn: (r: string) => revokePremium(userId, r), onSuccess: done })
+  function submit(e: FormEvent) {
+    e.preventDefault()
+    const r = validReason(reason)
+    if (r) return setError(r)
+    setError(null)
+    give.mutate()
+  }
+  const g = grant.data
+  return (
+    <div className="mt-4 rounded-doc border border-rule bg-paper p-4" role="region" aria-label="Premium por cortesia">
+      <p className="font-semibold text-ink">Premium por cortesia</p>
+      <p className="mt-1 text-graphite">
+        {g ? `${g.plan_name} liberado sem cobrança ${g.expires_at ? `até ${new Date(g.expires_at).toLocaleDateString('pt-BR')}` : 'sem prazo'}${g.active ? '' : ' (vencido)'}. Motivo: ${g.reason}`
+           : 'Nenhuma cortesia em vigor. Use para equipe, parceiros, oficinas convidadas ou testes; não gera cobrança nem fatura.'}
+      </p>
+      {!mode && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button size="sm" variant="secondary" onClick={() => setMode('grant')}>{g ? 'Trocar cortesia' : 'Liberar Premium'}</Button>
+          {g && <Button size="sm" variant="secondary" onClick={() => setMode('revoke')}>Retirar cortesia</Button>}
+        </div>
+      )}
+      {mode === 'grant' && (
+        <form onSubmit={submit} noValidate className="mt-3 grid gap-3" aria-label="Liberar Premium por cortesia">
+          <SelectField label="Plano" value={planId || premium[0]?.id || ''} onChange={(e) => setPlanId(e.target.value)}
+            options={premium.map((p) => p.id)} optionLabel={(id) => premium.find((p) => p.id === id)?.name ?? id} />
+          <TextField label="Válido até (em branco = sem prazo)" type="date" value={until} onChange={(e) => setUntil(e.target.value)} />
+          <TextField label="Motivo interno (fica na auditoria)" value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} />
+          {error && <Notice tone="error">{error}</Notice>}
+          <div className="flex gap-3">
+            <Button type="submit" size="sm" loading={give.isPending}>Liberar</Button>
+            <Button type="button" size="sm" variant="secondary" onClick={() => setMode(null)}>Cancelar</Button>
+          </div>
+        </form>
+      )}
+      {mode === 'revoke' && (
+        <ReasonForm title="Retirar cortesia" confirmLabel="Retirar" pending={remove.isPending}
+          error={remove.isError ? err(remove.error) : null} onCancel={() => setMode(null)} onConfirm={(r) => remove.mutate(r)} />
+      )}
+    </div>
   )
 }
 
@@ -87,6 +150,7 @@ function UserDetail({ user, detail, onClose }: { user: AdminUserRow; detail: Adm
           <Button size="sm" variant="quiet" onClick={onClose}>Fechar</Button>
         </div>
       )}
+      <PremiumCourtesy userId={user.id} />
       {notice && <SendNotice userId={user.id} onDone={() => setNotice(false)} />}
       {action && (
         <ReasonForm
