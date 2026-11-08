@@ -8,6 +8,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 |---|---|
 | `20261107003043_base.sql` | pgcrypto, utilitários (placa), auditoria imutável, triggers genéricos |
 | `20261107003102_identity.sql` | `profiles`, `user_roles`, criação automática no cadastro, `has_role`/`is_admin`, `system_settings` |
+| `20261108194522_workshop_management.sql` | PRD 2.1 Fase 4 (ADR-046): `workshop_parts_catalog`, `workshop_payments`, `workshop_appointments`, `workshop_reminders`, `workshop_contact_log`; permissão `can_manage_finance`; tolerância a autor zerado em registros permanentes. Reversão em `supabase/rollback/` |
 | `20261108192705_workshop_history_integration.sql` | PRD 2.1 Fase 3 (ADR-045): vínculo OS → `maintenance_records`, fotos → `attachments`, trava da OS concluída, registro pelo `create_workshop_service`. Reversão em `supabase/rollback/` (não apaga registros do histórico) |
 | `20261108191115_workshop_service_orders.sql` | PRD 2.1 Fase 2 (ADR-044): `workshop_service_orders`, itens, eventos, `workshop_inspections`, `workshop_os_photos`, `workshop_os_shares`; bucket privado `workshop-files`; permissão `can_execute_orders`; aviso `service_order_assigned`. Reversão em `supabase/rollback/` |
 | `20261108184011_workshop_quotes.sql` | PRD 2.1 Fase 1 (ADR-043): clientes, motos da oficina, catálogo, tabelas de preço, orçamentos, versões, itens, links, aceites e eventos; permissões `can_manage_quotes`/`can_manage_prices`; avisos `quote_*`; vencimento diário. Reversão em `supabase/rollback/` |

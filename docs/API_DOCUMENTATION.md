@@ -397,3 +397,7 @@ Todas recebem `p_org` (a oficina) e conferem a sessão. Detalhes em `docs/module
 | `workshop_publish_order_to_history(org, os, categoria?, título?, mostrar_valor?)` | `manage_quotes` + `register_services` + autorização vigente | Registro posterior |
 | `workshop_order_history(org, os)` | Membro | Situação (`ready`, `published`, `not_linked`, `no_access`…), sugestões, registro, fotos já enviadas |
 | `workshop_link_photo_to_history(org, os, foto, anexo)` | `manage_quotes` | Liga a foto da OS ao anexo criado pelo fluxo `register_workshop_attachment` |
+
+### Gestão (Fase 4, ADR-046)
+
+Contrato completo em `docs/modules/WORKSHOP_MANAGEMENT.md`. Resumo: peças (`workshop_save_part`, `workshop_list_parts`), recebimentos (`workshop_record_payment`, `workshop_void_payment`, `workshop_order_payments`, `workshop_finance`), agenda (`workshop_save_appointment`, `workshop_set_appointment_status`, `workshop_list_appointments`), lembretes e contatos (`workshop_save_reminder`, `workshop_set_reminder_status`, `workshop_log_contact`, `workshop_relationship`, `workshop_customer_contacts`) e `workshop_reports`. `set_org_member_extra_permissions` ganhou `p_manage_finance`; `get_my_workshop_permissions` devolve `manage_finance`.

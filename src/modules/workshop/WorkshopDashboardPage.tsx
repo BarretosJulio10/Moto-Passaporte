@@ -11,6 +11,7 @@ import { fetchDashboard } from './quotes/api'
 import { fetchOrdersSummary } from './service-orders/api'
 import { Card, WorkshopShell } from './shared/WorkshopShell'
 import { formatCents } from './shared/rpc'
+import { APPT_LABEL, agendaRange, fetchFinance, listAppointments } from './management/api'
 import type { MyWorkshop } from './api'
 import type { WorkshopPermissions } from './customers/api'
 
@@ -30,7 +31,7 @@ function rangeFor(p: Period): { from: string; to: string } {
   return { from: `${to.slice(0, 8)}01`, to }
 }
 
-/** Visão geral da oficina (PRD 2.1 §3). Mostra só o que já existe; OS, agenda e recebimentos chegam nas próximas fases. */
+/** Visão geral da oficina (PRD 2.1 §3): orçamentos, OS, agenda do dia e (com permissão) recebimentos. */
 export function WorkshopDashboardPage() {
   return <WorkshopShell>{({ orgId, shop, perms }) => <Dashboard orgId={orgId} shop={shop} perms={perms} />}</WorkshopShell>
 }
@@ -43,8 +44,13 @@ function Dashboard({ orgId, shop, perms }: { orgId: string; shop: MyWorkshop; pe
   const range = period === 'custom' ? custom : rangeFor(period)
   const dash = useQuery({ queryKey: ['ws-dashboard', orgId, range.from, range.to], queryFn: () => fetchDashboard(orgId, range.from, range.to) })
   const os = useQuery({ queryKey: ['ws-orders-summary', orgId, range.from, range.to], queryFn: () => fetchOrdersSummary(orgId, range.from, range.to) })
+  const fin = useQuery({ queryKey: ['ws-finance', orgId, range.from, range.to], queryFn: () => fetchFinance(orgId, range.from, range.to), enabled: perms.manage_finance })
+  const today = agendaRange('dia', new Date())
+  const agenda = useQuery({ queryKey: ['ws-agenda', orgId, 'dia', today.from.toISOString()], queryFn: () => listAppointments(orgId, today.from, today.to) })
   const d = dash.data
   const s = os.data
+  const f = fin.data
+  const appts = (agenda.data ?? []).filter((a) => a.status !== 'canceled')
   const base = `/oficina/${orgId}`
 
   return (
@@ -116,12 +122,37 @@ function Dashboard({ orgId, shop, perms }: { orgId: string; shop: MyWorkshop; pe
               </p>
             </>
           )}
-          <p className="mt-2 text-xs text-muted">Valor aprovado e concluído não são dinheiro recebido. Recebimentos e agenda entram na Fase 4.</p>
+          {f && (
+            <>
+              <h2 className="heading mt-6 text-lg text-ink">Financeiro</h2>
+              <ul className="mt-2 grid gap-3 sm:grid-cols-3">
+                <Kpi to={`${base}/financeiro`} label="Recebido no período" value={formatCents(f.received_cents)} sub="recebimentos registrados" />
+                <Kpi to={`${base}/financeiro`} label="A receber" value={formatCents(f.pending_total_cents)} sub={`${f.receivables.length} OS concluída${f.receivables.length === 1 ? '' : 's'} com saldo`} />
+                <Kpi to={`${base}/financeiro`} label="Concluído no período" value={formatCents(f.completed_cents)} sub={`${formatCents(f.discounts_cents)} em descontos`} />
+              </ul>
+            </>
+          )}
+          <p className="mt-2 text-xs text-muted">Valor aprovado e concluído não são dinheiro recebido; o recebido é o que a equipe registrou em Financeiro.</p>
         </>
       )}
 
       <div className="mt-8 grid gap-6 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="flex flex-col gap-6">
+          <Card title="Agenda de hoje" actions={<ButtonLink to={`${base}/agenda`} size="sm" variant="secondary">Abrir agenda</ButtonLink>}>
+            {agenda.isLoading ? <p className="text-sm text-muted" role="status">Carregando…</p> : appts.length === 0 ? (
+              <p className="text-sm text-muted">Nenhum horário marcado para hoje.</p>
+            ) : (
+              <ul className="divide-y divide-rule/70 text-sm">
+                {appts.map((a) => (
+                  <li key={a.id} className="flex flex-wrap justify-between gap-2 py-2">
+                    <span><span className="font-semibold tabular-nums text-ink">{new Date(a.starts_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                      {' · '}{a.customer_name ?? a.contact_name} · {a.service_description}</span>
+                    <span className="text-muted">{APPT_LABEL[a.status]}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
           {shop.can_request_access ? (
             <PlateSearchPanel organizationId={shop.organization_id} />
           ) : (
@@ -146,12 +177,12 @@ function Dashboard({ orgId, shop, perms }: { orgId: string; shop: MyWorkshop; pe
   )
 }
 
-function Kpi({ to, label, value, sub }: { to: string; label: string; value: number; sub: string }) {
+function Kpi({ to, label, value, sub }: { to: string; label: string; value: number | string; sub: string }) {
   return (
     <li>
       <Link to={to} className="block h-full rounded-sheet border border-rule bg-sheet px-4 py-3 hover:border-ink/50">
         <p className="text-sm text-muted">{label}</p>
-        <p className="heading text-3xl text-ink tabular-nums">{value}</p>
+        <p className="heading text-2xl sm:text-3xl text-ink tabular-nums">{value}</p>
         <p className="text-xs text-muted">{sub}</p>
       </Link>
     </li>

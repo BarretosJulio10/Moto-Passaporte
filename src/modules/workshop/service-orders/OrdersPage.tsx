@@ -116,8 +116,9 @@ export function NewOrderPage() {
 
 function NewOrder({ orgId }: { orgId: string }) {
   const navigate = useNavigate()
+  const [params] = useSearchParams()
   const [search, setSearch] = useState('')
-  const [customerId, setCustomerId] = useState('')
+  const [customerId, setCustomerId] = useState(params.get('cliente') ?? '')
   const [vehicleId, setVehicleId] = useState('')
   const [method, setMethod] = useState<AuthMethod>('presencial')
   const [by, setBy] = useState('')

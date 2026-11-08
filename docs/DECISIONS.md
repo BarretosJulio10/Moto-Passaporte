@@ -109,6 +109,16 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-046 — Módulo Oficina (PRD 2.1), Fase 4: gestão operacional sem fiscal e sem envio automático
+**Data:** 08/11/2026 · **Status:** aceita (Fase 3 validada: "continue")
+- **Financeiro é controle de recebimentos por OS**, não nota fiscal, caixa nem conciliação bancária (PRD 2.1 §15.3). Recebimento nunca é apagado nem editado: estorno com motivo. Soma não passa do total da OS. Concluído ≠ recebido nas telas.
+- **Permissão própria `can_manage_finance`** (padrão desligado): valores recebidos, a receber e a parte financeira dos relatórios ficam só com quem o responsável escolher. Custo da peça segue a permissão de preços.
+- **Peças**: catálogo simples com custo, venda e margem; `stock_qty` reservado, sem controle de estoque nesta versão. No orçamento a peça entra como item comum (descrição + preço), sem vínculo rígido.
+- **Agenda** interna; o campo `source='publico'` fica pronto para o agendamento pelo perfil público (Fase 5).
+- **Relacionamento sem envio automático**: lembretes e listas de recuperação; o botão abre o WhatsApp com texto pronto e registra que a mensagem foi preparada (imutável, não prova envio). WhatsApp oficial é Fase 5.
+- **Relatórios** calculados no banco por período (fuso de São Paulo); imprimir pelo navegador e CSV com `;` e BOM para abrir no Excel.
+- Registros permanentes (eventos, contatos, recebimentos, itens) aceitam só zerar o autor quando a conta é excluída (`wq_only_user_nulled`), para a exclusão de conta (LGPD) continuar funcionando.
+
 ### ADR-045 — Módulo Oficina (PRD 2.1), Fase 3: OS concluída vira registro no histórico da moto
 **Data:** 08/11/2026 · **Status:** aceita (Fase 2 validada: "continue"; registro direto, sem aprovação prévia do titular — recomendação aceita)
 - **Quando**: na conclusão da OS (padrão ligado, a oficina pode desmarcar e registrar depois) ou depois, pelo botão "Registrar no histórico". Exige moto da oficina vinculada ao passaporte, **autorização do titular vigente** e permissões "Clientes, orçamentos e OS" + "Registrar serviços". Sem isso, o atendimento fica só no registro da oficina (a OS mostra o motivo).

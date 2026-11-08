@@ -6,6 +6,7 @@ import { Notice } from '@/components/Notice'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { formatPlate, todayISO } from '@/core/shared/format'
 import { fetchCatalog, suggestPrice, CATEGORY_LABEL } from '../service-catalog/api'
+import { listParts } from '../management/api'
 import { fetchCustomer, vehicleLabel } from '../customers/api'
 import { centsToInput, formatCents, onlyDigits, parseMoney } from '../shared/rpc'
 import { Card } from '../shared/WorkshopShell'
@@ -55,6 +56,17 @@ export function QuoteEditor({ orgId, quote, version, onSaved, onSent }: {
   const [confirmSend, setConfirmSend] = useState(false)
 
   const services = (catalog.data?.services ?? []).filter((s) => s.active)
+  const partsQ = useQuery({ queryKey: ['ws-parts', orgId, '', false], queryFn: () => listParts(orgId) })
+  const parts = partsQ.data ?? []
+  const [pickPart, setPickPart] = useState('')
+  function addPart(partId: string) {
+    const p = parts.find((x) => x.id === partId)
+    if (!p) return
+    touch()
+    setRows((rs) => [...rs, { key: newKey(), kind: 'part', description: p.manufacturer ? `${p.name} (${p.manufacturer})` : p.name, service_id: null,
+      quantity: '1', price: centsToInput(p.sale_cents), notes: '', hint: p.sale_cents == null ? 'peça sem preço de venda: informe o valor' : undefined }])
+    setPickPart('')
+  }
   const vehicles = (customer.data?.vehicles ?? []).filter((v) => v.status === 'active' || v.id === quote.vehicle_id)
   const discountNumber = Number(discount.replace(',', '.')) || 0
   const totals = useMemo(() => computeTotals(
@@ -197,6 +209,16 @@ export function QuoteEditor({ orgId, quote, version, onSaved, onSent }: {
                   className="w-full rounded-doc border border-rule bg-sheet px-3 py-2.5 text-base focus:border-ink focus:outline-none">
                   <option value="">Escolha um serviço…</option>
                   {services.map((s) => <option key={s.id} value={s.id}>{s.name} ({CATEGORY_LABEL[s.category]})</option>)}
+                </select>
+              </label>
+            )}
+            {parts.length > 0 && (
+              <label className="flex min-w-[16rem] flex-1 flex-col gap-1.5">
+                <span className="text-sm font-semibold text-graphite">Adicionar peça</span>
+                <select value={pickPart} onChange={(e) => { setPickPart(e.target.value); if (e.target.value) addPart(e.target.value) }}
+                  className="w-full rounded-doc border border-rule bg-sheet px-3 py-2.5 text-base focus:border-ink focus:outline-none">
+                  <option value="">Escolha uma peça…</option>
+                  {parts.map((p) => <option key={p.id} value={p.id}>{p.name}{p.internal_code ? ` · ${p.internal_code}` : ''}{p.sale_cents != null ? ` · ${formatCents(p.sale_cents)}` : ''}</option>)}
                 </select>
               </label>
             )}

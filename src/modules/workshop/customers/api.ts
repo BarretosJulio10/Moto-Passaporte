@@ -99,6 +99,7 @@ export type WorkshopPermissions = {
   manage_quotes: boolean
   manage_prices: boolean
   execute_orders: boolean
+  manage_finance: boolean
   user_id?: string
 }
 

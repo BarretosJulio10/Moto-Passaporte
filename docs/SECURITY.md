@@ -246,3 +246,8 @@ Ver `KNOWN_ISSUES.md`.
 - O registro no passaporte usa só `create_workshop_service` (exige autorização vigente do titular e a permissão "Registrar serviços"); não há escrita paralela no histórico.
 - Uma OS gera um registro; OS concluída travada por gatilho; revogação bloqueia novos registros sem apagar os anteriores.
 - Fotos copiadas pelo fluxo de anexos da oficina (conferência de conteúdo e cota). Teste: `tests/security/phase7c_workshop_history_test.sql`.
+
+### Gestão da oficina (ADR-046)
+- 5 tabelas novas (`workshop_parts_catalog`, `workshop_payments`, `workshop_appointments`, `workshop_reminders`, `workshop_contact_log`) com RLS; gravação só por funções. `workshop_payments` só é lida com a permissão `manage_finance`; custo de peça só sai para `manage_prices`.
+- Recebimentos e contatos não são apagados (gatilho); recebimento só muda para estorno com motivo. Excluir conta só zera o autor (`wq_only_user_nulled`).
+- Nenhuma função nova executável por `anon` (conferido em produção). Teste: `tests/security/phase7d_workshop_management_test.sql`.

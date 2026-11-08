@@ -9,6 +9,24 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.47.0] — 08/11/2026 — Módulo Oficina (PRD 2.1), Fase 4: gestão
+
+### Adicionado
+- **Agenda** (dia, semana e mês): cliente cadastrado ou só nome e WhatsApp, responsável, situação, "Chegou" abre orçamento ou OS, confirmação pelo WhatsApp. Agenda de hoje na visão geral.
+- **Peças e produtos**: catálogo com código, fabricante, compatibilidade, custo (só para quem cuida de preços), venda e margem. No orçamento, "Adicionar peça" já traz o preço.
+- **Financeiro**: recebimentos por OS (dinheiro, Pix, débito, crédito, transferência, outro), estorno com motivo, a receber, recebido por forma e por dia, exportação CSV. Quadro financeiro na visão geral.
+- **Relacionamento**: lembretes de manutenção (por data ou km, criados na OS ou na ficha do cliente), orçamentos sem resposta, orçamentos perdidos e clientes sem voltar, com mensagem pronta no WhatsApp e registro do contato.
+- **Relatórios**: comercial, operacional, serviços mais feitos, por mecânico e financeiro; imprimir/PDF e CSV.
+- Ficha do cliente com lembretes, últimos contatos e pagamentos.
+- Permissão nova da equipe: **Financeiro** (desligada por padrão).
+
+### Segurança
+- 5 tabelas novas com RLS e gravação só por funções; recebimentos só para quem tem Financeiro, nunca apagados; custo de peça oculto para quem não cuida de preços. Excluir conta de funcionário só tira o autor dos registros permanentes.
+
+### Testes
+- Banco: 28 verificações novas (`phase7d_workshop_management_test.sql`) — 984 OK. Fumaça em produção (transação desfeita): pagamento acima do total bloqueado, estorno, agenda, lembrete, relatórios.
+- Tela: 8 novos — 232.
+
 ## [0.46.0] — 08/11/2026 — Módulo Oficina (PRD 2.1), Fase 3: histórico permanente
 
 ### Adicionado

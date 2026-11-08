@@ -15,6 +15,7 @@ import { CustomerFields, VehicleForm, emptyVehicle, validateCustomer, vehicleToI
 import { Card, StatusChip, WorkshopShell } from '../shared/WorkshopShell'
 import { formatCents, formatPhone } from '../shared/rpc'
 import { STATUS_LABEL, STATUS_TONE, type QuoteStatus } from '../quotes/api'
+import { RelationshipCard } from '../management/CustomerRelationship'
 import { fetchCustomerOrders, ORDER_STATUS_LABEL, ORDER_STATUS_TONE } from '../service-orders/api'
 
 export function CustomerPage() {
@@ -74,6 +75,7 @@ function CustomerView({ orgId, canEdit }: { orgId: string; canEdit: boolean }) {
               </Button>
             </div>
           )}
+          <RelationshipCard orgId={orgId} customerId={c.id} vehicles={c.vehicles} canEdit={canEdit} />
         </div>
 
         <div className="flex flex-col gap-6">

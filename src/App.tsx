@@ -49,6 +49,11 @@ const OrdersPage = lazy(() => import('@/modules/workshop/service-orders/OrdersPa
 const NewOrderPage = lazy(() => import('@/modules/workshop/service-orders/OrdersPage').then((m) => ({ default: m.NewOrderPage })))
 const OrderPage = lazy(() => import('@/modules/workshop/service-orders/OrderPage').then((m) => ({ default: m.OrderPage })))
 const OrderPublicPage = lazy(() => import('@/modules/workshop/service-orders/OrderPublicPage').then((m) => ({ default: m.OrderPublicPage })))
+const PartsPage = lazy(() => import('@/modules/workshop/management/PartsPage').then((m) => ({ default: m.PartsPage })))
+const AgendaPage = lazy(() => import('@/modules/workshop/management/AgendaPage').then((m) => ({ default: m.AgendaPage })))
+const FinancePage = lazy(() => import('@/modules/workshop/management/FinancePage').then((m) => ({ default: m.FinancePage })))
+const ReportsPage = lazy(() => import('@/modules/workshop/management/ReportsPage').then((m) => ({ default: m.ReportsPage })))
+const RelationshipPage = lazy(() => import('@/modules/workshop/management/RelationshipPage').then((m) => ({ default: m.RelationshipPage })))
 const QuoteApprovalPage = lazy(() => import('@/modules/workshop/quote-approval/QuoteApprovalPage').then((m) => ({ default: m.QuoteApprovalPage })))
 const InvitePage = lazy(() => import('@/modules/workshop/InvitePage').then((m) => ({ default: m.InvitePage })))
 const PublicWorkshopPage = lazy(() => import('@/modules/workshop/PublicWorkshopPage').then((m) => ({ default: m.PublicWorkshopPage })))
@@ -176,6 +181,11 @@ export const routes = [
           { path: '/oficina/:orgId/os', element: <OrdersPage /> },
           { path: '/oficina/:orgId/os/nova', element: <NewOrderPage /> },
           { path: '/oficina/:orgId/os/:orderId', element: <OrderPage /> },
+          { path: '/oficina/:orgId/pecas', element: <PartsPage /> },
+          { path: '/oficina/:orgId/agenda', element: <AgendaPage /> },
+          { path: '/oficina/:orgId/financeiro', element: <FinancePage /> },
+          { path: '/oficina/:orgId/relatorios', element: <ReportsPage /> },
+          { path: '/oficina/:orgId/relacionamento', element: <RelationshipPage /> },
           { path: '/oficina/:orgId/motos/:motoId', element: <WorkshopMotoPage /> },
           { path: '/oficina/:orgId/motos/:motoId/servico', element: <WorkshopServiceFormPage /> },
           { path: '/convite/:token', element: <InvitePage /> },

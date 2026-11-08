@@ -88,7 +88,8 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 | Oficina (PRD 2.1) Fase 1: clientes, catálogo, preços, orçamentos, aprovação por link | 2.1-F1 | `testado` (ADR-043, `docs/modules/`) |
 | Oficina (PRD 2.1) Fase 2: ordens de serviço, checklists, fotos, comprovante | 2.1-F2 | `testado` (ADR-044) |
 | Oficina (PRD 2.1) Fase 3: OS concluída no histórico da moto | 2.1-F3 | `testado` (ADR-045) |
-| Oficina (PRD 2.1) Fases 4–5: agenda, peças, financeiro, relatórios, perfil | 2.1 | `planejado` |
+| Oficina (PRD 2.1) Fase 4: agenda, peças, financeiro, relacionamento, relatórios | 2.1-F4 | `testado` (ADR-046) |
+| Oficina (PRD 2.1) Fase 5: perfil avançado, avaliações, agendamento público | 2.1 | `planejado` |
 
 ## 6. Ambientes
 

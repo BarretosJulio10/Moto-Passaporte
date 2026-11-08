@@ -6,13 +6,19 @@ import { fetchMyPermissions, type WorkshopPermissions } from '../customers/api'
 import type { MyWorkshop } from '../api'
 
 /** Abas do módulo Oficina (PRD 2.1 §22.1). Itens das próximas fases entram quando existirem. */
-const TABS: { to: string; label: string; end?: boolean }[] = [
+type Tab = { to: string; label: string; end?: boolean; show?: (p: WorkshopPermissions) => boolean }
+const TABS: Tab[] = [
   { to: '', label: 'Visão geral', end: true },
+  { to: 'agenda', label: 'Agenda' },
   { to: 'orcamentos', label: 'Orçamentos' },
   { to: 'os', label: 'Ordens de serviço' },
   { to: 'clientes', label: 'Clientes' },
+  { to: 'relacionamento', label: 'Relacionamento' },
   { to: 'motos', label: 'Motos' },
   { to: 'servicos', label: 'Serviços e preços' },
+  { to: 'pecas', label: 'Peças' },
+  { to: 'financeiro', label: 'Financeiro', show: (p) => p.manage_finance },
+  { to: 'relatorios', label: 'Relatórios', show: (p) => p.manage_quotes || p.manage_finance },
   { to: 'equipe', label: 'Equipe' },
   { to: 'perfil', label: 'Perfil da oficina' },
 ]
@@ -40,7 +46,7 @@ export function WorkshopShell({ children }: { children: (ctx: WorkshopContext) =
       </div>
     )
   }
-  const tabs = TABS.filter((t) => t.to !== 'perfil' || shop.role === 'responsible')
+  const tabs = TABS.filter((t) => (t.to !== 'perfil' || shop.role === 'responsible') && (!t.show || t.show(perms.data)))
 
   return (
     <div>

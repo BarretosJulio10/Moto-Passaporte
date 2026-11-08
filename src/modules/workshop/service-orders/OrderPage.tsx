@@ -15,6 +15,7 @@ import type { WorkshopPermissions } from '../customers/api'
 import { InspectionCard, PhotosCard } from './InspectionAndPhotos'
 import { OrderReceipt, type ReceiptDoc } from './OrderReceipt'
 import { HistoryCard, HistoryOptionsFields } from './HistoryCard'
+import { PaymentsCard, ReminderForm } from '../management/widgets'
 import {
   addComplement, addOrderItem, fetchOrderHistory, type HistoryOptions, type OrderHistory, AUTH_LABEL, AUTH_METHODS, cancelOrder, CLOSED, completeOrder, createOrderLink, deliverOrder, fetchOrder,
   itemNet, ITEM_STATUS_LABEL, MANUAL_STATUSES, notifyPickup, ORDER_STATUS_LABEL, ORDER_STATUS_TONE, orderLink, setOrderStatus,
@@ -216,6 +217,9 @@ function OrderView({ orgId, perms }: { orgId: string; perms: WorkshopPermissions
             </Card>
           )}
 
+          {perms.manage_finance && <PaymentsCard orgId={orgId} orderId={o.id} canceled={o.status === 'canceled'} />}
+          {manage && o.completed_at && o.status !== 'canceled' && <ReminderCard orgId={orgId} order={o} />}
+
           {manage && !closed && <CancelCard orgId={orgId} order={o} run={run} busy={busy} />}
           {o.status === 'canceled' && <Notice tone="info" title="OS cancelada">{o.canceled_reason}</Notice>}
 
@@ -354,6 +358,24 @@ function TechnicalNotes({ orgId, order, canEdit, onSaved }: { orgId: string; ord
             onClick={async () => { setSaving(true); try { await setTechnicalNotes(orgId, order.id, v); await onSaved() } finally { setSaving(false) } }}>Salvar observações</Button>
         </>
       ) : <p className="whitespace-pre-line text-graphite">{order.technical_notes}</p>}
+    </Card>
+  )
+}
+
+/** Lembrete de manutenção a partir da OS concluída (PRD 2.1 §14.1). */
+function ReminderCard({ orgId, order: o }: { orgId: string; order: Order }) {
+  const [open, setOpen] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const first = o.items.find((i) => i.status === 'done')?.description
+  return (
+    <Card title="Próxima manutenção">
+      {saved && !open && <p className="mb-2 text-sm text-emerald-800">Lembrete criado. Ele aparece em Relacionamento quando estiver perto.</p>}
+      {open ? (
+        <ReminderForm orgId={orgId} customerId={o.customer_id} vehicleId={o.vehicle_id} orderId={o.id} suggestion={first ? `Próxima: ${first}` : ''}
+          onDone={() => { setOpen(false); setSaved(true) }} onCancel={() => setOpen(false)} />
+      ) : (
+        <Button size="sm" variant="secondary" onClick={() => setOpen(true)}>Criar lembrete para o cliente</Button>
+      )}
     </Card>
   )
 }
