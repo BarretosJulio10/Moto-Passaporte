@@ -220,6 +220,7 @@ export function AdminUsersPage() {
   const [search, setSearch] = useState('')
   const [term, setTerm] = useState('')
   const [opening, setOpening] = useState<string | null>(null)
+  const [bonus, setBonus] = useState<string | null>(null)
   const [opened, setOpened] = useState<{ id: string; detail: AdminUserDetail } | null>(null)
   const users = useQuery({ queryKey: ['admin-users', term], queryFn: () => listUsers(term) })
 
@@ -241,7 +242,7 @@ export function AdminUsersPage() {
       <Link to="/admin" className="text-sm text-muted underline underline-offset-4">Administração</Link>
       <h1 className="heading mt-2 text-3xl text-ink">Usuários</h1>
       <p className="mt-1 max-w-2xl text-muted">
-        E-mails aparecem mascarados. Para ver dados de uma conta ou mudar a situação dela, informe o motivo: tudo fica na auditoria.
+        E-mails aparecem mascarados. "Bônus Premium" libera meses de Premium sem cobrança direto da lista. Para ver dados de uma conta ou mudar a situação dela, informe o motivo: tudo fica na auditoria.
       </p>
       <form onSubmit={submit} className="mt-5 flex max-w-xl items-end gap-3" role="search">
         <TextField label="Buscar por nome ou e-mail" value={search} onChange={(e) => setSearch(e.target.value)} className="flex-1" />
@@ -266,10 +267,16 @@ export function AdminUsersPage() {
                   {u.workshops > 0 ? ` · ${u.workshops} oficina(s)` : ''}
                 </p>
               </div>
-              {opened?.id !== u.id && opening !== u.id && (
-                <Button size="sm" variant="secondary" onClick={() => { setOpened(null); setOpening(u.id) }}>Ver dados</Button>
-              )}
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant={bonus === u.id ? 'primary' : 'secondary'} onClick={() => setBonus(bonus === u.id ? null : u.id)}>
+                  {bonus === u.id ? 'Fechar bônus' : 'Bônus Premium'}
+                </Button>
+                {opened?.id !== u.id && opening !== u.id && (
+                  <Button size="sm" variant="secondary" onClick={() => { setOpened(null); setOpening(u.id) }}>Ver dados</Button>
+                )}
+              </div>
             </div>
+            {bonus === u.id && opened?.id !== u.id && <PremiumCourtesy userId={u.id} />}
             {opening === u.id && (
               <ReasonForm
                 title="Por que você precisa ver os dados desta conta?"

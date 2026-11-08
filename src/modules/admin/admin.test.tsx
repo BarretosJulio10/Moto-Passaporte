@@ -154,12 +154,11 @@ describe('bônus Premium sem cobrança', () => {
     expect(addMonths(new Date(2026, 7, 31), 6)).toBe('2027-02-28')
   })
 
-  it('libera 3 meses com um clique e confirmação', async () => {
+  it('libera 3 meses direto da lista, sem abrir dados pessoais', async () => {
     const user = userEvent.setup()
     wrap(<AdminUsersPage />)
-    await user.click((await screen.findAllByRole('button', { name: 'Ver dados' }))[0]!)
-    await user.type(screen.getByLabelText(/Motivo/), 'Atendimento: liberar bônus')
-    await user.click(within(screen.getByRole('form')).getByRole('button', { name: 'Ver dados' }))
+    await user.click((await screen.findAllByRole('button', { name: 'Bônus Premium' }))[0]!)
+    expect(calls.some((c) => c.fn === 'getUser')).toBe(false)
     const box = await screen.findByRole('region', { name: 'Bônus Premium' })
     const group = within(box).getByRole('group', { name: 'Duração do bônus' })
     for (const label of ['1 mês', '2 meses', '3 meses', '4 meses', '5 meses', '6 meses']) expect(within(group).getByRole('button', { name: label })).toBeVisible()

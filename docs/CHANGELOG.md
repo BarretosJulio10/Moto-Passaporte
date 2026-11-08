@@ -9,6 +9,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.38.1] — 08/11/2026 — Bônus Premium direto na lista
+
+### Alterado
+- Botão "Bônus Premium" em cada conta da lista de usuários: libera de 1 a 6 meses sem precisar abrir os dados pessoais (não exige o motivo de consulta; a concessão continua auditada).
+
 ## [0.38.0] — 08/11/2026 — Bônus Premium em um clique e atualização automática
 
 ### Adicionado
