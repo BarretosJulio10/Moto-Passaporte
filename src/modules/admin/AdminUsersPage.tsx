@@ -47,51 +47,97 @@ function SendNotice({ userId, onDone }: { userId: string; onDone: () => void }) 
   )
 }
 
-/** Premium por cortesia: liberado sem cobrança, com motivo auditado (ADR-037). */
+/** Data local (AAAA-MM-DD) somando meses; fim de mês ajustado (31/01 + 1 mês = 28 ou 29/02). */
+export function addMonths(base: Date, months: number): string {
+  const d = new Date(base.getFullYear(), base.getMonth() + months, 1)
+  const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()
+  d.setDate(Math.min(base.getDate(), last))
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+const BONUS_MONTHS = [1, 2, 3, 4, 5, 6] as const
+const months = (n: number) => `${n} ${n === 1 ? 'mês' : 'meses'}`
+const br = (ymd: string) => ymd.split('-').reverse().join('/')
+
+/** Bônus Premium sem cobrança: atalhos de 1 a 6 meses ou prazo livre, com motivo auditado (ADR-037). */
 function PremiumCourtesy({ userId }: { userId: string }) {
   const qc = useQueryClient()
   const grant = useQuery({ queryKey: ['admin-premium-grant', userId], queryFn: () => getPremiumGrant(userId) })
   const plans = useQuery({ queryKey: ['admin-plans'], queryFn: adminListPlans })
   const premium = (plans.data ?? []).filter((p) => p.kind === 'premium' && p.is_active)
-  const [mode, setMode] = useState<'grant' | 'revoke' | null>(null)
+  const [mode, setMode] = useState<'custom' | 'revoke' | null>(null)
+  const [pick, setPick] = useState<number | null>(null)
   const [planId, setPlanId] = useState('')
   const [until, setUntil] = useState('')
   const [reason, setReason] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const done = () => {
+  const [ok, setOk] = useState<string | null>(null)
+  const g = grant.data
+  const plan = planId || premium[0]?.id || ''
+  // Com bônus em vigor e prazo definido, os meses são somados ao fim do bônus atual.
+  const base = g?.active && g.expires_at ? new Date(new Date(g.expires_at).getTime() - 1) : new Date()
+  const done = (msg: string) => {
     setMode(null)
+    setPick(null)
     setReason('')
     setUntil('')
+    setError(null)
+    setOk(msg)
     qc.invalidateQueries({ queryKey: ['admin-premium-grant', userId] })
     qc.invalidateQueries({ queryKey: ['admin-users'] })
   }
-  const give = useMutation({ mutationFn: () => grantPremium(userId, planId || premium[0]?.id || '', until || null, reason.trim()), onSuccess: done, onError: (e) => setError(err(e)) })
-  const remove = useMutation({ mutationFn: (r: string) => revokePremium(userId, r), onSuccess: done })
-  function submit(e: FormEvent) {
+  const give = useMutation({
+    mutationFn: (v: { until: string | null; reason: string }) => grantPremium(userId, plan, v.until, v.reason),
+    onSuccess: (_, v) => done(v.until ? `Premium liberado até ${br(v.until)}.` : 'Premium liberado sem prazo.'),
+    onError: (e) => setError(err(e)),
+  })
+  const remove = useMutation({ mutationFn: (r: string) => revokePremium(userId, r), onSuccess: () => done('Bônus retirado. A conta volta ao plano gratuito.') })
+  function confirmBonus() {
+    if (!pick) return
+    const u = addMonths(base, pick)
+    give.mutate({ until: u, reason: `Bônus Premium de ${months(pick)} sem cobrança, liberado pelo painel admin` })
+  }
+  function submitCustom(e: FormEvent) {
     e.preventDefault()
     const r = validReason(reason)
     if (r) return setError(r)
     setError(null)
-    give.mutate()
+    give.mutate({ until: until || null, reason: reason.trim() })
   }
-  const g = grant.data
   return (
-    <div className="mt-4 rounded-doc border border-rule bg-paper p-4" role="region" aria-label="Premium por cortesia">
-      <p className="font-semibold text-ink">Premium por cortesia</p>
+    <div className="mt-4 rounded-doc border border-rule bg-paper p-4" role="region" aria-label="Bônus Premium">
+      <p className="font-semibold text-ink">Bônus Premium (sem cobrança)</p>
       <p className="mt-1 text-graphite">
-        {g ? `${g.plan_name} liberado sem cobrança ${g.expires_at ? `até ${new Date(g.expires_at).toLocaleDateString('pt-BR')}` : 'sem prazo'}${g.active ? '' : ' (vencido)'}. Motivo: ${g.reason}`
-           : 'Nenhuma cortesia em vigor. Use para equipe, parceiros, oficinas convidadas ou testes; não gera cobrança nem fatura.'}
+        {g ? `${g.plan_name} liberado ${g.expires_at ? `até ${new Date(new Date(g.expires_at).getTime() - 1).toLocaleDateString('pt-BR')}` : 'sem prazo'}${g.active ? '' : ' (vencido)'}.`
+           : 'Nenhum bônus em vigor. A conta usa o plano gratuito ou a assinatura paga.'}
       </p>
-      {!mode && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Button size="sm" variant="secondary" onClick={() => setMode('grant')}>{g ? 'Trocar cortesia' : 'Liberar Premium'}</Button>
-          {g && <Button size="sm" variant="secondary" onClick={() => setMode('revoke')}>Retirar cortesia</Button>}
+      {ok && <div className="mt-2"><Notice tone="success">{ok}</Notice></div>}
+      {premium.length > 1 && (
+        <div className="mt-3 max-w-xs">
+          <SelectField label="Benefícios do plano" value={plan} onChange={(e) => setPlanId(e.target.value)}
+            options={premium.map((p) => p.id)} optionLabel={(id) => premium.find((p) => p.id === id)?.name ?? id} />
         </div>
       )}
-      {mode === 'grant' && (
-        <form onSubmit={submit} noValidate className="mt-3 grid gap-3" aria-label="Liberar Premium por cortesia">
-          <SelectField label="Plano" value={planId || premium[0]?.id || ''} onChange={(e) => setPlanId(e.target.value)}
-            options={premium.map((p) => p.id)} optionLabel={(id) => premium.find((p) => p.id === id)?.name ?? id} />
+      <p className="mt-3 text-xs text-muted">{g?.active && g.expires_at ? 'Somar ao bônus atual:' : 'Liberar Premium por:'}</p>
+      <div className="mt-1 flex flex-wrap gap-2" role="group" aria-label="Duração do bônus">
+        {BONUS_MONTHS.map((n) => (
+          <Button key={n} size="sm" variant={pick === n ? 'primary' : 'secondary'} onClick={() => { setPick(n); setMode(null); setOk(null) }}>
+            {months(n)}
+          </Button>
+        ))}
+        <Button size="sm" variant="quiet" onClick={() => { setMode('custom'); setPick(null); setOk(null) }}>Outro prazo</Button>
+        {g && <Button size="sm" variant="quiet" onClick={() => { setMode('revoke'); setPick(null); setOk(null) }}>Retirar bônus</Button>}
+      </div>
+      {pick && (
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <span className="text-graphite">Premium até <strong>{br(addMonths(base, pick))}</strong>, sem cobrança. A pessoa recebe um aviso.</span>
+          <Button size="sm" loading={give.isPending} onClick={confirmBonus}>Confirmar {months(pick)}</Button>
+          <Button size="sm" variant="secondary" onClick={() => setPick(null)}>Cancelar</Button>
+        </div>
+      )}
+      {pick && error && <div className="mt-2"><Notice tone="error">{error}</Notice></div>}
+      {mode === 'custom' && (
+        <form onSubmit={submitCustom} noValidate className="mt-3 grid gap-3" aria-label="Bônus com outro prazo">
           <TextField label="Válido até (em branco = sem prazo)" type="date" value={until} onChange={(e) => setUntil(e.target.value)} />
           <TextField label="Motivo interno (fica na auditoria)" value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} />
           {error && <Notice tone="error">{error}</Notice>}
@@ -102,7 +148,7 @@ function PremiumCourtesy({ userId }: { userId: string }) {
         </form>
       )}
       {mode === 'revoke' && (
-        <ReasonForm title="Retirar cortesia" confirmLabel="Retirar" pending={remove.isPending}
+        <ReasonForm title="Retirar bônus Premium" confirmLabel="Retirar" pending={remove.isPending}
           error={remove.isError ? err(remove.error) : null} onCancel={() => setMode(null)} onConfirm={(r) => remove.mutate(r)} />
       )}
     </div>

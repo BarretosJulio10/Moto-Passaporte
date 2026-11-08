@@ -42,6 +42,9 @@ vi.mock('./adminApi', async () => {
         motorcycles: [{ id: 'm1', name: 'Honda CG 160', year: 2022, plate: 'ABC1D23', since: '' }], workshops: [], subscription: null }
     },
     setUserStatus: async (...args: unknown[]) => { calls.push({ fn: 'setUserStatus', args }) },
+    getPremiumGrant: async () => null,
+    grantPremium: async (...args: unknown[]) => { calls.push({ fn: 'grantPremium', args }) },
+    revokePremium: async (...args: unknown[]) => { calls.push({ fn: 'revokePremium', args }) },
     listWorkshops: async () => workshops,
     setWorkshopStatus: async (...args: unknown[]) => { calls.push({ fn: 'setWorkshopStatus', args }) },
     setWorkshopVerification: async (...args: unknown[]) => { calls.push({ fn: 'setWorkshopVerification', args }) },
@@ -60,6 +63,10 @@ vi.mock('./adminApi', async () => {
     getAuditEntry: async (...args: unknown[]) => { calls.push({ fn: 'getAuditEntry', args }); return { previous_data: { value: 7 }, new_data: { value: 5, reason: 'Decisão comercial' } } },
   }
 })
+vi.mock('@/modules/plans/api', async () => ({
+  ...(await vi.importActual<typeof import('@/modules/plans/api')>('@/modules/plans/api')),
+  adminListPlans: async () => [{ id: 'p-anual', name: 'Premium anual', kind: 'premium', is_active: true }],
+}))
 vi.mock('@/lib/supabase', () => ({
   getSupabase: () => ({
     from: () => ({ select: () => ({ order: () => ({ limit: async () => ({ data: [], error: null }) }) }) }),
@@ -67,7 +74,7 @@ vi.mock('@/lib/supabase', () => ({
 }))
 
 import { AdminDashboardPage } from './AdminDashboardPage'
-import { AdminUsersPage } from './AdminUsersPage'
+import { AdminUsersPage, addMonths } from './AdminUsersPage'
 import { AdminWorkshopsPage } from './AdminWorkshopsPage'
 import { AdminSettingsPage } from './AdminSettingsPage'
 import { AdminAuditPage } from './AdminAuditPage'
@@ -137,6 +144,31 @@ describe('usuários', () => {
     await user.type(within(region).getByLabelText(/Motivo/), 'Denúncia de uso indevido em análise')
     await user.click(within(region).getByRole('button', { name: 'Confirmar' }))
     expect(calls.find((c) => c.fn === 'setUserStatus')!.args).toEqual(['u1', 'suspended', 'Denúncia de uso indevido em análise'])
+  })
+})
+
+describe('bônus Premium sem cobrança', () => {
+  it('soma meses ajustando o fim do mês', () => {
+    expect(addMonths(new Date(2026, 10, 8), 3)).toBe('2027-02-08')
+    expect(addMonths(new Date(2026, 0, 31), 1)).toBe('2026-02-28')
+    expect(addMonths(new Date(2026, 7, 31), 6)).toBe('2027-02-28')
+  })
+
+  it('libera 3 meses com um clique e confirmação', async () => {
+    const user = userEvent.setup()
+    wrap(<AdminUsersPage />)
+    await user.click((await screen.findAllByRole('button', { name: 'Ver dados' }))[0]!)
+    await user.type(screen.getByLabelText(/Motivo/), 'Atendimento: liberar bônus')
+    await user.click(within(screen.getByRole('form')).getByRole('button', { name: 'Ver dados' }))
+    const box = await screen.findByRole('region', { name: 'Bônus Premium' })
+    const group = within(box).getByRole('group', { name: 'Duração do bônus' })
+    for (const label of ['1 mês', '2 meses', '3 meses', '4 meses', '5 meses', '6 meses']) expect(within(group).getByRole('button', { name: label })).toBeVisible()
+    await user.click(within(group).getByRole('button', { name: '3 meses' }))
+    expect(calls.some((c) => c.fn === 'grantPremium')).toBe(false)
+    await user.click(await within(box).findByRole('button', { name: 'Confirmar 3 meses' }))
+    const call = calls.find((c) => c.fn === 'grantPremium')!
+    expect(call.args).toEqual(['u1', 'p-anual', addMonths(new Date(), 3), 'Bônus Premium de 3 meses sem cobrança, liberado pelo painel admin'])
+    expect(await within(box).findByText(/Premium liberado até/)).toBeVisible()
   })
 })
 

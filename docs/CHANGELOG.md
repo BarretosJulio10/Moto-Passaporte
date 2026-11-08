@@ -9,6 +9,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.38.0] — 08/11/2026 — Bônus Premium em um clique e atualização automática
+
+### Adicionado
+- /admin → Usuários → detalhe → "Bônus Premium (sem cobrança)": botões de 1 a 6 meses com confirmação (um clique + confirmar), além de "Outro prazo" e "Retirar bônus". Com bônus em vigor, os meses são somados ao fim do bônus atual. Motivo gravado automaticamente na auditoria (ADR-037).
+
+### Corrigido
+- Aba aberta durante uma publicação nova mostrava "Unexpected Application Error / Failed to fetch dynamically imported module". Agora o site recarrega sozinho uma vez para pegar a versão nova; outros erros mostram uma tela amigável com "Recarregar".
+
+### Testes
+- 6 novos (soma de meses com fim de mês, bônus de 3 meses com confirmação, erro de versão antiga, tela de erro amigável): 193 no total.
+
 ## [0.37.0] — 08/11/2026 — Alerta ativo
 
 ### Adicionado

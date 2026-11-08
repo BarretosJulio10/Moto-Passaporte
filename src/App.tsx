@@ -1,5 +1,6 @@
-import { lazy } from 'react'
-import { createBrowserRouter, Link, RouterProvider, ScrollRestoration, Outlet } from 'react-router-dom'
+import { lazy, useEffect } from 'react'
+import { createBrowserRouter, Link, RouterProvider, ScrollRestoration, Outlet, useRouteError } from 'react-router-dom'
+import { isStaleChunkError, reloadForNewVersion } from '@/core/shared/staleChunk'
 import { PublicLayout } from '@/modules/public_site/PublicLayout'
 import { HomePage } from '@/modules/public_site/HomePage'
 import { LegalPage } from '@/modules/public_site/LegalPage'
@@ -10,6 +11,7 @@ import { SignInPage } from '@/modules/auth/SignInPage'
 import { ForgotPasswordPage } from '@/modules/auth/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/modules/auth/ResetPasswordPage'
 import { AppLayout } from '@/components/AppLayout'
+import { Button } from '@/components/Button'
 import { RequireAdmin } from '@/modules/admin/RequireAdmin'
 import { RequireAuth } from '@/core/auth/RequireAuth'
 
@@ -59,6 +61,29 @@ function Root() {
   )
 }
 
+/** Erro inesperado numa tela: versão nova publicada (recarrega sozinho) ou falha real (mensagem amigável). */
+export function RouteErrorPage() {
+  const error = useRouteError()
+  const stale = isStaleChunkError(error)
+  useEffect(() => {
+    if (stale) reloadForNewVersion()
+  }, [stale])
+  return (
+    <div className="mx-auto max-w-xl px-5 py-20" role="alert">
+      <h1 className="heading text-3xl text-ink">{stale ? 'Atualizando o Moto Passaporte…' : 'Algo deu errado nesta tela'}</h1>
+      <p className="mt-3 text-muted">
+        {stale
+          ? 'Publicamos uma versão nova. Se a página não recarregar sozinha, toque no botão abaixo.'
+          : 'Tente recarregar a página. Se continuar, fale com o suporte pela página de contato.'}
+      </p>
+      <div className="mt-6 flex flex-wrap gap-4">
+        <Button onClick={() => window.location.reload()}>Recarregar</Button>
+        <Link to="/" className="self-center font-semibold text-ink underline underline-offset-4">Ir para o início</Link>
+      </div>
+    </div>
+  )
+}
+
 function NotFoundPage() {
   return (
     <div className="mx-auto max-w-xl px-5 py-20">
@@ -72,6 +97,7 @@ function NotFoundPage() {
 export const routes = [
   {
     element: <Root />,
+    errorElement: <RouteErrorPage />,
     children: [
       {
         element: <PublicLayout />,
