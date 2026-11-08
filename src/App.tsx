@@ -57,6 +57,8 @@ const RelationshipPage = lazy(() => import('@/modules/workshop/management/Relati
 const ReviewsPage = lazy(() => import('@/modules/workshop/growth/ReviewsPage').then((m) => ({ default: m.ReviewsPage })))
 const CampaignsPage = lazy(() => import('@/modules/workshop/growth/CampaignsPage').then((m) => ({ default: m.CampaignsPage })))
 const AdminReviewsPage = lazy(() => import('@/modules/admin/AdminReviewsPage').then((m) => ({ default: m.AdminReviewsPage })))
+const ClaimPage = lazy(() => import('@/modules/customer_link/ClaimPage').then((m) => ({ default: m.ClaimPage })))
+const MyRecordsPage = lazy(() => import('@/modules/customer_link/MyRecordsPage').then((m) => ({ default: m.MyRecordsPage })))
 const QuoteApprovalPage = lazy(() => import('@/modules/workshop/quote-approval/QuoteApprovalPage').then((m) => ({ default: m.QuoteApprovalPage })))
 const InvitePage = lazy(() => import('@/modules/workshop/InvitePage').then((m) => ({ default: m.InvitePage })))
 const PublicWorkshopPage = lazy(() => import('@/modules/workshop/PublicWorkshopPage').then((m) => ({ default: m.PublicWorkshopPage })))
@@ -157,6 +159,8 @@ export const routes = [
           { path: '/painel/motos/nova', element: <RegisterMotorcyclePage /> },
           { path: '/painel/plano', element: <MyPlanPage /> },
           { path: '/painel/notificacoes', element: <NotificationsPage /> },
+          { path: '/painel/atendimentos', element: <MyRecordsPage /> },
+          { path: '/painel/vincular/:kind/:token', element: <ClaimPage /> },
           { path: '/painel/conta', element: <AccountPage /> },
           { path: '/painel/plano/recibo/:id', element: <ReceiptPage /> },
           { path: '/painel/motos/:id', element: <MotorcyclePage /> },

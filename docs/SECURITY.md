@@ -247,6 +247,10 @@ Ver `KNOWN_ISSUES.md`.
 - Uma OS gera um registro; OS concluída travada por gatilho; revogação bloqueia novos registros sem apagar os anteriores.
 - Fotos copiadas pelo fluxo de anexos da oficina (conferência de conteúdo e cota). Teste: `tests/security/phase7c_workshop_history_test.sql`.
 
+### Cliente com conta (ADR-048)
+- Vínculo só com conta logada + token de link que a oficina enviou (convite: 256 bits, hash, 30 dias, uso único; ou link do orçamento/OS) + confirmação. Sem ligação por placa, telefone ou e-mail. Cadastro já ligado é recusado para outra conta.
+- `get_my_workshop_records` filtra por `user_id = auth.uid()` e não devolve observações internas, custos nem dados de outros clientes. Teste: `tests/security/phase7f_workshop_customer_link_test.sql`.
+
 ### Crescimento comercial (ADR-047)
 - Funções públicas novas (`get_public_workshop`, `get_public_booking_slots`, `request_public_appointment`, `submit_workshop_review`) com limite por conexão (`public_workshop_views_per_hour` = 300, `public_booking_requests_per_hour` = 10) e devolvendo só campos comerciais.
 - Leitura sem conta no Storage só para arquivos de `workshop_public_photos` de oficina pública e ativa (`is_public_workshop_file`); fotos de OS seguem privadas.

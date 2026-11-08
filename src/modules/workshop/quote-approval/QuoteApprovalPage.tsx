@@ -9,6 +9,7 @@ import { formatDate } from '@/core/shared/format'
 import { formatCents, formatDateTime, formatPhone } from '../shared/rpc'
 import { QuoteDocument, type DocItem, type QuoteDoc } from '../quotes/QuoteDocument'
 import { decideQuote, fetchPublicQuote, approvedTotal, type PublicQuote } from './api'
+import { SaveToAccount } from '@/modules/customer_link/SaveToAccount'
 
 type Err = { code?: string; message?: string }
 
@@ -88,6 +89,7 @@ export function QuoteApprovalPage() {
               <Button className="mt-3" variant="secondary" size="sm" onClick={() => window.print()}>Salvar comprovante em PDF</Button>
             </div>
           )}
+          <div className="mt-4"><SaveToAccount kind="quote" token={token} workshop={p.workshop.business_name} /></div>
         </aside>
       </div>
     </div>

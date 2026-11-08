@@ -16,13 +16,14 @@ import { Card, StatusChip, WorkshopShell } from '../shared/WorkshopShell'
 import { formatCents, formatPhone } from '../shared/rpc'
 import { STATUS_LABEL, STATUS_TONE, type QuoteStatus } from '../quotes/api'
 import { RelationshipCard } from '../management/CustomerRelationship'
+import { AccountLinkCard } from '@/modules/customer_link/AccountLinkCard'
 import { fetchCustomerOrders, ORDER_STATUS_LABEL, ORDER_STATUS_TONE } from '../service-orders/api'
 
 export function CustomerPage() {
-  return <WorkshopShell>{({ orgId, perms }) => <CustomerView orgId={orgId} canEdit={perms.manage_quotes} />}</WorkshopShell>
+  return <WorkshopShell>{({ orgId, perms, shop }) => <CustomerView orgId={orgId} canEdit={perms.manage_quotes} workshopName={shop.business_name} isResponsible={perms.responsible} />}</WorkshopShell>
 }
 
-function CustomerView({ orgId, canEdit }: { orgId: string; canEdit: boolean }) {
+function CustomerView({ orgId, canEdit, workshopName, isResponsible }: { orgId: string; canEdit: boolean; workshopName: string; isResponsible: boolean }) {
   const { customerId = '' } = useParams()
   const queryClient = useQueryClient()
   const key = ['ws-customer', orgId, customerId]
@@ -75,6 +76,7 @@ function CustomerView({ orgId, canEdit }: { orgId: string; canEdit: boolean }) {
               </Button>
             </div>
           )}
+          <AccountLinkCard orgId={orgId} workshopName={workshopName} customer={c} canInvite={canEdit} isResponsible={isResponsible} />
           <RelationshipCard orgId={orgId} customerId={c.id} vehicles={c.vehicles} canEdit={canEdit} optOutAt={c.marketing_opt_out_at} />
         </div>
 

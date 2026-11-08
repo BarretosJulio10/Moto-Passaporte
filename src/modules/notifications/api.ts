@@ -29,6 +29,9 @@ export const KIND_LABEL: Record<string, string> = {
   service_order_assigned: 'Ordem de serviço designada a mim',
   appointment_requested: 'Pedidos de agendamento pelo site',
   workshop_review: 'Novas avaliações da oficina',
+  workshop_update: 'Andamento dos meus atendimentos em oficinas',
+  workshop_reminder_due: 'Lembretes de clientes vencendo (oficina)',
+  appointment_canceled: 'Agendamentos cancelados (oficina)',
 }
 
 export async function fetchNotifications(before?: string): Promise<AppNotification[]> {

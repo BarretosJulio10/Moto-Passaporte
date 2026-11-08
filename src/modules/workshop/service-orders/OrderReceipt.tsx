@@ -2,6 +2,7 @@ import { formatKm, formatPlate } from '@/core/shared/format'
 import { formatCents, formatDateTime, formatPhone } from '../shared/rpc'
 import { ITEM_KIND_LABEL, type ItemKind } from '../quotes/api'
 import { STATE_LABEL, ENTRY_ITEMS, EXIT_ITEMS, type InspectionItems } from './api'
+import { WorkshopLogo } from '../shared/WorkshopLogo'
 
 export type ReceiptItem = {
   position: number
@@ -51,7 +52,7 @@ export function OrderReceipt({ doc }: { doc: ReceiptDoc }) {
       className="report-sheet mx-auto max-w-[52rem] rounded-sheet border border-rule bg-white p-4 text-[13px] leading-relaxed text-ink shadow-sm sm:p-8">
       <header className="flex flex-wrap items-start justify-between gap-4 border-b-2 border-ink pb-4">
         <div className="flex min-w-0 items-start gap-3">
-          {w.logo_url && <img src={w.logo_url} alt="" className="h-14 w-14 rounded-doc object-contain" />}
+          <WorkshopLogo src={w.logo_url} />
           <div>
             <p className="heading text-xl">{w.business_name}</p>
             {w.cnpj && <p className="text-muted">CNPJ {w.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5')}</p>}

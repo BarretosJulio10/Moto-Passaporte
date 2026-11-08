@@ -405,3 +405,7 @@ Contrato completo em `docs/modules/WORKSHOP_MANAGEMENT.md`. Resumo: peças (`wor
 ### Crescimento comercial (Fase 5, ADR-047)
 
 Contrato completo em `docs/modules/WORKSHOP_GROWTH.md`. Públicas (sem conta, com limite): `get_public_workshop`, `get_public_booking_slots`, `request_public_appointment`, `submit_workshop_review`. Da oficina: fotos do perfil, avaliações (`workshop_list_reviews`, `workshop_reply_review`, `workshop_report_review`), campanhas (`workshop_save_campaign`, `workshop_close_campaign`, `workshop_list_campaigns`, `workshop_campaign_recipients`, `workshop_set_marketing_opt_out`). Admin: `admin_list_reviews`, `admin_moderate_review`. `get_service_order_by_token` passou a devolver `review` no comprovante.
+
+### Cliente com conta (Fase 5.1, ADR-048)
+
+Contrato em `docs/modules/WORKSHOP_CUSTOMER_LINK.md`: `workshop_create_customer_invite`, `get_customer_link_preview`, `claim_workshop_customer`, `get_my_workshop_records`, `unlink_my_workshop_customer`, `workshop_unlink_customer`. Rotina diária `system_workshop_reminders()` (serviço).

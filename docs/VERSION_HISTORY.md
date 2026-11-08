@@ -19,5 +19,6 @@ Registro das versões do documento de requisitos e dos marcos do produto. O deta
 | 0.44 | 08/11/2026 | PRD 2.1 — Fase 1 do módulo Oficina (atendimento e orçamento) |
 | 0.45 | 08/11/2026 | PRD 2.1 — Fase 2 do módulo Oficina (ordem de serviço) |
 | 0.46 | 08/11/2026 | PRD 2.1 — Fase 3 do módulo Oficina (histórico permanente) |
+| 0.49 | 08/11/2026 | PRD 2.1 — Fase 5.1 do módulo Oficina (cliente com conta, avisos, logotipo) |
 | 0.48 | 08/11/2026 | PRD 2.1 — Fase 5 do módulo Oficina (perfil público, avaliações, agendamento pelo site, campanhas) |
 | 0.47 | 08/11/2026 | PRD 2.1 — Fase 4 do módulo Oficina (gestão: agenda, peças, financeiro, relacionamento, relatórios) |

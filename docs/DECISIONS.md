@@ -109,6 +109,14 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-048 — Módulo Oficina (PRD 2.1), Fase 5.1: o cliente liga o próprio cadastro; avisos pelo vínculo
+**Data:** 08/11/2026 · **Status:** aceita ("ok continue")
+- **Prova do vínculo = link que a oficina enviou ao cliente + conta logada + confirmação.** Aceitos: convite (novo, uso único, 30 dias), link do orçamento e link da OS. Nunca por placa, telefone ou e-mail iguais (§4.3). Cadastro já ligado a outra conta é recusado; o responsável ou o cliente desfazem.
+- O vínculo é **entre a conta e o cadastro de cliente da oficina**, não entre motos: ligar a moto ao passaporte continua exigindo a autorização do titular pela placa (ADR-013/045). Assim um cliente pode acompanhar atendimentos mesmo sem passaporte da moto.
+- **Avisos ao cliente só com vínculo** (`workshop_update`, opcional): sem conta ligada, o canal continua sendo o WhatsApp da oficina. Gatilhos no banco garantem o aviso qualquer que seja a tela que mudou a situação; `dedupe_key` evita repetição.
+- Lembrete de manutenção vira aviso por rotina diária (uma vez por lembrete). Cancelamento de agendamento avisa o responsável só quando outra pessoa cancelou.
+- Logotipo: em vez de reescrever as quatro funções que montam documentos, `logo_url` passa a guardar `storage:workshop-files/<caminho>` (gatilho ao trocar o logo) e o site gera o link temporário.
+
 ### ADR-047 — Módulo Oficina (PRD 2.1), Fase 5: perfil, avaliações autênticas, agendamento público e campanhas sem envio em massa
 **Data:** 08/11/2026 · **Status:** aceita (Fase 4 validada: "continue")
 - **Perfil público por função** (`get_public_workshop`), não por leitura da tabela: lista fechada de campos comerciais. Fotos ficam no bucket privado existente; uma política libera a leitura sem conta só dos arquivos registrados no perfil de oficina pública e ativa. Assim não há bucket público e a conferência de conteúdo (ADR-033) vale para tudo.

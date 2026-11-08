@@ -9,6 +9,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.49.0] — 08/11/2026 — Módulo Oficina (PRD 2.1), Fase 5.1: cliente com conta, avisos e logotipo
+
+### Adicionado
+- **Convite para o Moto Passaporte** na ficha do cliente (link pelo WhatsApp da oficina) e caixa "Acompanhe pelo Moto Passaporte" nas páginas do orçamento e da OS.
+- **Vínculo seguro**: o próprio cliente, logado, abre o link e confirma "Sou eu". Nunca por coincidência de placa ou telefone.
+- **Meus atendimentos** no painel do cliente: OS, orçamentos, agendamentos e próximas manutenções das oficinas ligadas; desfazer a qualquer momento.
+- **Avisos**: cliente com conta é avisado de orçamento enviado, OS aberta e cada etapa (em execução, peças, concluída, pronta, entregue), agendamento confirmado/cancelado e manutenção vencendo; equipe recebe lembrete de manutenção vencendo (rotina diária) e o responsável, agendamento cancelado.
+- **Logotipo do perfil** no orçamento e no comprovante (tela, PDF e link do cliente).
+
+### Segurança
+- Convite com token de 256 bits guardado só como hash, 30 dias, uso único. Cadastro já ligado não muda de dono. O painel do cliente não mostra observações internas nem custos.
+
+### Testes
+- Banco: 20 verificações novas (`phase7f_workshop_customer_link_test.sql`) — 1041 OK. Fumaça em produção (transação desfeita): convite, prévia, vínculo, OS no painel e aviso ao cliente.
+- Tela: 3 novos — 242.
+
 ## [0.48.0] — 08/11/2026 — Módulo Oficina (PRD 2.1), Fase 5: crescimento comercial
 
 ### Adicionado

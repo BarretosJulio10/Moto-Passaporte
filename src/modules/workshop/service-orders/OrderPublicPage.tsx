@@ -11,6 +11,7 @@ import { rpc } from '../shared/rpc'
 import type { ItemKind } from '../quotes/api'
 import { OrderReceipt } from './OrderReceipt'
 import { ReviewBox } from '../growth/ReviewBox'
+import { SaveToAccount } from '@/modules/customer_link/SaveToAccount'
 import { AUTH_LABEL, ENTRY_ITEMS, STATE_LABEL, type AuthMethod, type InspectionItems } from './api'
 
 type Err = { code?: string; message?: string }
@@ -93,6 +94,7 @@ export function OrderPublicPage() {
         }} />
         {p.review && <div className="mt-8 print:hidden"><ReviewBox token={token} review={p.review} workshop={p.workshop.business_name} slug={p.workshop.public_slug ?? null}
           customerName={p.customer_name} onDone={() => queryClient.invalidateQueries({ queryKey: key })} /></div>}
+        <div className="mt-6"><SaveToAccount kind="order" token={token} workshop={p.workshop.business_name} /></div>
       </div>
     )
   }
