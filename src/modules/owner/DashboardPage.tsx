@@ -89,7 +89,7 @@ type Moto = Awaited<ReturnType<typeof fetchMyMotorcycles>>[number]
 
 /** Cartão da moto com o check-up resumido (km, óleo, corrente) e atalhos. */
 function MotoCard({ moto: m }: { moto: Moto }) {
-  const care = useQuery({ queryKey: ['care', m.id], queryFn: () => fetchCare(m.id), staleTime: 60_000 })
+  const care = useQuery({ queryKey: ['care', m.id], queryFn: () => fetchCare(m.id ?? ''), enabled: Boolean(m.id), staleTime: 60_000 })
   const c = care.data
   const days = c ? daysSince(c.km_updated_at) : null
   const oil = c?.oil
