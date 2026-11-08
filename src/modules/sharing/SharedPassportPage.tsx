@@ -8,6 +8,7 @@ import { formatBRL } from '@/modules/maintenance/schemas'
 import { KIND_LABEL } from '@/modules/attachments/files'
 import { DIARY_CATEGORY_LABEL } from '@/modules/diary/schemas'
 import { fetchSharedPassport, openSharedFile, type SharedPassport } from './sharesApi'
+import { isRateLimited } from '@/core/shared/rateLimit'
 
 type SharedAttachment = NonNullable<SharedPassport['history']>[number]['attachments']
 
@@ -84,6 +85,14 @@ export function SharedPassportPage() {
 
   if (valid && passport.isLoading) {
     return <p className="mx-auto max-w-3xl px-5 py-16 text-muted" role="status">Abrindo passaporte…</p>
+  }
+  if (passport.isError && isRateLimited(passport.error)) {
+    return (
+      <div className="mx-auto max-w-2xl px-5 py-16">
+        <h1 className="heading text-3xl text-ink">Muitas consultas seguidas</h1>
+        <p className="mt-3 text-muted">Por segurança, limitamos consultas repetidas a partir da mesma conexão. Aguarde alguns minutos e abra o link de novo.</p>
+      </div>
+    )
   }
   if (!valid || passport.isError || !passport.data) {
     return (

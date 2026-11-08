@@ -113,6 +113,7 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 - v0.31.0: páginas sob demanda (KI-010).
 - v0.32.0: conferência de conteúdo no servidor (ADR-033, KI-018). Testes que inserem em `storage.objects` no banco local passam pela conferência simulada no stub; para testar a recusa, `set tests.skip_file_check = 'on'`. No Supabase real, gravar o resultado como service_role (`record_attachment_check`).
 - v0.33.0: comprovantes pelo link (ADR-034, KI-022) e KI-023. Edge Functions publicadas pelo MCP podem levar só o trecho de `_shared` que usam; ao republicar a partir do Git, mandar o `_shared/mercadopago.ts` completo.
+- v0.34.0: limite de consultas anônimas (ADR-035, KI-003). Testes que chamam `get_public_passport`/`get_shared_passport` como anônimo com `request.headers` definido passam pelo limite (padrão 120/h). Ao mudar `get_shared_passport`, o rollback de `public_rate_limit` restaura a versão com ids de comprovantes e o de `shared_files` a versão anterior.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 

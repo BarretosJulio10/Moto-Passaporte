@@ -86,6 +86,8 @@
 | Supabase real — conferência de conteúdo, em transação desfeita | `tests/security/supabase/phase6j_attachment_checks_rollback.sql` | 8 aprovadas |
 | PostgreSQL 16 local — comprovantes pelo link | `tests/security/phase6k_shared_files_test.sql` | 14 aprovadas |
 | Supabase real — comprovantes pelo link, em transação desfeita | `tests/security/supabase/phase6k_shared_files_rollback.sql` | 7 aprovadas |
+| PostgreSQL 16 local — limite de consultas anônimas | `tests/security/phase6l_rate_limit_test.sql` | 12 aprovadas |
+| Supabase real — limite de consultas anônimas, em transação desfeita | `tests/security/supabase/phase6l_rate_limit_rollback.sql` | 6 aprovadas |
 | Supabase real — MFA de administradores, em transação desfeita | `tests/security/supabase/phase6g_admin_mfa_rollback.sql` | 8 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.

@@ -96,12 +96,12 @@ ok "chassis cifrados abrem no banco restaurado com a chave guardada"
 for f in $(ls "$ROOT"/supabase/rollback/*.down.sql | sort -r); do
   "${PSQL[@]}" -d "$DST" -f "$f" >/dev/null
 done
-gone=$("${PSQL[@]}" -d "$DST" -c "select count(*) from (values ('admin_storage_overview'), ('admin_resolve_claim'), ('admin_update_setting'), ('admin_get_metrics'), ('mask_email'), ('admin_job_status'), ('my_admin_access'), ('get_my_notifications'), ('record_attachment_check'), ('shared_attachment_for_download'), ('get_my_chassis')) v(f)
+gone=$("${PSQL[@]}" -d "$DST" -c "select count(*) from (values ('admin_storage_overview'), ('admin_resolve_claim'), ('admin_update_setting'), ('admin_get_metrics'), ('mask_email'), ('admin_job_status'), ('my_admin_access'), ('get_my_notifications'), ('record_attachment_check'), ('shared_attachment_for_download'), ('anon_rate_limit_ok'), ('get_my_chassis')) v(f)
                                    where exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname = v.f)")
 [ "$gone" = 0 ] || fail "rollback deixou funções para trás"
 cols=$("${PSQL[@]}" -d "$DST" -c "select count(*) from information_schema.columns where table_schema = 'public' and column_name in ('account_status', 'owner_notified_at')")
 [ "$cols" = 0 ] || fail "rollback deixou colunas para trás"
-ok "rollback remove funções, colunas e tabelas das 11 migrações"
+ok "rollback remove funções, colunas e tabelas das 12 migrações"
 [ "$("${PSQL[@]}" -d "$DST" -c "select count(*) from public.motorcycles")" = "$("${PSQL[@]}" -d "$SRC" -c "select count(*) from public.motorcycles")" ] || fail "rollback mexeu em motos"
 [ "$("${PSQL[@]}" -d "$DST" -c "select count(*) from public.maintenance_records")" = "$("${PSQL[@]}" -d "$SRC" -c "select count(*) from public.maintenance_records")" ] || fail "rollback mexeu no histórico"
 ok "histórico e motos intactos após o rollback"
@@ -109,7 +109,7 @@ w=$("${PSQL[@]}" -d "$DST" -c "select count(*) from information_schema.role_tabl
 [ "$w" = 0 ] || fail "rollback reabriu escrita direta em system_settings"
 ok "rollback não reabre a falha de segurança corrigida (escrita direta em configurações)"
 
-for v in 20261107204757 20261107205649 20261107211016 20261107211152 20261107212126 20261107223027 20261107223918 20261107225331 20261107230107 20261107231202 20261107231411 20261108024810 20261108025543; do
+for v in 20261107204757 20261107205649 20261107211016 20261107211152 20261107212126 20261107223027 20261107223918 20261107225331 20261107230107 20261107231202 20261107231411 20261108024810 20261108025543 20261108032719; do
   "${PSQL[@]}" -d "$DST" -f "$(ls "$ROOT"/supabase/migrations/${v}_*.sql)" >/dev/null
 done
 [ "$(SWEEP_COUNT "$DST")" = 0 ] || fail "varredura com violações após reaplicar"

@@ -343,3 +343,6 @@ Implementação em `src/modules/plans/api.ts`.
 ### Comprovantes pelo link (ADR-034)
 - `get_shared_passport` → em `history[].attachments`: `{ id, kind, mime_type }` (só com "Mostrar comprovantes").
 - Edge Function `POST /functions/v1/shared-file` `{ token, attachment_id }` (sem login) → `{ url, file_name }` (link de 60 s); 404 indisponível; 429 limite por hora.
+
+### Limite de consultas anônimas (ADR-035)
+- `get_public_passport` e `get_shared_passport` podem responder erro `P0001` com `hint = 'rate_limited'` ("Muitas consultas…"). O site trata com `isRateLimited()` (`src/core/shared/rateLimit.ts`).

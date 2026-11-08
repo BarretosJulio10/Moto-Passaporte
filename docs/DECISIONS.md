@@ -109,6 +109,13 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-035 — Limite de consultas anônimas por conexão (KI-003)
+**Data:** 08/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- Passaporte público e passaporte compartilhado: até 120 consultas por hora por conexão, cada um com o seu limite (configurações `public_passport_views_per_hour` e `shared_passport_views_per_hour`).
+- A conexão é identificada pelo IP que o Supabase repassa, transformado num resumo SHA-256 com uma chave secreta do Vault **e a data do dia**. O IP nunca é guardado; o mesmo visitante gera resumos diferentes em dias diferentes. Registros com mais de 2 dias são apagados (LGPD: mínimo necessário).
+- Consulta recusada não soma na contagem. A tela mostra "Muitas consultas seguidas", sem dizer se o passaporte existe.
+- Sem cabeçalho de IP (chamadas internas), não há limite. Limite na borda (CDN) continua possível depois, se o volume pedir.
+
 ### ADR-034 — Comprovantes abertos pelo link de compartilhamento (PRD 11; KI-022)
 **Data:** 08/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - Com "Mostrar comprovantes" marcado, quem tem o link abre as notas fiscais, ordens de serviço e recibos **dos serviços vigentes** da moto. Fotos do diário, arquivos sem serviço e comprovantes de registros anulados ou substituídos nunca saem pelo link.

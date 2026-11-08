@@ -6,7 +6,7 @@ Problemas conhecidos e sua situação.
 |---|---|---|---|
 | KI-001 | Migrações testadas só em PostgreSQL local com simulação do Supabase | Média | **Resolvido** em 06/11/2026 — aplicadas e testadas no Supabase dev (71 verificações) |
 | KI-002 | Chassi armazenado em tabela isolada com RLS, mas sem criptografia em coluna (D-T3). O Supabase Vault já está disponível no projeto | Média | **Resolvido** — v0.30.0: chassi cifrado com chave no Vault (ADR-032). Guardar a chave junto com a do backup |
-| KI-003 | `get_public_passport` não tem rate limiting para anônimos (o `public_id` de 128 bits torna a enumeração inviável, mas não impede abuso de volume) | Baixa | Aberto — aplicar limite na borda (Edge Function/CDN) na Fase 4 |
+| KI-003 | `get_public_passport` não tem rate limiting para anônimos (o `public_id` de 128 bits torna a enumeração inviável, mas não impede abuso de volume) | Baixa | **Resolvido** — v0.34.0: 120 consultas/hora por conexão, resumo do IP com chave diária (ADR-035) |
 | KI-004 | Pedidos de verificação de duplicidade (`motorcycle_claim_requests`) ainda não têm tela/função administrativa de resolução | Baixa | **Resolvido** — v0.23.0 (ADR-025) |
 | KI-005 | O cadastro com placa já ativa informa "verificação necessária", o que permite a um usuário autenticado inferir que a placa existe. Mitigado por rate limit (10/hora) e auditoria | Baixa | Aceito — inerente à regra de duplicidade por placa (ADR-007) |
 | KI-006 | Supabase em us-east-1: latência maior para usuários no Brasil do que sa-east-1 | Baixa | Aceito (ADR-009) — reavaliar antes do lançamento |

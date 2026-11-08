@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Notice } from '@/components/Notice'
 import { formatDate } from '@/core/shared/format'
 import { getPublicPassport } from '@/modules/motorcycles/api'
+import { isRateLimited } from '@/core/shared/rateLimit'
 
 /** Página pública: só os campos padrão (ADR-008). Sem placa, chassi ou dados do dono. */
 export function PublicPassportPage() {
@@ -30,6 +31,14 @@ export function PublicPassportPage() {
     return <p className="mx-auto max-w-2xl px-5 py-16 text-muted" role="status">Abrindo passaporte…</p>
   }
 
+  if (passport.isError && isRateLimited(passport.error)) {
+    return (
+      <div className="mx-auto max-w-2xl px-5 py-16">
+        <h1 className="heading text-3xl text-ink">Muitas consultas seguidas</h1>
+        <p className="mt-3 text-muted">Por segurança, limitamos consultas repetidas a partir da mesma conexão. Aguarde alguns minutos e abra o link de novo.</p>
+      </div>
+    )
+  }
   if (!valid || passport.isError || !passport.data) {
     return (
       <div className="mx-auto max-w-2xl px-5 py-16">

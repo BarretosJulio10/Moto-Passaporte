@@ -9,6 +9,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.34.0] — 08/11/2026 — Limite de consultas anônimas
+
+### Segurança
+- Passaporte público e compartilhado: até 120 consultas por hora por conexão; acima disso, "Muitas consultas seguidas". Só um resumo do IP com chave diária é guardado, por até 2 dias (ADR-035; KI-003).
+
+### Testes
+- Banco local: 12 verificações novas (26 suítes). Supabase real: 6 (limite, compartilhado com limite próprio, outra conexão liberada, IP não guardado, contagens fechadas) e uma consulta real pela API pública contada pelo limite. Tela: 3 novos (181).
+
+### Rollback desta versão
+- `supabase/rollback/20261108032719_public_rate_limit.down.sql` e publicar o site anterior.
+
 ## [0.33.0] — 08/11/2026 — Comprovantes pelo link de compartilhamento
 
 ### Adicionado
