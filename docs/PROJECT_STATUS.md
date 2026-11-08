@@ -26,13 +26,12 @@
 
 ## Próximos passos (em ordem)
 
-Concluído em 0.26.0: backup, restauração e rollback (ADR-028, `OPERATIONS.md`). Item 6.5 concluído; ativar o backup cadastrando os segredos no GitHub. Antes de publicar: `scripts/validation/run_all.sh`.
+1. **Responsável:** percorrer o roteiro do `HOMOLOGATION.md` com contas reais (proprietário, oficina, comprador) e fazer uma assinatura real do plano mais barato (KI-026); o Claude acompanha pelo banco e corrige o que aparecer.
+2. **Responsável:** cadastrar os segredos do backup no GitHub (OPERATIONS.md §2), ligar a proteção contra senhas vazadas (KI-021, exige plano Pro) e decidir sobre repositório privado (KI-031).
+3. **Decisões antes de vender em escala:** nota fiscal de serviço (KI-027), revisão jurídica de Termos/Privacidade/LGPD, ambiente de produção separado (KI-007).
+4. Depois do lançamento: ideias para oficinas (backlog de produto).
 
-1. Fase 6.6 — homologação (`HOMOLOGATION.md`) e publicação.
-2. Fase 6 — testes de segurança, backup, homologação e lançamento.
-2. Validação ponta a ponta com credenciais de teste (KI-026) assim que o responsável cadastrar a conta de teste.
-2. Fase 5.3 a 5.5 — faturas, cotas Premium, atraso, cancelamento e reativação.
-3. **Responsável pelo produto:** ligar a proteção contra senhas vazadas no Supabase (KI-021) e cadastrar os segredos do backup no GitHub (OPERATIONS.md §2). MFA do admin ativado e e-mail de atendimento definido em 08/11/2026.
+Feito em 08/11/2026: MFA do admin, e-mail de atendimento, contratação liberada com conexão testada, direitos do titular (v0.35.0), Premium por cortesia (v0.36.0), alerta ativo (v0.37.0) e homologação técnica.
 
 ## Riscos ativos
 
