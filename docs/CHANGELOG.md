@@ -9,6 +9,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.33.0] — 08/11/2026 — Comprovantes pelo link de compartilhamento
+
+### Adicionado
+- No passaporte compartilhado com "Mostrar comprovantes", cada nota fiscal, ordem de serviço ou recibo tem o botão "Abrir", que abre o arquivo numa nova aba por link temporário de 60 segundos (ADR-034; KI-022).
+- Edge Function `shared-file`, função `shared_attachment_for_download` (service_role), registro `passport_share_file_views` e limite `share_file_views_per_hour` (60).
+
+### Alterado
+- Opção do link renomeada para "Mostrar comprovantes", com aviso de que os arquivos serão abertos por quem tiver o link.
+- Configurações `free_plan_max_motorcycles` e `free_plan_storage_quota_mb` marcadas como não usadas (KI-023).
+
+### Testes
+- Banco local: 14 verificações novas (25 suítes). Supabase real: 7 (link com id sem caminho, visitante sem acesso à função interna, abre, sem opção, arquivo sem serviço, link revogado, registro da abertura); Edge Function real responde 404 para link inexistente ou inválido. Tela: abrir comprovante e erro (178).
+
+### Rollback desta versão
+- `supabase/rollback/20261108025543_shared_files.down.sql`, remover a Edge Function `shared-file` e publicar o site anterior.
+
 ## [0.32.0] — 08/11/2026 — Arquivos conferidos no servidor
 
 ### Segurança

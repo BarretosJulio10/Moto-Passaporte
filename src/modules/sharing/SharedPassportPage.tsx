@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Notice } from '@/components/Notice'
@@ -7,7 +7,59 @@ import { CATEGORY_LABEL, SOURCE_COLOR, SOURCE_LABEL } from '@/modules/maintenanc
 import { formatBRL } from '@/modules/maintenance/schemas'
 import { KIND_LABEL } from '@/modules/attachments/files'
 import { DIARY_CATEGORY_LABEL } from '@/modules/diary/schemas'
-import { fetchSharedPassport, type SharedPassport } from './sharesApi'
+import { fetchSharedPassport, openSharedFile, type SharedPassport } from './sharesApi'
+
+type SharedAttachment = NonNullable<SharedPassport['history']>[number]['attachments']
+
+/** Abre um comprovante numa nova aba por link temporário (ADR-034). */
+function SharedFiles({ token, files }: { token: string; files: NonNullable<SharedAttachment> }) {
+  const [busy, setBusy] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [fallback, setFallback] = useState<{ id: string; url: string } | null>(null)
+
+  async function open(id: string) {
+    setError(null)
+    setFallback(null)
+    setBusy(id)
+    const tab = window.open('', '_blank')
+    try {
+      const url = await openSharedFile(token, id)
+      if (tab) {
+        tab.opener = null
+        tab.location.href = url
+      } else setFallback({ id, url })
+    } catch (e) {
+      tab?.close()
+      setError(e instanceof Error ? e.message : 'Não foi possível abrir o comprovante agora.')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  return (
+    <div className="mt-2 text-sm">
+      <span className="text-graphite">Comprovantes: </span>
+      <span className="inline-flex flex-wrap gap-x-3 gap-y-1">
+        {files.map((a, i) =>
+          a.id ? (
+            <button key={a.id} type="button" onClick={() => open(a.id!)} disabled={busy !== null}
+              className="font-semibold text-ink underline underline-offset-4 disabled:opacity-60">
+              {busy === a.id ? 'Abrindo…' : `Abrir ${KIND_LABEL[a.kind].toLowerCase()}${a.mime_type === 'application/pdf' ? ' (PDF)' : ''}`}
+            </button>
+          ) : (
+            <span key={i} className="text-graphite">{KIND_LABEL[a.kind]}</span>
+          ),
+        )}
+      </span>
+      {fallback && (
+        <a href={fallback.url} target="_blank" rel="noopener noreferrer" className="mt-1 block font-semibold text-ink underline underline-offset-4">
+          Toque aqui para abrir (o link vale por 1 minuto)
+        </a>
+      )}
+      {error && <p role="alert" className="mt-1 text-danger">{error}</p>}
+    </div>
+  )
+}
 
 /** /c/:token — passaporte compartilhado pelo titular (PRD 11). Sem cadastro, fora dos buscadores. */
 export function SharedPassportPage() {
@@ -44,10 +96,10 @@ export function SharedPassportPage() {
       </div>
     )
   }
-  return <SharedPassportView p={passport.data} />
+  return <SharedPassportView p={passport.data} token={token} />
 }
 
-export function SharedPassportView({ p }: { p: SharedPassport }) {
+export function SharedPassportView({ p, token }: { p: SharedPassport; token?: string }) {
   const title = [p.brand, p.model, p.version].filter(Boolean).join(' ')
   const year = p.model_year ? `${p.manufacturing_year}/${p.model_year}` : String(p.manufacturing_year)
   const history = p.history ?? []
@@ -136,11 +188,7 @@ export function SharedPassportView({ p }: { p: SharedPassport }) {
                       Peças: {h.items.map((it) => [it.item_name, it.brand].filter(Boolean).join(' ')).join('; ')}
                     </p>
                   )}
-                  {p.options.attachments && h.attachments && h.attachments.length > 0 && (
-                    <p className="mt-2 text-sm text-graphite">
-                      Comprovantes: {h.attachments.map((a) => KIND_LABEL[a.kind]).join(', ')}
-                    </p>
-                  )}
+                  {p.options.attachments && h.attachments && h.attachments.length > 0 && <SharedFiles token={token ?? ''} files={token ? h.attachments : h.attachments.map(({ kind }) => ({ kind }))} />}
                   {h.is_correction && <p className="mt-2 text-xs text-stamp">Versão corrigida de um registro anterior.</p>}
                 </article>
               )

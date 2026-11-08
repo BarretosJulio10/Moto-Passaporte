@@ -339,3 +339,7 @@ Implementação em `src/modules/plans/api.ts`.
 
 ### Conferência de arquivos (ADR-033)
 - Edge Function `POST /functions/v1/attachment-check` `{ path }` (com login), chamada entre o envio ao Storage e `register_*`. 200 = conferido; 422 = conteúdo não bate com o tipo (arquivo apagado); 404/409 = arquivo de outra pessoa ou já registrado.
+
+### Comprovantes pelo link (ADR-034)
+- `get_shared_passport` → em `history[].attachments`: `{ id, kind, mime_type }` (só com "Mostrar comprovantes").
+- Edge Function `POST /functions/v1/shared-file` `{ token, attachment_id }` (sem login) → `{ url, file_name }` (link de 60 s); 404 indisponível; 429 limite por hora.

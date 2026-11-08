@@ -4,7 +4,7 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 08/11/2026 — v0.32.0
+**Última conferência:** 08/11/2026 — v0.33.0
 **Item atual na ordem:** Fase 6 → homologação e publicação (6.6)
 
 ## Progresso

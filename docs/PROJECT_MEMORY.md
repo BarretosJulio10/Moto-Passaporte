@@ -112,6 +112,7 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 - v0.30.0: chassi cifrado (ADR-032, KI-002). Nunca ler `motorcycle_private` pelo navegador; usar `get_my_chassis`/`set_my_chassis`. Nova permissão por coluna exige entrar na lista `column_write_ok` da varredura. Limites já vêm de `user_plan()` (ADR-018): a 5.4 só troca a regra para a assinatura ativa. Antes de cobrar: decisões P-1, P-3, P-4, P-5 e credenciais de teste do Mercado Pago. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
 - v0.31.0: páginas sob demanda (KI-010).
 - v0.32.0: conferência de conteúdo no servidor (ADR-033, KI-018). Testes que inserem em `storage.objects` no banco local passam pela conferência simulada no stub; para testar a recusa, `set tests.skip_file_check = 'on'`. No Supabase real, gravar o resultado como service_role (`record_attachment_check`).
+- v0.33.0: comprovantes pelo link (ADR-034, KI-022) e KI-023. Edge Functions publicadas pelo MCP podem levar só o trecho de `_shared` que usam; ao republicar a partir do Git, mandar o `_shared/mercadopago.ts` completo.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 

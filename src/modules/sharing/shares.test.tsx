@@ -28,6 +28,11 @@ vi.mock('./sharesApi', async () => {
       shares = shares.map((s) => (s.id === args[0] ? { ...s, status: 'revoked', revoked_at: '2026-11-08T10:00:00Z' } : s))
     },
     fetchSharedPassport: async () => shared,
+    openSharedFile: async (...args: unknown[]) => {
+      calls.push({ fn: 'openFile', args })
+      if (args[1] === 'att-bad') throw new Error('Comprovante indisponível. O link pode ter sido revogado ou vencido.')
+      return 'https://mock.supabase.co/storage/v1/object/sign/attachments/x.pdf?token=t'
+    },
     fetchPublicPageEnabled: async () => pageEnabled,
     setPublicPageEnabled: async (...args: unknown[]) => {
       calls.push({ fn: 'setPage', args })
@@ -94,7 +99,7 @@ describe('ShareSection (titular)', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Criar link de compartilhamento' }))
     await userEvent.click(screen.getByLabelText(/Histórico de serviços/))
     expect(screen.getByLabelText(/Valores dos serviços/)).toBeDisabled()
-    expect(screen.getByLabelText(/Indicar comprovantes/)).toBeDisabled()
+    expect(screen.getByLabelText(/Mostrar comprovantes/)).toBeDisabled()
   })
 
   it('revoga com confirmação e move para encerrados', async () => {
@@ -134,13 +139,22 @@ describe('SharedPassportPage (comprador)', () => {
     shared = passport({
       options: { plate: true, mileage: false, history: true, values: true, attachments: true, diary: true },
       plate: 'ABC1234', mileage: undefined,
-      history: [{ ...base.history![0]!, service_value_cents: 45000, attachments: [{ kind: 'invoice' }] }],
+      history: [{ ...base.history![0]!, service_value_cents: 45000, attachments: [{ kind: 'invoice', id: 'att-1', mime_type: 'application/pdf' }, { kind: 'receipt', id: 'att-bad', mime_type: 'image/jpeg' }] }],
       diary: [{ entry_date: '2026-10-01', category: 'trip', title: 'Viagem à serra', body: null, location: 'Campos do Jordão', photo_count: 2 }],
     })
     renderShared('c'.repeat(48))
     expect(await screen.findByText('ABC-1234')).toBeInTheDocument()
     expect(screen.getByText('R$ 450,00')).toBeInTheDocument()
-    expect(screen.getByText('Comprovantes: Nota fiscal')).toBeInTheDocument()
+    const tab = { opener: {}, location: { href: '' }, close: vi.fn() }
+    const openSpy = vi.spyOn(window, 'open').mockReturnValue(tab as unknown as Window)
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir nota fiscal (PDF)' }))
+    expect(calls.find((c) => c.fn === 'openFile')?.args).toEqual(['c'.repeat(48), 'att-1'])
+    expect(tab.location.href).toContain('/storage/v1/object/sign/')
+    expect(tab.opener).toBeNull()
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir recibo' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Comprovante indisponível')
+    expect(tab.close).toHaveBeenCalled()
+    openSpy.mockRestore()
     expect(screen.getByText('Viagem à serra')).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Quilometragem documentada' })).toBeNull()
   })

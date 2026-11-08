@@ -31,7 +31,7 @@ export const OPTION_LABEL: Record<keyof ShareOptions, { label: string; hint: str
   show_mileage: { label: 'Quilometragem documentada', hint: 'Leituras registradas ao longo do tempo.' },
   show_plate: { label: 'Placa', hint: 'Útil para o comprador conferir a moto.' },
   show_values: { label: 'Valores dos serviços', hint: 'Quanto foi pago em cada serviço.' },
-  show_attachments: { label: 'Indicar comprovantes', hint: 'Mostra quais registros têm nota fiscal, ordem de serviço ou recibo (os arquivos não são abertos).' },
+  show_attachments: { label: 'Mostrar comprovantes', hint: 'Quem tem o link vê e abre as notas fiscais, ordens de serviço e recibos dos serviços. Fotos do diário não entram.' },
   show_diary: { label: 'Diário compartilhável', hint: 'Só as entradas que você marcou como compartilháveis.' },
 }
 
@@ -63,7 +63,7 @@ export type SharedPassport = {
     is_correction: boolean
     items: Array<{ item_name: string; brand: string | null; quantity: number }>
     service_value_cents: number | null
-    attachments: Array<{ kind: AttachmentKind }> | null
+    attachments: Array<{ kind: AttachmentKind; id?: string; mime_type?: string }> | null
   }>
   diary?: Array<{ entry_date: string; category: DiaryCategory; title: string; body: string | null; location: string | null; photo_count: number }>
 }
@@ -114,4 +114,22 @@ export async function fetchPublicPageEnabled(motorcycleId: string): Promise<bool
 export async function setPublicPageEnabled(motorcycleId: string, enabled: boolean) {
   const { error } = await getSupabase().rpc('set_public_page_enabled', { p_motorcycle_id: motorcycleId, p_enabled: enabled })
   if (error) throw error
+}
+
+/** Link temporário (60 s) de um comprovante do passaporte compartilhado (ADR-034). */
+export async function openSharedFile(token: string, attachmentId: string): Promise<string> {
+  const { data, error } = await getSupabase().functions.invoke('shared-file', { body: { token, attachment_id: attachmentId } })
+  if (error) {
+    const ctx = (error as { context?: Response }).context
+    let message: string | undefined
+    if (ctx && typeof ctx.json === 'function') {
+      try {
+        message = ((await ctx.json()) as { message?: string }).message
+      } catch {
+        /* sem corpo */
+      }
+    }
+    throw new Error(message ?? 'Não foi possível abrir o comprovante agora.')
+  }
+  return (data as { url: string }).url
 }

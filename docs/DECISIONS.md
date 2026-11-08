@@ -109,6 +109,12 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-034 — Comprovantes abertos pelo link de compartilhamento (PRD 11; KI-022)
+**Data:** 08/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
+- Com "Mostrar comprovantes" marcado, quem tem o link abre as notas fiscais, ordens de serviço e recibos **dos serviços vigentes** da moto. Fotos do diário, arquivos sem serviço e comprovantes de registros anulados ou substituídos nunca saem pelo link.
+- O link informa só o id e o tipo de cada comprovante (nunca o caminho no Storage). A Edge Function `shared-file` (sem login) pede ao banco o arquivo; o banco confere o link (vigente, não revogado, criado pelo titular atual, moto ativa), as opções e o vínculo do arquivo, aplica limite de 60 aberturas por link por hora e registra cada abertura (sem dados do visitante). A função devolve um link temporário de 60 segundos.
+- O texto da opção no painel passou a dizer claramente que os arquivos serão abertos por quem tiver o link.
+
 ### ADR-033 — Conferência do conteúdo dos arquivos no servidor (KI-018)
 **Data:** 07/11/2026 · **Status:** aceita (decidida pelo Claude dentro da autonomia dada pelo responsável; revisável)
 - Entre o envio ao Storage e o registro, o site chama a Edge Function `attachment-check` (com login). Ela confere que o arquivo é do próprio usuário, ainda não registrado, que a extensão bate com o tipo declarado e que os primeiros bytes têm a assinatura do formato (JPG, PNG, WebP, PDF). Se não bater, apaga o arquivo.

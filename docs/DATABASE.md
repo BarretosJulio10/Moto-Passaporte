@@ -19,6 +19,8 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 | `20261107205649_admin_audit_settings.sql` | Configurações por catálogo (sem escrita direta), busca e consulta de auditoria (ADR-024) |
 | `20261107211016_plate_claims.sql` | Pedidos de verificação de placa: acompanhamento pelo solicitante, fila e decisão do admin, aviso anônimo ao titular (ADR-025) |
 | `20261107211152_plate_claims_notice_fix.sql` | Aviso ao titular aparece também quando titularidade e aviso têm o mesmo instante |
+| `20261108025707_legacy_settings_note.sql` | Marca duas configurações antigas como não usadas (KI-023) |
+| `20261108025543_shared_files.sql` | Comprovantes pelo link (`passport_share_file_views`, `shared_attachment_for_download`), id dos comprovantes em `get_shared_passport` (ADR-034) |
 | `20261108024810_fk_indexes.sql` | Índices de três vínculos apontados pelo Supabase |
 | `20261107231411_attachment_checks_enforce.sql` | Gatilho: só registra anexo conferido (ADR-033) |
 | `20261107231202_attachment_checks.sql` | `attachment_checks`, `attachment_object_info`, `record_attachment_check` (service_role) |
