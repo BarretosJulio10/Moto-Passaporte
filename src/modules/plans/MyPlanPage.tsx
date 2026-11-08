@@ -53,8 +53,10 @@ export function PlanSummary() {
 }
 
 const date = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString('pt-BR') : '—')
+/** Último dia do bônus (o fim gravado é a meia-noite seguinte). */
+export const bonusLastDay = (iso: string) => new Date(new Date(iso).getTime() - 1).toLocaleDateString('pt-BR')
 
-function SubscriptionCard({ sub, onCancel, canceling }: { sub: MySubscription; onCancel: () => void; canceling: boolean }) {
+function SubscriptionCard({ sub, onCancel, canceling, bonusUntil }: { sub: MySubscription; onCancel: () => void; canceling: boolean; bonusUntil?: string | null }) {
   const open = ['pending', 'active', 'past_due', 'paused'].includes(sub.status)
   return (
     <section className="mt-6 max-w-xl rounded-sheet border border-rule bg-sheet p-5" aria-label="Assinatura">
@@ -67,7 +69,10 @@ function SubscriptionCard({ sub, onCancel, canceling }: { sub: MySubscription; o
         {sub.environment === 'test' ? ' · ambiente de teste' : ''}
       </p>
       <div className="mt-3 text-sm text-graphite">
-        {sub.status === 'pending' && <p>Assim que o Mercado Pago confirmar o pagamento, o Premium é liberado. Isso pode levar alguns minutos.</p>}
+        {sub.status === 'pending' && bonusUntil && (
+          <p>Assinatura registrada. A primeira cobrança acontece em {bonusLastDay(bonusUntil)}, quando o seu bônus terminar; até lá o Premium segue sem custo.</p>
+        )}
+        {sub.status === 'pending' && !bonusUntil && <p>Assim que o Mercado Pago confirmar o pagamento, o Premium é liberado. Isso pode levar alguns minutos.</p>}
         {sub.status === 'active' && <p>Próxima renovação em {date(sub.current_period_end)}.</p>}
         {sub.status === 'past_due' && (
           <p className="text-danger">
@@ -162,6 +167,13 @@ export function MyPlanPage() {
       {plan.data && (
         <section className="mt-6 max-w-xl rounded-sheet border border-rule bg-sheet p-5" aria-label="Uso do plano">
           <p className="font-semibold text-ink">{plan.data.name}</p>
+          {plan.data.bonus && (
+            <p className="mt-1 text-sm text-graphite">
+              {plan.data.bonus_until
+                ? <>Bônus Premium sem cobrança até <strong>{bonusLastDay(plan.data.bonus_until)}</strong>. Depois disso a conta volta ao gratuito, a não ser que você assine. Se assinar agora, a primeira cobrança só acontece quando o bônus terminar.</>
+                : 'Bônus Premium sem cobrança, sem prazo para terminar.'}
+            </p>
+          )}
           <div className="mt-4 grid gap-4">
             <Meter label="Motos" used={plan.data.motorcycles_used} total={plan.data.max_motorcycles}
               text={`${plan.data.motorcycles_used} de ${plan.data.max_motorcycles}`} />
@@ -181,7 +193,7 @@ export function MyPlanPage() {
         </section>
       )}
 
-      {s && <SubscriptionCard sub={s} onCancel={() => cancel.mutate()} canceling={cancel.isPending} />}
+      {s && <SubscriptionCard sub={s} onCancel={() => cancel.mutate()} canceling={cancel.isPending} bonusUntil={plan.data?.bonus ? plan.data.bonus_until : null} />}
 
       {invoices.data && invoices.data.length > 0 && (
         <section className="mt-8 max-w-xl" aria-labelledby="invoices-title">

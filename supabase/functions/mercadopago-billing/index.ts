@@ -43,6 +43,7 @@ Deno.serve(async (req) => {
       const p = prep as {
         subscription_id: string; payer_email: string; plan_name: string; billing_period: string
         price_cents: number; currency: string; trial_days: number; expired_provider_ids: string[]
+        first_charge_at: string | null
       }
       const token = await accessToken(server)
       for (const old of p.expired_provider_ids ?? []) {
@@ -54,7 +55,9 @@ Deno.serve(async (req) => {
         transaction_amount: p.price_cents / 100,
         currency_id: p.currency,
       }
-      if (p.trial_days > 0) autoRecurring.free_trial = { frequency: p.trial_days, frequency_type: 'days' }
+      // Bônus Premium em vigor: a primeira cobrança só no dia em que ele termina (ADR-037).
+      if (p.first_charge_at) autoRecurring.start_date = new Date(p.first_charge_at).toISOString()
+      else if (p.trial_days > 0) autoRecurring.free_trial = { frequency: p.trial_days, frequency_type: 'days' }
       try {
         const pre = await mp<{ id: string; init_point: string }>(token, '/preapproval', {
           method: 'POST',

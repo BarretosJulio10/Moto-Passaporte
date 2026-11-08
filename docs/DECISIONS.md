@@ -119,6 +119,7 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 **Data:** 08/11/2026 · **Status:** aceita (pedido do responsável: liberar o Premium para a conta admin)
 - O administrador libera um plano Premium sem cobrança para uma conta, em /admin → Usuários → detalhe → "Premium por cortesia", com motivo auditado e prazo opcional (vale até o fim do dia escolhido, horário de Brasília). Uma cortesia em vigor por conta; trocar encerra a anterior. A pessoa recebe aviso.
 - Ordem do plano vigente: assinatura paga > cortesia > gratuito. A cortesia tem os benefícios e limites do plano escolhido no catálogo, com o nome "(cortesia)" e preço zero. Não gera fatura, pagamento nem cobrança no Mercado Pago.
+- Fim do bônus: avisos 7 dias antes, 1 dia antes e quando termina (só para quem não assinou); a conta volta sozinha ao gratuito, sem cobrança. Quem assina durante o bônus tem a 1ª cobrança do Mercado Pago marcada para o dia em que o bônus termina (`auto_recurring.start_date`); até lá a assinatura fica "pendente" e o Premium segue pelo bônus.
 - Uso previsto: conta da equipe, parceiros, oficinas convidadas e testes. Tabela `premium_grants` sem acesso direto (só por funções).
 
 ### ADR-036 — Direitos do titular: cópia dos dados, pedidos e exclusão por anonimização (LGPD art. 18; PRD 15.6)

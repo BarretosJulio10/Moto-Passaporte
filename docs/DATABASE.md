@@ -19,6 +19,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 | `20261107205649_admin_audit_settings.sql` | Configurações por catálogo (sem escrita direta), busca e consulta de auditoria (ADR-024) |
 | `20261107211016_plate_claims.sql` | Pedidos de verificação de placa: acompanhamento pelo solicitante, fila e decisão do admin, aviso anônimo ao titular (ADR-025) |
 | `20261107211152_plate_claims_notice_fix.sql` | Aviso ao titular aparece também quando titularidade e aviso têm o mesmo instante |
+| `20261108164415_bonus_billing.sql` | Avisos de fim do bônus, 1ª cobrança após o bônus (`billing_prepare_subscription.first_charge_at`), `bonus_until` em `get_my_plan` — ADR-037 |
 | `20261108162247_system_health.sql` | `system_health()` pública, só sim/não, para o monitor externo — ADR-038 |
 | `20261108161839_premium_grants.sql` | Premium por cortesia (`premium_grants`, `admin_grant_premium`, `admin_revoke_premium`; `user_plan` considera a cortesia) — ADR-037 |
 | `20261108161525_privacy_rights.sql` | Direitos do titular (`privacy_requests`, `export_my_data`, pedidos, `admin_anonymize_account`) — ADR-036 |

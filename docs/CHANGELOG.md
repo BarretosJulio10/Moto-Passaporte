@@ -9,6 +9,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.39.0] — 08/11/2026 — Fim do bônus sem surpresa
+
+### Adicionado
+- Avisos do bônus Premium: 7 dias antes, 1 dia antes e quando termina, com convite para assinar (ADR-037).
+- "Meu plano" mostra até quando vai o bônus e que, assinando agora, a primeira cobrança só acontece quando ele terminar.
+
+### Alterado
+- Assinar durante o bônus: a 1ª cobrança do Mercado Pago fica para o dia em que o bônus termina (antes era cobrada na hora). Edge Function `mercadopago-billing` v2.
+
+### Testes
+- Supabase real (com desfazer): aviso de 7 dias com a data certa, sem repetir, aviso de fim, volta ao gratuito, data da 1ª cobrança e `bonus_until`. Tela: 2 novos (195).
+
+### Rollback desta versão
+- Reaplicar as definições anteriores de `get_my_plan`, `billing_prepare_subscription` e `system_generate_notifications` (migrações `20261107194520`, `20261107153512`/`20261107225331`) e publicar a versão anterior da Edge Function.
+
 ## [0.38.1] — 08/11/2026 — Bônus Premium direto na lista
 
 ### Alterado

@@ -47,11 +47,13 @@ vi.mock('./billingApi', async () => {
     },
   }
 })
+const FREE_PLAN = { code: 'gratuito', kind: 'free', name: 'Gratuito', billing_period: 'none', max_motorcycles: 1, storage_quota_mb: 100, motorcycles_used: 1, features: [], entitlements: [], max_share_links: 3 }
+let myPlan: Record<string, unknown> = FREE_PLAN
 vi.mock('./api', async () => {
   const actual = await vi.importActual<typeof import('./api')>('./api')
   return {
     ...actual,
-    fetchMyPlan: async () => ({ code: 'gratuito', kind: 'free', name: 'Gratuito', billing_period: 'none', max_motorcycles: 1, storage_quota_mb: 100, motorcycles_used: 1, features: [], entitlements: [], max_share_links: 3 }),
+    fetchMyPlan: async () => myPlan,
   }
 })
 vi.mock('@/modules/attachments/api', () => ({ getStorageUsage: async () => ({ used_bytes: 0, quota_bytes: 104857600, max_file_bytes: 1 }) }))
@@ -95,8 +97,27 @@ const active = (over: Partial<MySubscription> = {}): MySubscription => ({
 
 beforeEach(() => {
   calls.length = 0
+  myPlan = FREE_PLAN
   sub = null
   billingEnabled = true
+})
+
+describe('Meu plano — bônus Premium', () => {
+  const BONUS = { ...FREE_PLAN, code: 'premium_anual', kind: 'premium', name: 'Premium anual (cortesia)', max_motorcycles: 3, bonus: true, bonus_until: '2027-02-09T03:00:00Z' }
+
+  it('mostra até quando vai o bônus e que assinar agora só cobra depois', async () => {
+    myPlan = BONUS
+    wrap(<MyPlanPage />)
+    expect(await screen.findByText(/Bônus Premium sem cobrança até/)).toHaveTextContent('08/02/2027')
+    expect(screen.getByText(/primeira cobrança só acontece quando o bônus terminar/)).toBeVisible()
+  })
+
+  it('assinatura feita durante o bônus: primeira cobrança na data do fim do bônus', async () => {
+    myPlan = BONUS
+    sub = { ...active(), status: 'pending' }
+    wrap(<MyPlanPage />)
+    expect(await screen.findByText(/A primeira cobrança acontece em 08\/02\/2027/)).toBeVisible()
+  })
 })
 
 describe('Meu plano — assinatura', () => {

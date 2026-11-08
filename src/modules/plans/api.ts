@@ -41,6 +41,9 @@ export type MyPlan = {
   features: string[]
   entitlements: Entitlement[]
   max_share_links: number
+  /** Premium por cortesia (bônus) em vigor e quando termina (ADR-037). */
+  bonus?: boolean
+  bonus_until?: string | null
 }
 
 export type AdminPlan = Database['public']['Functions']['admin_list_plans']['Returns'][number]
