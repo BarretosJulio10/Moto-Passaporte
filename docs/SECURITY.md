@@ -241,3 +241,8 @@ Ver `KNOWN_ISSUES.md`.
 - Fotos: bucket privado `workshop-files`; envio só na pasta da própria oficina e por quem executa serviços; leitura por membros com link de 10 min; tipo e conteúdo conferidos (ADR-033) antes do registro.
 - Links do cliente (ciência e comprovante): token de 256 bits com hash, 30 dias, revogação, limite por conexão; não expõem ids, IP, valores (no link de ciência) nem observações técnicas.
 - Teste: `tests/security/phase7b_workshop_orders_test.sql`.
+
+### Histórico a partir da OS (ADR-045)
+- O registro no passaporte usa só `create_workshop_service` (exige autorização vigente do titular e a permissão "Registrar serviços"); não há escrita paralela no histórico.
+- Uma OS gera um registro; OS concluída travada por gatilho; revogação bloqueia novos registros sem apagar os anteriores.
+- Fotos copiadas pelo fluxo de anexos da oficina (conferência de conteúdo e cota). Teste: `tests/security/phase7c_workshop_history_test.sql`.

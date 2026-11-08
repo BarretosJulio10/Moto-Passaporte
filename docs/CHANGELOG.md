@@ -9,6 +9,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.46.0] — 08/11/2026 — Módulo Oficina (PRD 2.1), Fase 3: histórico permanente
+
+### Adicionado
+- **OS concluída vai para o histórico do passaporte** da moto autorizada, como "confirmado por prestador": só serviços executados, peças com fabricante e código, km final, valor (opcional) e código do comprovante. O titular é avisado.
+- Na conclusão: opção "Registrar no histórico" já marcada, com categoria sugerida pelo catálogo e título editáveis. Também dá para registrar depois.
+- Cartão "Histórico da moto" na OS: situação (registrada, sem passaporte, sem autorização…), link para o histórico, **correção** com motivo (original preservado) e envio das **fotos** escolhidas ao histórico.
+
+### Segurança
+- OS concluída travada no banco (valores, km, comprovante, vínculo). Uma OS gera um registro só. Sem autorização vigente, nada é gravado no passaporte; registros anteriores continuam.
+
+### Testes
+- Banco: 19 verificações novas (`phase7c_workshop_history_test.sql`) — 956 OK. Fumaça em produção (transação desfeita): registro gerado com peça e km, titular avisado.
+- Tela: 3 novos — 224.
+
 ## [0.45.0] — 08/11/2026 — Módulo Oficina (PRD 2.1), Fase 2: ordem de serviço
 
 ### Adicionado

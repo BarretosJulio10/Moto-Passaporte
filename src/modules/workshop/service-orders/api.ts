@@ -2,7 +2,7 @@
 // OS concluída ainda não gera registro no histórico da moto (Fase 3).
 import { getSupabase } from '@/lib/supabase'
 import { buildStoragePath } from '@/modules/attachments/files'
-import { AttachmentError, prepareFile } from '@/modules/attachments/api'
+import { AttachmentError, prepareFile, uploadAttachment } from '@/modules/attachments/api'
 import { rpc } from '../shared/rpc'
 import type { ItemKind, QuoteStatus } from '../quotes/api'
 import type { Vehicle } from '../customers/api'
@@ -137,7 +137,7 @@ export type Order = {
   workshop: { business_name: string; cnpj: string | null; phone: string | null; whatsapp: string | null; email: string | null; address: string | null; city: string | null; state: string | null; logo_url: string | null }
   items: OrderItem[]
   inspections: Partial<Record<'entry' | 'exit', Inspection>>
-  photos: { id: string; phase: PhotoPhase; storage_path: string; caption: string | null; created_at: string; created_by_name: string | null }[]
+  photos: { id: string; phase: PhotoPhase; storage_path: string; caption: string | null; created_at: string; created_by_name: string | null; history_attachment_id?: string | null }[]
   events: OrderEvent[]
   links: { purpose: 'entry_ack' | 'receipt'; created_at: string; expires_at: string; first_viewed_at: string | null; view_count: number; active: boolean }[]
   team: { user_id: string; name: string }[]
@@ -203,10 +203,58 @@ export const saveInspection = (org: string, id: string, phase: 'entry' | 'exit',
   rpc<void>('workshop_save_inspection', { p_org: org, p_order: id, p_phase: phase, p_data: data })
 export const removePhoto = (org: string, id: string, photoId: string) =>
   rpc<void>('workshop_remove_os_photo', { p_org: org, p_order: id, p_photo: photoId })
-export const completeOrder = (org: string, id: string, kmOut: number, notes: string, adjustmentCents: number, adjustmentReason: string) =>
-  rpc<{ final_total_cents: number; receipt_code: string }>('workshop_complete_order', {
+export type HistoryOptions = { publish: boolean; category?: string; title?: string; include_value?: boolean }
+export const completeOrder = (org: string, id: string, kmOut: number, notes: string, adjustmentCents: number, adjustmentReason: string, history?: HistoryOptions) =>
+  rpc<{ final_total_cents: number; receipt_code: string; history_state: HistoryState; record_id: string | null }>('workshop_complete_order', {
     p_org: org, p_order: id, p_km_out: kmOut, p_notes: notes, p_adjustment_cents: adjustmentCents, p_adjustment_reason: adjustmentReason,
+    p_history: history ?? null,
   })
+
+/** Situação da OS em relação ao histórico do passaporte (PRD 2.1 §17, ADR-045). */
+export type HistoryState = 'published' | 'not_completed' | 'no_vehicle' | 'not_linked' | 'no_access' | 'no_permission' | 'ready'
+export type OrderHistory = {
+  state: HistoryState
+  motorcycle_id: string | null
+  record_id: string | null
+  published_at: string | null
+  suggested_category: string
+  suggested_title: string
+  done_items: number
+  record: { id: string; title: string; category: string; service_date: string; mileage: number | null; superseded: boolean } | null
+  photos_in_history: number
+  photo_ids_in_history: string[]
+  vehicle_label: string | null
+}
+export const HISTORY_STATE_TEXT: Record<HistoryState, string> = {
+  published: 'Registrado no histórico da moto.',
+  not_completed: 'Ao concluir, o serviço vai para o histórico do passaporte da moto.',
+  no_vehicle: 'A OS não tem moto: fica só no registro da oficina.',
+  not_linked: 'A moto não está vinculada a um passaporte: o atendimento fica só no registro da oficina. Se o cliente tiver Moto Passaporte, peça a autorização pela placa e vincule na ficha do cliente.',
+  no_access: 'A autorização do titular não está vigente. O atendimento fica só no registro da oficina; os registros anteriores continuam no histórico.',
+  no_permission: 'Seu acesso não inclui registrar serviços no histórico.',
+  ready: 'Pronta para ir ao histórico da moto.',
+}
+export const fetchOrderHistory = (org: string, id: string) => rpc<OrderHistory>('workshop_order_history', { p_org: org, p_order: id })
+export const publishOrder = (org: string, id: string, category: string, title: string, includeValue: boolean) =>
+  rpc<string>('workshop_publish_order_to_history', { p_org: org, p_order: id, p_category: category, p_title: title, p_include_value: includeValue })
+
+/** Copia as fotos escolhidas da OS para o registro no histórico pelo fluxo de anexos da oficina (conferência e cota). */
+export async function sendPhotosToHistory(org: string, order: Order, motorcycleId: string, recordId: string, photoIds: string[]): Promise<number> {
+  const photos = order.photos.filter((p) => photoIds.includes(p.id))
+  const urls = await photoUrls(photos.map((p) => p.storage_path))
+  let n = 0
+  for (const p of photos) {
+    const url = urls[p.storage_path]
+    if (!url) continue
+    const blob = await (await fetch(url)).blob()
+    const name = `os-${order.number}-${PHOTO_PHASE_LABEL[p.phase].toLowerCase()}-${n + 1}.${p.storage_path.split('.').pop()}`
+    const prepared = await prepareFile(new File([blob], name, { type: blob.type }))
+    const attachmentId = await uploadAttachment({ motorcycleId, file: prepared, kind: 'photo', maintenanceRecordId: recordId, organizationId: org })
+    await rpc<void>('workshop_link_photo_to_history', { p_org: org, p_order: order.id, p_photo: p.id, p_attachment: attachmentId })
+    n++
+  }
+  return n
+}
 export const notifyPickup = (org: string, id: string) => rpc<void>('workshop_notify_pickup', { p_org: org, p_order: id })
 export const deliverOrder = (org: string, id: string, to: string, notes = '') =>
   rpc<void>('workshop_deliver_order', { p_org: org, p_order: id, p_delivered_to: to, p_notes: notes })

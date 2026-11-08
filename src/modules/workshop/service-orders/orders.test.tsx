@@ -86,3 +86,40 @@ describe('ordem de serviço', () => {
     expect(await screen.findByText('Este link não está mais ativo')).toBeInTheDocument()
   })
 })
+
+describe('histórico da moto na OS', () => {
+  const base = {
+    motorcycle_id: 'm1', record_id: null, published_at: null, suggested_category: 'oil_change', suggested_title: 'Troca de óleo',
+    done_items: 1, record: null, photos_in_history: 0, photo_ids_in_history: [], vehicle_label: 'Honda CG 160',
+  }
+  const order = { id: 'os1', number: 7, photos: [] } as unknown as Order
+
+  async function renderCard(history: Record<string, unknown>) {
+    const { HistoryCard } = await import('./HistoryCard')
+    const router = createMemoryRouter([{ path: '/', element: <HistoryCard orgId="org" order={order} history={history as never} canManage onChanged={async () => undefined} /> }])
+    render(<RouterProvider router={router} />)
+  }
+
+  it('moto sem passaporte explica que o atendimento fica só na oficina', async () => {
+    await renderCard({ ...base, state: 'not_linked', motorcycle_id: null })
+    expect(screen.getByText(/não está vinculada a um passaporte/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Registrar no histórico' })).not.toBeInTheDocument()
+  })
+
+  it('registrada: mostra o registro, link para o histórico e correção (sem apagar o original)', async () => {
+    await renderCard({ ...base, state: 'published', record_id: 'r1', published_at: '2026-11-09T16:00:00Z',
+      record: { id: 'r1', title: 'Troca de óleo', category: 'oil_change', service_date: '2026-11-09', mileage: 18240, superseded: false } })
+    expect(screen.getByRole('link', { name: 'Ver no histórico' })).toHaveAttribute('href', '/oficina/org/motos/m1')
+    expect(screen.getByRole('link', { name: 'Corrigir registro' })).toHaveAttribute('href', '/oficina/org/motos/m1/servico?corrigir=r1')
+    expect(screen.getByText(/o original fica preservado/)).toBeInTheDocument()
+  })
+
+  it('pronta para registrar: envia categoria, título e valor escolhidos', async () => {
+    const user = userEvent.setup()
+    await renderCard({ ...base, state: 'ready' })
+    await user.click(screen.getByLabelText('Mostrar o valor do serviço ao titular'))
+    await user.click(screen.getByRole('button', { name: 'Registrar no histórico' }))
+    const call = calls.find((c) => c.fn === 'workshop_publish_order_to_history')
+    expect(call?.args).toEqual({ p_org: 'org', p_order: 'os1', p_category: 'oil_change', p_title: 'Troca de óleo', p_include_value: false })
+  })
+})

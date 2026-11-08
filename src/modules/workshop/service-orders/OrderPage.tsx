@@ -14,8 +14,9 @@ import { ITEM_KIND_LABEL, ITEM_KINDS, STATUS_LABEL as QUOTE_STATUS_LABEL, whatsa
 import type { WorkshopPermissions } from '../customers/api'
 import { InspectionCard, PhotosCard } from './InspectionAndPhotos'
 import { OrderReceipt, type ReceiptDoc } from './OrderReceipt'
+import { HistoryCard, HistoryOptionsFields } from './HistoryCard'
 import {
-  addComplement, addOrderItem, AUTH_LABEL, AUTH_METHODS, cancelOrder, CLOSED, completeOrder, createOrderLink, deliverOrder, fetchOrder,
+  addComplement, addOrderItem, fetchOrderHistory, type HistoryOptions, type OrderHistory, AUTH_LABEL, AUTH_METHODS, cancelOrder, CLOSED, completeOrder, createOrderLink, deliverOrder, fetchOrder,
   itemNet, ITEM_STATUS_LABEL, MANUAL_STATUSES, notifyPickup, ORDER_STATUS_LABEL, ORDER_STATUS_TONE, orderLink, setOrderStatus,
   setTechnicalNotes, updateOrder, updateOrderItem, type AuthMethod, type ItemStatus, type Order, type OrderItem, type OrderStatus,
 } from './api'
@@ -48,6 +49,7 @@ const EVENT_LABEL: Record<string, string> = {
   item_updated: 'Item atualizado', complement_added: 'Itens do complementar incluídos', checklist_saved: 'Checklist salvo',
   photo_added: 'Foto incluída', photo_removed: 'Foto removida', link_created: 'Link criado para o cliente', customer_ack: 'Cliente deu ciência da entrada',
   completed: 'OS concluída', pickup_notified: 'Cliente avisado da retirada', delivered: 'Moto entregue', canceled: 'OS cancelada', notes_updated: 'Observações atualizadas',
+  history_published: 'Registrado no histórico da moto', history_photo_added: 'Foto enviada ao histórico da moto',
 }
 
 function OrderView({ orgId, perms }: { orgId: string; perms: WorkshopPermissions & { user_id?: string } }) {
@@ -55,6 +57,7 @@ function OrderView({ orgId, perms }: { orgId: string; perms: WorkshopPermissions
   const queryClient = useQueryClient()
   const key = ['ws-order', orgId, orderId]
   const q = useQuery({ queryKey: key, queryFn: () => fetchOrder(orgId, orderId), enabled: Boolean(orderId) })
+  const hist = useQuery({ queryKey: ['ws-order-history', orgId, orderId], queryFn: () => fetchOrderHistory(orgId, orderId), enabled: Boolean(orderId) })
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState('')
   const [link, setLink] = useState<{ purpose: 'entry_ack' | 'receipt'; url: string } | null>(null)
@@ -62,6 +65,7 @@ function OrderView({ orgId, perms }: { orgId: string; perms: WorkshopPermissions
     queryClient.invalidateQueries({ queryKey: key }),
     queryClient.invalidateQueries({ queryKey: ['ws-orders', orgId] }),
     queryClient.invalidateQueries({ queryKey: ['ws-orders-summary', orgId] }),
+    queryClient.invalidateQueries({ queryKey: ['ws-order-history', orgId, orderId] }),
   ])
   async function run(name: string, fn: () => Promise<unknown>) {
     setBusy(name)
@@ -188,14 +192,16 @@ function OrderView({ orgId, perms }: { orgId: string; perms: WorkshopPermissions
             </Card>
           )}
 
-          {manage && !closed && <CompleteCard orgId={orgId} order={o} pending={pending} run={run} busy={busy} />}
+          {manage && !closed && <CompleteCard orgId={orgId} order={o} history={hist.data} pending={pending} run={run} busy={busy} />}
+          {hist.data && (closed || hist.data.motorcycle_id) && o.status !== 'canceled' && (
+            <HistoryCard orgId={orgId} order={o} history={hist.data} canManage={manage} onChanged={refresh} />
+          )}
 
           {o.completed_at && (
             <Card title="Concluída">
               <p className="text-sm text-graphite">
                 Em {formatDateTime(o.completed_at)} por {o.completed_by_name ?? 'equipe'} · {formatKm(o.km_out)} · total <span className="font-semibold">{formatCents(o.final_total_cents)}</span> · código {o.receipt_code}
               </p>
-              <p className="mt-1 text-xs text-muted">O registro no histórico da moto (passaporte) chega na próxima fase.</p>
               {manage && o.status !== 'delivered' && (
                 <div className="mt-3 flex flex-col items-start gap-2">
                   <Button size="sm" loading={busy === 'link-receipt'} onClick={async () => { await makeLink('receipt'); if (o.status === 'completed') await run('pickup', () => notifyPickup(orgId, o.id)) }}>
@@ -213,7 +219,7 @@ function OrderView({ orgId, perms }: { orgId: string; perms: WorkshopPermissions
           {manage && !closed && <CancelCard orgId={orgId} order={o} run={run} busy={busy} />}
           {o.status === 'canceled' && <Notice tone="info" title="OS cancelada">{o.canceled_reason}</Notice>}
 
-          <Card title="Histórico">
+          <Card title="Histórico da OS">
             <ol className="flex flex-col gap-2.5 text-sm">
               {o.events.map((e) => (
                 <li key={e.id} className="border-l-2 border-rule pl-3">
@@ -352,13 +358,14 @@ function TechnicalNotes({ orgId, order, canEdit, onSaved }: { orgId: string; ord
   )
 }
 
-function CompleteCard({ orgId, order: o, pending, run, busy }: { orgId: string; order: Order; pending: number; run: (n: string, fn: () => Promise<unknown>) => Promise<void>; busy: string }) {
+function CompleteCard({ orgId, order: o, history, pending, run, busy }: { orgId: string; order: Order; history?: OrderHistory; pending: number; run: (n: string, fn: () => Promise<unknown>) => Promise<void>; busy: string }) {
   const [open, setOpen] = useState(false)
   const [km, setKm] = useState(o.inspections.exit?.km?.toString() ?? '')
   const [notes, setNotes] = useState('')
   const [adj, setAdj] = useState('')
   const [reason, setReason] = useState('')
   const [err, setErr] = useState<string | null>(null)
+  const [hopts, setHopts] = useState<HistoryOptions>({ publish: true })
   const done = o.items.filter((i) => i.status === 'done')
   const sum = done.reduce((s, i) => s + itemNet(i), 0)
   const adjCents = adj ? (adj.trim().startsWith('-') ? -1 : 1) * (parseMoney(adj.replace('-', '')) ?? 0) : 0
@@ -378,13 +385,14 @@ function CompleteCard({ orgId, order: o, pending, run, busy }: { orgId: string; 
           {adjCents !== 0 && <TextField label="Motivo do ajuste" value={reason} onChange={(e) => setReason(e.target.value)} />}
           <TextAreaField label="Observações finais (vão no comprovante)" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
           <p className="text-sm">Valor final: <span className="font-semibold">{formatCents(sum + adjCents)}</span></p>
+          {history?.motorcycle_id && <HistoryOptionsFields history={history} value={hopts} onChange={setHopts} showPublishToggle />}
           {!o.inspections.exit && <p className="text-xs text-muted">Dica: preencha o checklist de saída antes de concluir.</p>}
           {err && <Notice tone="error">{err}</Notice>}
           <div className="flex gap-2">
             <Button size="sm" loading={busy === 'complete'} onClick={async () => {
               if (!km) return setErr('Informe o km final.')
               setErr(null)
-              await run('complete', () => completeOrder(orgId, o.id, Number(onlyDigits(km)), notes, adjCents, reason))
+              await run('complete', () => completeOrder(orgId, o.id, Number(onlyDigits(km)), notes, adjCents, reason, history?.motorcycle_id ? hopts : { publish: false }))
             }}>Concluir OS</Button>
             <Button size="sm" variant="secondary" onClick={() => setOpen(false)}>Voltar</Button>
           </div>

@@ -109,6 +109,16 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-045 — Módulo Oficina (PRD 2.1), Fase 3: OS concluída vira registro no histórico da moto
+**Data:** 08/11/2026 · **Status:** aceita (Fase 2 validada: "continue"; registro direto, sem aprovação prévia do titular — recomendação aceita)
+- **Quando**: na conclusão da OS (padrão ligado, a oficina pode desmarcar e registrar depois) ou depois, pelo botão "Registrar no histórico". Exige moto da oficina vinculada ao passaporte, **autorização do titular vigente** e permissões "Clientes, orçamentos e OS" + "Registrar serviços". Sem isso, o atendimento fica só no registro da oficina (a OS mostra o motivo).
+- **Como**: pelo mesmo fluxo que já existia (`create_workshop_service`): origem "oficina", classificação "confirmado por prestador", oficina e funcionário como autores, km final como leitura da oficina, aviso ao titular. Não foi criado caminho paralelo para escrever no histórico.
+- **O quê**: só itens **executados** (descrição com o nº da OS), peças executadas com fabricante e código, categoria sugerida pelo catálogo (editável), título editável, valor final opcional (padrão: mostrar), observações + código do comprovante. Itens não executados e recusados nunca aparecem.
+- **Uma OS = um registro** (índice único + trava). Mudanças depois são **correções** pelo fluxo existente (registro novo com motivo, original preservado — §17.5).
+- **Fotos**: a oficina escolhe por etapa quais fotos vão ao histórico; o site as copia pelo fluxo de anexos da oficina (conferência do conteúdo, cota de 500 MB da oficina) e liga cada foto ao anexo.
+- **Trava nova**: OS concluída não muda valores, km, comprovante nem vínculo com o histórico, nem por acesso direto ao banco (gatilho).
+- Revogação da autorização bloqueia novos registros e preserva os anteriores (§20.5). O comprovante em PDF não vai como anexo (só o código no registro) — KI-037.
+
 ### ADR-044 — Módulo Oficina (PRD 2.1), Fase 2: ordem de serviço só com itens autorizados
 **Data:** 08/11/2026 · **Status:** aceita (Fase 1 validada pelo responsável: "continue")
 - **OS nasce da autorização.** Do orçamento aprovado entram **só as posições aprovadas** no aceite (com o desconto distribuído proporcionalmente por item); recusados nunca entram. Uma OS por orçamento. Orçamento complementar aprovado entra na mesma OS por botão. OS sem orçamento ou item extra exigem **forma da autorização (pessoalmente, telefone, WhatsApp, outro) e quem autorizou**, gravados no item. Assim nenhum item "executado" existe sem autorização (§8.4) — garantido por restrição no banco.

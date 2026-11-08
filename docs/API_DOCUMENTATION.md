@@ -388,3 +388,12 @@ Todas recebem `p_org` (a oficina) e conferem a sessão. Detalhes em `docs/module
 | `workshop_list_orders(org, situação?, busca?, só minhas?)` / `workshop_get_order` / `workshop_orders_summary` / `workshop_customer_orders` | Membro | Leitura (quem não gerencia vê só as OS designadas) |
 | `workshop_create_order_link(org, os, entry_ack\|receipt)` | `manage_quotes` | Link do cliente (token uma vez) |
 | `get_service_order_by_token(token)` / `ack_service_order_entry(token, nome, confirmado)` | Anônimo | Ver checklist/comprovante e dar ciência da entrada |
+
+### Histórico da moto a partir da OS (Fase 3, ADR-045)
+
+| Função | Quem | O que faz |
+|---|---|---|
+| `workshop_complete_order(org, os, km, obs, ajuste, motivo, {publish, category, title, include_value})` | `manage_quotes` | Conclui e, se possível e pedido (padrão), registra no histórico. Devolve `history_state` e `record_id` |
+| `workshop_publish_order_to_history(org, os, categoria?, título?, mostrar_valor?)` | `manage_quotes` + `register_services` + autorização vigente | Registro posterior |
+| `workshop_order_history(org, os)` | Membro | Situação (`ready`, `published`, `not_linked`, `no_access`…), sugestões, registro, fotos já enviadas |
+| `workshop_link_photo_to_history(org, os, foto, anexo)` | `manage_quotes` | Liga a foto da OS ao anexo criado pelo fluxo `register_workshop_attachment` |
