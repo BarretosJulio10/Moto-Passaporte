@@ -605,6 +605,17 @@ export type Database = {
       }
       workshops: {
         Row: {
+          booking_capacity: number
+          booking_days_ahead: number
+          booking_enabled: boolean
+          booking_min_hours: number
+          booking_slot_minutes: number
+          brands_served: string[]
+          logo_path: string | null
+          show_prices: boolean
+          show_services: boolean
+          website_url: string | null
+          weekly_hours: Json | null
           address: string | null
           business_name: string
           city: string | null
@@ -627,6 +638,17 @@ export type Database = {
           whatsapp: string | null
         }
         Insert: {
+          booking_capacity?: number
+          booking_days_ahead?: number
+          booking_enabled?: boolean
+          booking_min_hours?: number
+          booking_slot_minutes?: number
+          brands_served?: string[]
+          logo_path?: string | null
+          show_prices?: boolean
+          show_services?: boolean
+          website_url?: string | null
+          weekly_hours?: Json | null
           address?: string | null
           business_name: string
           city?: string | null
@@ -649,6 +671,17 @@ export type Database = {
           whatsapp?: string | null
         }
         Update: {
+          booking_capacity?: number
+          booking_days_ahead?: number
+          booking_enabled?: boolean
+          booking_min_hours?: number
+          booking_slot_minutes?: number
+          brands_served?: string[]
+          logo_path?: string | null
+          show_prices?: boolean
+          show_services?: boolean
+          website_url?: string | null
+          weekly_hours?: Json | null
           address?: string | null
           business_name?: string
           city?: string | null

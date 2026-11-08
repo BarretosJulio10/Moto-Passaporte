@@ -54,6 +54,9 @@ const AgendaPage = lazy(() => import('@/modules/workshop/management/AgendaPage')
 const FinancePage = lazy(() => import('@/modules/workshop/management/FinancePage').then((m) => ({ default: m.FinancePage })))
 const ReportsPage = lazy(() => import('@/modules/workshop/management/ReportsPage').then((m) => ({ default: m.ReportsPage })))
 const RelationshipPage = lazy(() => import('@/modules/workshop/management/RelationshipPage').then((m) => ({ default: m.RelationshipPage })))
+const ReviewsPage = lazy(() => import('@/modules/workshop/growth/ReviewsPage').then((m) => ({ default: m.ReviewsPage })))
+const CampaignsPage = lazy(() => import('@/modules/workshop/growth/CampaignsPage').then((m) => ({ default: m.CampaignsPage })))
+const AdminReviewsPage = lazy(() => import('@/modules/admin/AdminReviewsPage').then((m) => ({ default: m.AdminReviewsPage })))
 const QuoteApprovalPage = lazy(() => import('@/modules/workshop/quote-approval/QuoteApprovalPage').then((m) => ({ default: m.QuoteApprovalPage })))
 const InvitePage = lazy(() => import('@/modules/workshop/InvitePage').then((m) => ({ default: m.InvitePage })))
 const PublicWorkshopPage = lazy(() => import('@/modules/workshop/PublicWorkshopPage').then((m) => ({ default: m.PublicWorkshopPage })))
@@ -186,6 +189,8 @@ export const routes = [
           { path: '/oficina/:orgId/financeiro', element: <FinancePage /> },
           { path: '/oficina/:orgId/relatorios', element: <ReportsPage /> },
           { path: '/oficina/:orgId/relacionamento', element: <RelationshipPage /> },
+          { path: '/oficina/:orgId/avaliacoes', element: <ReviewsPage /> },
+          { path: '/oficina/:orgId/campanhas', element: <CampaignsPage /> },
           { path: '/oficina/:orgId/motos/:motoId', element: <WorkshopMotoPage /> },
           { path: '/oficina/:orgId/motos/:motoId/servico', element: <WorkshopServiceFormPage /> },
           { path: '/convite/:token', element: <InvitePage /> },
@@ -266,6 +271,14 @@ export const routes = [
             element: (
               <RequireAdmin>
                 <AdminClaimsPage />
+              </RequireAdmin>
+            ),
+          },
+          {
+            path: '/admin/avaliacoes',
+            element: (
+              <RequireAdmin>
+                <AdminReviewsPage />
               </RequireAdmin>
             ),
           },

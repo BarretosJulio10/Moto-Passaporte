@@ -15,6 +15,7 @@ import {
   type AgendaView, type Appointment, type ApptStatus,
 } from './api'
 import { ContactButton } from './widgets'
+import { whatsappUrl } from '../quotes/api'
 
 type Err = { code?: string; message?: string }
 const VIEWS: { v: AgendaView; label: string }[] = [{ v: 'dia', label: 'Dia' }, { v: 'semana', label: 'Semana' }, { v: 'mes', label: 'Mês' }]
@@ -93,7 +94,8 @@ function AgendaViewPage({ orgId, workshopName, canEdit }: { orgId: string; works
                           <p className="font-semibold text-ink"><span className="tabular-nums">{time(a.starts_at)}</span> · {a.customer_name ?? a.contact_name}</p>
                           <p className="text-sm text-graphite">{a.service_description}</p>
                           <p className="text-xs text-muted">
-                            {[a.vehicle_label, `${a.duration_minutes} min`, a.responsible_name, a.contact_phone && formatPhone(a.contact_phone)].filter(Boolean).join(' · ')}
+                            {a.source === 'publico' && <span className="mr-1 rounded-full border border-amber-300 bg-amber-50 px-1.5 font-semibold text-amber-900">Pelo site</span>}
+                            {[a.vehicle_label ?? a.vehicle_text, `${a.duration_minutes} min`, a.responsible_name, a.contact_phone && formatPhone(a.contact_phone)].filter(Boolean).join(' · ')}
                           </p>
                         </div>
                         <StatusChip className={APPT_TONE[a.status]}>{APPT_LABEL[a.status]}</StatusChip>
@@ -108,6 +110,10 @@ function AgendaViewPage({ orgId, workshopName, canEdit }: { orgId: string; works
                               <Button size="sm" onClick={() => navigate(`/oficina/${orgId}/orcamentos/novo?cliente=${a.customer_id}`)}>Criar orçamento</Button>
                               <Button size="sm" variant="secondary" onClick={() => navigate(`/oficina/${orgId}/os/nova?cliente=${a.customer_id}`)}>Abrir OS</Button>
                             </>
+                          )}
+                          {!a.customer_id && a.contact_phone && a.status !== 'in_service' && (
+                            <a href={whatsappUrl(a.contact_phone, `Olá, ${(a.contact_name ?? '').split(' ')[0]}! Aqui é da ${workshopName}. Recebemos seu pedido para ${new Date(a.starts_at).toLocaleDateString('pt-BR')} às ${time(a.starts_at)}. Podemos confirmar?`)}
+                              target="_blank" rel="noopener noreferrer" className="inline-flex items-center rounded-doc border border-rule bg-sheet px-3 py-1.5 text-sm font-semibold text-ink hover:border-ink">Confirmar pelo WhatsApp</a>
                           )}
                           {a.customer_id && a.status !== 'in_service' && (
                             <ContactButton orgId={orgId} customerId={a.customer_id} customerName={a.customer_name ?? ''} whatsapp={a.customer_whatsapp}

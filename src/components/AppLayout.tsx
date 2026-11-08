@@ -30,6 +30,7 @@ const ADMIN_LINKS: [string, string][] = [
   ['/admin/usuarios', 'Usuários'],
   ['/admin/oficinas', 'Oficinas'],
   ['/admin/verificacoes', 'Verificações de placa'],
+  ['/admin/avaliacoes', 'Avaliações de oficinas'],
   ['/admin/assinaturas', 'Assinaturas e pagamentos'],
   ['/admin/planos', 'Planos'],
   ['/admin/pagamentos', 'Mercado Pago'],

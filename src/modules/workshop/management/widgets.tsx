@@ -168,12 +168,12 @@ export function ReminderForm({ orgId, customerId, vehicleId, orderId, suggestion
 }
 
 /** Abre o WhatsApp com a mensagem pronta e registra o contato (não prova que foi enviado). */
-export function ContactButton({ orgId, customerId, customerName, whatsapp, workshopName, reason, reference, detail, onLogged, label = 'WhatsApp' }: {
+export function ContactButton({ orgId, customerId, customerName, whatsapp, workshopName, reason, reference, detail, onLogged, label = 'WhatsApp', text }: {
   orgId: string; customerId: string; customerName: string; whatsapp: string | null | undefined; workshopName: string
-  reason: ContactReason; reference?: string | null; detail?: string; onLogged?: () => void; label?: string
+  reason: ContactReason; reference?: string | null; detail?: string; onLogged?: () => void; label?: string; text?: string
 }) {
   if (!whatsapp) return <span className="text-xs text-muted">sem WhatsApp</span>
-  const url = whatsappUrl(whatsapp, contactMessage(reason, { customerName, workshopName, detail }))
+  const url = whatsappUrl(whatsapp, text ?? contactMessage(reason, { customerName, workshopName, detail }))
   return (
     <a href={url} target="_blank" rel="noopener noreferrer"
       onClick={() => { logContact(orgId, customerId, reason, reference ?? null).then(() => onLogged?.(), () => undefined) }}

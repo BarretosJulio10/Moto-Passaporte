@@ -84,6 +84,7 @@ export type Customer = Omit<CustomerRow, 'vehicles' | 'quotes' | 'last_quote_at'
   created_at: string
   vehicles: Vehicle[]
   quotes: CustomerQuoteSummary[]
+  marketing_opt_out_at?: string | null
 }
 
 export type VehicleRow = Pick<Vehicle, 'id' | 'customer_id' | 'brand' | 'model' | 'version' | 'year' | 'displacement_cc' | 'plate' | 'km' | 'color' | 'status'> & {

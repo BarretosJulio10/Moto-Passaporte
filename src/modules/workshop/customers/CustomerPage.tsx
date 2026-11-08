@@ -75,7 +75,7 @@ function CustomerView({ orgId, canEdit }: { orgId: string; canEdit: boolean }) {
               </Button>
             </div>
           )}
-          <RelationshipCard orgId={orgId} customerId={c.id} vehicles={c.vehicles} canEdit={canEdit} />
+          <RelationshipCard orgId={orgId} customerId={c.id} vehicles={c.vehicles} canEdit={canEdit} optOutAt={c.marketing_opt_out_at} />
         </div>
 
         <div className="flex flex-col gap-6">

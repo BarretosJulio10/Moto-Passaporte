@@ -10,6 +10,7 @@ import { formatDateTime } from '../shared/rpc'
 import { rpc } from '../shared/rpc'
 import type { ItemKind } from '../quotes/api'
 import { OrderReceipt } from './OrderReceipt'
+import { ReviewBox } from '../growth/ReviewBox'
 import { AUTH_LABEL, ENTRY_ITEMS, STATE_LABEL, type AuthMethod, type InspectionItems } from './api'
 
 type Err = { code?: string; message?: string }
@@ -31,10 +32,11 @@ type Pub = {
   adjustment_reason: string | null
   customer_name: string
   vehicle: { brand: string; model: string; version: string | null; year: number | null; plate: string | null; color: string | null } | null
-  workshop: { business_name: string; cnpj: string | null; phone: string | null; whatsapp: string | null; email: string | null; address: string | null; city: string | null; state: string | null; logo_url: string | null }
+  workshop: { business_name: string; cnpj: string | null; phone: string | null; whatsapp: string | null; email: string | null; address: string | null; city: string | null; state: string | null; logo_url: string | null; public_slug?: string | null }
   entry: { items: InspectionItems; fuel_level: string | null; keys_count: number | null; km: number | null; notes: string | null; recorded_at: string; customer_ack_at: string | null; customer_ack_name: string | null } | null
   exit: { items: InspectionItems; km: number | null; notes: string | null } | null
   photos_count: number
+  review?: { done: false } | { done: true; rating: number; comment: string | null; reply: string | null } | null
   items: { position: number; kind: ItemKind; description: string; quantity: number; subtotal_cents: number; status: 'pending' | 'done' | 'not_done'; part_brand: string | null; part_code: string | null; notes: string | null; origin: string }[] | null
 }
 type Result = Pub | { state: 'not_found' } | { state: 'inactive'; workshop?: string }
@@ -89,6 +91,8 @@ export function OrderPublicPage() {
           entry: p.entry ? { items: p.entry.items, notes: p.entry.notes, ackName: p.entry.customer_ack_name, ackAt: p.entry.customer_ack_at } : null,
           exit: p.exit ? { items: p.exit.items, notes: p.exit.notes } : null,
         }} />
+        {p.review && <div className="mt-8 print:hidden"><ReviewBox token={token} review={p.review} workshop={p.workshop.business_name} slug={p.workshop.public_slug ?? null}
+          customerName={p.customer_name} onDone={() => queryClient.invalidateQueries({ queryKey: key })} /></div>}
       </div>
     )
   }

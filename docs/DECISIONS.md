@@ -109,6 +109,15 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-047 — Módulo Oficina (PRD 2.1), Fase 5: perfil, avaliações autênticas, agendamento público e campanhas sem envio em massa
+**Data:** 08/11/2026 · **Status:** aceita (Fase 4 validada: "continue")
+- **Perfil público por função** (`get_public_workshop`), não por leitura da tabela: lista fechada de campos comerciais. Fotos ficam no bucket privado existente; uma política libera a leitura sem conta só dos arquivos registrados no perfil de oficina pública e ativa. Assim não há bucket público e a conferência de conteúdo (ADR-033) vale para tudo.
+- **Autenticidade das avaliações**: só quem tem o link do comprovante de uma OS concluída (token de 256 bits, ADR-044) avalia, uma vez por OS. Nome exibido reduzido a "Primeiro I.". Nota e comentário não mudam. A oficina responde; **denunciar não esconde** (evita a oficina sumir com críticas); só o admin oculta ou mantém, com motivo auditado.
+- **Agendamento público = pedido**, não reserva confirmada: entra como "Solicitado" e a equipe confirma pelo WhatsApp. Horários calculados no banco pelo horário estruturado, capacidade e antecedência; limites por conexão e por WhatsApp contra abuso. Consentimento explícito para uso do nome e WhatsApp.
+- **Campanhas sem envio em massa**: o sistema monta o público e o texto; a equipe abre cada conversa. Toda mensagem leva "responda SAIR"; o pedido de saída é registrado no cliente e o tira de todas as campanhas (avisos do próprio serviço continuam). Base legal e textos devem passar pela revisão jurídica (KI-035).
+- **WhatsApp oficial (PRD 2.1 §13.2 B) só preparado**: o registro de contatos distingue "preparada" de enviada/entregue/lida/falhou e guarda provedor e id da mensagem. Implementar o envio exige conta no WhatsApp Business Platform (ou provedor), templates aprovados, consentimento e uma Edge Function com as credenciais no cofre — decisão do responsável (KI-040).
+- "Novas integrações comerciais" (PRD 2.1 §25) ficam no backlog até haver parceiro definido.
+
 ### ADR-046 — Módulo Oficina (PRD 2.1), Fase 4: gestão operacional sem fiscal e sem envio automático
 **Data:** 08/11/2026 · **Status:** aceita (Fase 3 validada: "continue")
 - **Financeiro é controle de recebimentos por OS**, não nota fiscal, caixa nem conciliação bancária (PRD 2.1 §15.3). Recebimento nunca é apagado nem editado: estorno com motivo. Soma não passa do total da OS. Concluído ≠ recebido nas telas.

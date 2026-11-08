@@ -23,6 +23,12 @@ export const KIND_LABEL: Record<string, string> = {
   claim_decided: 'Pedidos de verificação de placa',
   ownership_notice: 'Avisos sobre a minha moto',
   admin_notice: 'Avisos da equipe',
+  quote_viewed: 'Orçamento aberto pelo cliente',
+  quote_decided: 'Resposta do cliente ao orçamento',
+  quote_expired: 'Orçamento vencido',
+  service_order_assigned: 'Ordem de serviço designada a mim',
+  appointment_requested: 'Pedidos de agendamento pelo site',
+  workshop_review: 'Novas avaliações da oficina',
 }
 
 export async function fetchNotifications(before?: string): Promise<AppNotification[]> {

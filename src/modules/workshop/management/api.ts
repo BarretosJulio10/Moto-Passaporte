@@ -109,6 +109,9 @@ export type Appointment = {
   notes: string | null
   quote_id: string | null
   order_id: string | null
+  source: 'equipe' | 'publico'
+  vehicle_text: string | null
+  consent_at: string | null
   customer_name: string | null
   customer_whatsapp: string | null
   vehicle_label: string | null
@@ -184,9 +187,9 @@ export const saveReminder = (org: string, id: string | null, data: ReminderInput
 export const setReminderStatus = (org: string, id: string, status: Reminder['status']) =>
   rpc<void>('workshop_set_reminder_status', { p_org: org, p_id: id, p_status: status })
 
-export type ContactReason = 'quote_followup' | 'reminder' | 'return' | 'pickup' | 'other'
+export type ContactReason = 'quote_followup' | 'reminder' | 'return' | 'pickup' | 'campaign' | 'other'
 export const CONTACT_LABEL: Record<ContactReason, string> = {
-  quote_followup: 'Retorno de orçamento', reminder: 'Lembrete de manutenção', return: 'Convite para voltar', pickup: 'Moto pronta', other: 'Outro',
+  quote_followup: 'Retorno de orçamento', reminder: 'Lembrete de manutenção', return: 'Convite para voltar', pickup: 'Moto pronta', campaign: 'Campanha', other: 'Outro',
 }
 export const logContact = (org: string, customer: string, reason: ContactReason, reference: string | null, note = '') =>
   rpc<void>('workshop_log_contact', { p_org: org, p_customer: customer, p_reason: reason, p_reference: reference, p_channel: 'whatsapp', p_note: note || null })

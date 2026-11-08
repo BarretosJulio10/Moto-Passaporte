@@ -9,6 +9,7 @@ import { translateDbError } from '@/core/shared/dbErrors'
 import { SPECIALTIES, workshopProfileSchema } from './schemas'
 import { fetchWorkshop, updateWorkshop } from './api'
 import { WorkshopBasicFields } from './WorkshopForm'
+import { PublicProfileSettings } from './growth/PublicProfileSettings'
 
 export function WorkshopProfilePage() {
   const { orgId = '' } = useParams()
@@ -85,6 +86,7 @@ export function WorkshopProfilePage() {
             name="openingHours"
             defaultValue={w.opening_hours ?? ''}
             placeholder="Ex.: seg a sex, 8h às 18h; sáb, 8h às 12h"
+            hint="Texto livre, usado se você não preencher o horário por dia em Perfil público, abaixo."
             className="sm:col-span-2"
             error={errors.openingHours}
           />
@@ -121,6 +123,7 @@ export function WorkshopProfilePage() {
           <Link to={`/oficina/${orgId}`} className="px-2 py-2 font-semibold text-ink underline-offset-4 hover:underline">Cancelar</Link>
         </div>
       </form>
+      <PublicProfileSettings shop={w} />
     </div>
   )
 }

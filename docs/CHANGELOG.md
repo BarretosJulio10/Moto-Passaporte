@@ -9,6 +9,24 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.48.0] — 08/11/2026 — Módulo Oficina (PRD 2.1), Fase 5: crescimento comercial
+
+### Adicionado
+- **Perfil público avançado**: logotipo, até 12 fotos, marcas atendidas, site/Instagram, serviços do catálogo (com valor opcional), horário por dia da semana, nota média e avaliações. Botões de agendar, WhatsApp e ligar.
+- **Agendamento pelo site**: o cliente escolhe dia e horário livres, informa nome, WhatsApp e o que a moto precisa; o pedido entra na Agenda como "Solicitado" e a equipe é avisada. A oficina define intervalo, motos por horário e antecedência.
+- **Avaliações**: pelo comprovante da OS concluída (uma por serviço). A oficina responde em público e o responsável pode denunciar; a moderação da plataforma decide (nova tela `/admin/avaliacoes`).
+- **Campanhas de relacionamento**: público (sem voltar há N dias, com lembrete aberto, marca, todos), mensagem com `{nome}`, `{oficina}` e `{moto}`, lista de clientes com WhatsApp pronto e marcação de quem já foi contatado. Opção "Não quer receber" na campanha e na ficha do cliente.
+- Preparação para o WhatsApp oficial: situação de entrega e id do provedor no registro de contatos (sem envio automático).
+- Avisos novos: pedido de agendamento pelo site e nova avaliação.
+
+### Segurança
+- Perfil público sem CNPJ, razão social, responsável, funcionários ou clientes. Fotos do perfil conferidas e públicas só enquanto o perfil é público; fotos de OS continuam privadas.
+- Agendamento e consultas públicas com limite por conexão; até 3 pedidos em aberto por WhatsApp. Avaliação imutável; ocultar só pela moderação, com auditoria.
+
+### Testes
+- Banco: 37 verificações novas (`phase7e_workshop_growth_test.sql`) — 1021 OK. Fumaça em produção (transação desfeita): horários, pedido de agendamento, avaliação pelo comprovante, perfil público e campanha.
+- Tela: 7 novos — 239.
+
 ## [0.47.0] — 08/11/2026 — Módulo Oficina (PRD 2.1), Fase 4: gestão
 
 ### Adicionado

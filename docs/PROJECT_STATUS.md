@@ -1,15 +1,15 @@
 # PROJECT_STATUS — Moto Passaporte
 
-**Versão atual:** 0.47.0
+**Versão atual:** 0.48.0
 **Data:** 08/11/2026
 **Fase:** Fases 1 a 4 concluídas. Fases 1 a 5 concluídas (Mercado Pago aguardando teste ponta a ponta). Fase 6 em andamento: painel administrativo
-**Progresso geral:** PRD 2.0: 97,5% (39 de 40 itens — `PRD_CHECKLIST.md`). PRD 2.1 (módulo Oficina): Fases 1 a 4 de 5 concluídas (≈ 80%)
+**Progresso geral:** PRD 2.0: 97,5% (39 de 40 itens — `PRD_CHECKLIST.md`). PRD 2.1 (módulo Oficina): Fases 1 a 5 concluídas (100%; WhatsApp oficial só preparado, KI-040)
 
 ## Ambientes
 
 | Ambiente | URL | Banco | Situação |
 |---|---|---|---|
-| Desenvolvimento | https://moto-passaporte.vercel.app (Vercel, deploy automático da `main`) | Supabase `ripgenhykaajcnzdxoid` (MOTO_Passaporte, us-east-1, PG 17) | migrações até `workshop_management` aplicadas; Edge Functions `mercadopago-check`, `mercadopago-billing`, `mercadopago-webhook`, `storage-cleanup`, `scheduled-jobs`, `attachment-check`, `shared-file` e `push-send` publicadas; rotinas agendadas no pg_cron |
+| Desenvolvimento | https://moto-passaporte.vercel.app (Vercel, deploy automático da `main`) | Supabase `ripgenhykaajcnzdxoid` (MOTO_Passaporte, us-east-1, PG 17) | migrações até `workshop_growth` aplicadas; Edge Functions `mercadopago-check`, `mercadopago-billing`, `mercadopago-webhook`, `storage-cleanup`, `scheduled-jobs`, `attachment-check`, `shared-file` e `push-send` publicadas; rotinas agendadas no pg_cron |
 | Homologação | — | — | não configurado |
 | Produção | — | — | não configurado |
 
@@ -26,7 +26,7 @@
 | PRD 2.1 — Oficina, Fase 2 (ordem de serviço) | concluída (v0.45.0): OS só com itens autorizados, status, mecânico, checklists, ciência do cliente, fotos, conclusão, comprovante e entrega |
 | PRD 2.1 — Oficina, Fase 3 (histórico permanente) | concluída (v0.46.0): OS concluída gera registro no passaporte autorizado, fotos, correções |
 | PRD 2.1 — Oficina, Fase 4 (gestão) | concluída (v0.47.0): agenda, peças, financeiro com permissão própria, lembretes e recuperação, relatórios |
-| PRD 2.1 — Fase 5 | planejada: perfil avançado, avaliações, agendamento público, WhatsApp oficial |
+| PRD 2.1 — Oficina, Fase 5 (crescimento comercial) | concluída (v0.48.0): perfil público avançado, avaliações com moderação, agendamento pelo site, campanhas; WhatsApp oficial preparado |
 | 6 — Administração e lançamento | em andamento: painel administrativo completo, verificação de placa, armazenamento, testes/regressão e backup/restauração; falta homologação e lançamento |
 
 ## Próximos passos (em ordem)

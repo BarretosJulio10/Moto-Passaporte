@@ -10,7 +10,7 @@ Ferramenta de trabalho diário da oficina, integrada ao passaporte sem se confun
 | 2 — Ordem de serviço (OS, mecânico, checklist, fotos, peças usadas, comprovante) | **concluída e testada** — ver `SERVICE_ORDERS.md` | 0.45.0 |
 | 3 — Histórico permanente (registro após conclusão, notificação, correções) | **concluída e testada** — ver `WORKSHOP_HISTORY_INTEGRATION.md` | 0.46.0 |
 | 4 — Gestão (agenda, peças, financeiro, funcionários, relatórios, lembretes) | **concluída e testada** — ver `WORKSHOP_MANAGEMENT.md` | 0.47.0 |
-| 5 — Crescimento (perfil avançado, avaliações, agendamento público, WhatsApp oficial) | planejada | — |
+| 5 — Crescimento (perfil avançado, avaliações, agendamento público, campanhas, WhatsApp oficial) | **concluída e testada** — ver `WORKSHOP_GROWTH.md` (WhatsApp oficial: só a preparação, ADR-047) | 0.48.0 |
 
 ## O que existe (Fase 1)
 

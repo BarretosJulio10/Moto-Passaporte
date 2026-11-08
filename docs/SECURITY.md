@@ -247,6 +247,11 @@ Ver `KNOWN_ISSUES.md`.
 - Uma OS gera um registro; OS concluída travada por gatilho; revogação bloqueia novos registros sem apagar os anteriores.
 - Fotos copiadas pelo fluxo de anexos da oficina (conferência de conteúdo e cota). Teste: `tests/security/phase7c_workshop_history_test.sql`.
 
+### Crescimento comercial (ADR-047)
+- Funções públicas novas (`get_public_workshop`, `get_public_booking_slots`, `request_public_appointment`, `submit_workshop_review`) com limite por conexão (`public_workshop_views_per_hour` = 300, `public_booking_requests_per_hour` = 10) e devolvendo só campos comerciais.
+- Leitura sem conta no Storage só para arquivos de `workshop_public_photos` de oficina pública e ativa (`is_public_workshop_file`); fotos de OS seguem privadas.
+- Avaliação exige o token do comprovante de OS concluída; imutável; ocultar só por admin com motivo (`write_audit`). Campanhas respeitam o pedido de não receber no banco. Teste: `tests/security/phase7e_workshop_growth_test.sql`.
+
 ### Gestão da oficina (ADR-046)
 - 5 tabelas novas (`workshop_parts_catalog`, `workshop_payments`, `workshop_appointments`, `workshop_reminders`, `workshop_contact_log`) com RLS; gravação só por funções. `workshop_payments` só é lida com a permissão `manage_finance`; custo de peça só sai para `manage_prices`.
 - Recebimentos e contatos não são apagados (gatilho); recebimento só muda para estorno com motivo. Excluir conta só zera o autor (`wq_only_user_nulled`).

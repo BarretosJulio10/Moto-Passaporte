@@ -7,9 +7,10 @@ import { Card } from '../shared/WorkshopShell'
 import { formatCents, formatDateTime } from '../shared/rpc'
 import { CONTACT_LABEL, PAY_LABEL, REMINDER_LABEL, fetchCustomerContacts, formatDay, setReminderStatus } from './api'
 import { ReminderForm } from './widgets'
+import { setMarketingOptOut } from '../growth/api'
 
 /** Lembretes, últimos contatos e (com permissão) pagamentos do cliente (PRD 2.1 §4.2). */
-export function RelationshipCard({ orgId, customerId, vehicles, canEdit }: { orgId: string; customerId: string; vehicles: Vehicle[]; canEdit: boolean }) {
+export function RelationshipCard({ orgId, customerId, vehicles, canEdit, optOutAt }: { orgId: string; customerId: string; vehicles: Vehicle[]; canEdit: boolean; optOutAt?: string | null }) {
   const qc = useQueryClient()
   const key = ['ws-customer-contacts', orgId, customerId]
   const q = useQuery({ queryKey: key, queryFn: () => fetchCustomerContacts(orgId, customerId) })
@@ -55,6 +56,12 @@ export function RelationshipCard({ orgId, customerId, vehicles, canEdit }: { org
                 ))}
               </ul>
             )}
+          </section>
+          <section>
+            <h3 className="font-semibold text-ink">Campanhas</h3>
+            <p className="text-muted">{optOutAt ? `Pediu para não receber em ${formatDateTime(optOutAt)}. Avisos do próprio serviço continuam.` : 'Recebe campanhas de relacionamento.'}</p>
+            {canEdit && <Button size="sm" variant="quiet" onClick={async () => { await setMarketingOptOut(orgId, customerId, !optOutAt); await qc.invalidateQueries({ queryKey: ['ws-customer', orgId, customerId] }) }}>
+              {optOutAt ? 'Voltar a receber' : 'Não quer receber campanhas'}</Button>}
           </section>
           {d.payments && (
             <section>

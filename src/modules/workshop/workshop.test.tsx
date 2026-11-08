@@ -15,8 +15,16 @@ vi.mock('./api', () => ({
     created.push(input)
     return createImpl(input)
   },
-  fetchPublicWorkshop: (slug: string) => publicImpl(slug),
 }))
+vi.mock('./growth/api', async () => {
+  const actual = await vi.importActual<typeof import('./growth/api')>('./growth/api')
+  return {
+    ...actual,
+    fetchPublicWorkshop: (slug: string) => publicImpl(slug),
+    publicPhotoUrls: async () => ({}),
+    fetchBookingSlots: async () => ['09:00', '10:00'],
+  }
+})
 
 import { CreateWorkshopPage } from './CreateWorkshopPage'
 import { PublicWorkshopPage } from './PublicWorkshopPage'
@@ -117,7 +125,16 @@ describe('PublicWorkshopPage', () => {
       whatsapp: '17991234567',
       email: null,
       address: null,
+      website_url: null,
       verification_status: 'unverified',
+      brands_served: ['Honda'],
+      weekly_hours: { '1': ['08:00', '18:00'], '0': null },
+      logo_path: null,
+      photos: [],
+      services: [{ name: 'Troca de óleo', category: 'motor', estimated_minutes: 30, price_cents: 6000 }],
+      rating: { count: 1, average: 5 },
+      reviews: [{ rating: 5, comment: 'Muito bom', display_name: 'Ana P.', reply: 'Obrigado!', created_at: '2026-11-08T12:00:00Z' }],
+      booking: { slot_minutes: 60, days_ahead: 7, min_hours: 2 },
     })
     render(
       <QueryClientProvider client={qc()}>
@@ -130,8 +147,13 @@ describe('PublicWorkshopPage', () => {
     )
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Oficina do Zé')
     expect(screen.getByText('Suspensão')).toBeInTheDocument()
-    expect(screen.getByText('(17) 99123-4567')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Abrir conversa' })).toHaveAttribute('href', 'https://wa.me/5517991234567')
+    expect(screen.getAllByText('(17) 99123-4567').length).toBeGreaterThan(0)
+    expect(screen.getByRole('link', { name: 'WhatsApp' })).toHaveAttribute('href', 'https://wa.me/5517991234567')
+    expect(screen.getByText('Honda')).toBeInTheDocument()
+    expect(screen.getByText('Troca de óleo')).toBeInTheDocument()
+    expect(screen.getByText('Resposta da oficina')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Agendar horário' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: '09:00' })).toBeInTheDocument()
     expect(screen.queryByText(/CNPJ/)).not.toBeInTheDocument()
     expect(screen.getByText(/Não é certificação técnica/)).toBeInTheDocument()
   })

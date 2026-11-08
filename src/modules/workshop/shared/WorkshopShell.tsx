@@ -14,6 +14,8 @@ const TABS: Tab[] = [
   { to: 'os', label: 'Ordens de serviço' },
   { to: 'clientes', label: 'Clientes' },
   { to: 'relacionamento', label: 'Relacionamento' },
+  { to: 'campanhas', label: 'Campanhas' },
+  { to: 'avaliacoes', label: 'Avaliações' },
   { to: 'motos', label: 'Motos' },
   { to: 'servicos', label: 'Serviços e preços' },
   { to: 'pecas', label: 'Peças' },

@@ -401,3 +401,7 @@ Todas recebem `p_org` (a oficina) e conferem a sessão. Detalhes em `docs/module
 ### Gestão (Fase 4, ADR-046)
 
 Contrato completo em `docs/modules/WORKSHOP_MANAGEMENT.md`. Resumo: peças (`workshop_save_part`, `workshop_list_parts`), recebimentos (`workshop_record_payment`, `workshop_void_payment`, `workshop_order_payments`, `workshop_finance`), agenda (`workshop_save_appointment`, `workshop_set_appointment_status`, `workshop_list_appointments`), lembretes e contatos (`workshop_save_reminder`, `workshop_set_reminder_status`, `workshop_log_contact`, `workshop_relationship`, `workshop_customer_contacts`) e `workshop_reports`. `set_org_member_extra_permissions` ganhou `p_manage_finance`; `get_my_workshop_permissions` devolve `manage_finance`.
+
+### Crescimento comercial (Fase 5, ADR-047)
+
+Contrato completo em `docs/modules/WORKSHOP_GROWTH.md`. Públicas (sem conta, com limite): `get_public_workshop`, `get_public_booking_slots`, `request_public_appointment`, `submit_workshop_review`. Da oficina: fotos do perfil, avaliações (`workshop_list_reviews`, `workshop_reply_review`, `workshop_report_review`), campanhas (`workshop_save_campaign`, `workshop_close_campaign`, `workshop_list_campaigns`, `workshop_campaign_recipients`, `workshop_set_marketing_opt_out`). Admin: `admin_list_reviews`, `admin_moderate_review`. `get_service_order_by_token` passou a devolver `review` no comprovante.
