@@ -336,3 +336,6 @@ Implementação em `src/modules/plans/api.ts`.
 
 ### Chassi (ADR-032)
 - `get_my_chassis({ p_motorcycle_id })` → texto ou null (só titular atual); `set_my_chassis({ p_motorcycle_id, p_chassis })` (vazio apaga; inválido recusado). A tabela `motorcycle_private` não é mais lida pelo navegador.
+
+### Conferência de arquivos (ADR-033)
+- Edge Function `POST /functions/v1/attachment-check` `{ path }` (com login), chamada entre o envio ao Storage e `register_*`. 200 = conferido; 422 = conteúdo não bate com o tipo (arquivo apagado); 404/409 = arquivo de outra pessoa ou já registrado.

@@ -9,6 +9,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.32.0] — 08/11/2026 — Arquivos conferidos no servidor
+
+### Segurança
+- Cada arquivo enviado é conferido no servidor (Edge Function `attachment-check`): dono, tipo declarado e assinatura dos primeiros bytes. Arquivo disfarçado é recusado e apagado (ADR-033; KI-018).
+- O banco só registra anexo conferido com o mesmo tipo nas últimas 2 horas (gatilho `attachments_require_check`).
+
+### Desempenho
+- Índices nos vínculos `attachment_checks.checked_by`, `storage_cleanups.requested_by` e `subscription_plans.updated_by` (aviso do Supabase).
+
+### Testes
+- Banco local: 9 verificações novas (24 suítes). Supabase real: 8 (sem conferência, conteúdo errado, tipo trocado, conferência vencida, autoaprovação bloqueada, conferido registra). Varredura: 0 violações. Backup/restauração/rollback com as 10 migrações da Fase 6: 15 verificações.
+
+### Rollback desta versão
+- `supabase/rollback/20261107231202_attachment_checks.down.sql`, remover a Edge Function `attachment-check` e publicar o site anterior. Índices: ver cabeçalho de `20261108024810_fk_indexes.sql`.
+
 ## [0.31.0] — 07/11/2026 — Site mais leve
 
 ### Desempenho

@@ -110,6 +110,8 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 - v0.28.0: MFA obrigatório para admin (ADR-030, KI-014). Testes no Supabase real precisam de `'aal', 'aal2'` nos claims do admin. No banco local, o stub de `auth.jwt()` assume aal2 quando só `request.jwt.claim.sub` é definido.
 - v0.29.0: central de notificações (ADR-031, KI-020). Novo evento que mereça aviso: chamar `public.notify(user, kind, título, texto, link interno, chave)` no banco (gatilho ou função), acrescentar o `kind` na checagem da tabela e na lista de `get_my_notification_preferences`, e o rótulo em `src/modules/notifications/api.ts`.
 - v0.30.0: chassi cifrado (ADR-032, KI-002). Nunca ler `motorcycle_private` pelo navegador; usar `get_my_chassis`/`set_my_chassis`. Nova permissão por coluna exige entrar na lista `column_write_ok` da varredura. Limites já vêm de `user_plan()` (ADR-018): a 5.4 só troca a regra para a assinatura ativa. Antes de cobrar: decisões P-1, P-3, P-4, P-5 e credenciais de teste do Mercado Pago. Ver `PROJECT_STATUS.md` e `PRD_CHECKLIST.md`.
+- v0.31.0: páginas sob demanda (KI-010).
+- v0.32.0: conferência de conteúdo no servidor (ADR-033, KI-018). Testes que inserem em `storage.objects` no banco local passam pela conferência simulada no stub; para testar a recusa, `set tests.skip_file_check = 'on'`. No Supabase real, gravar o resultado como service_role (`record_attachment_check`).
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 

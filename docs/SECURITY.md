@@ -82,6 +82,8 @@
 | PostgreSQL 16 local — central de notificações | `tests/security/phase6h_notifications_test.sql` | 36 aprovadas |
 | Supabase real — central de notificações (transferência real), em transação desfeita | `tests/security/supabase/phase6h_notifications_rollback.sql` | 9 aprovadas |
 | Supabase real — chassi cifrado, em transação desfeita | `tests/security/supabase/phase6i_chassis_rollback.sql` | 9 aprovadas |
+| PostgreSQL 16 local — conferência de conteúdo dos arquivos | `tests/security/phase6j_attachment_checks_test.sql` | 9 aprovadas |
+| Supabase real — conferência de conteúdo, em transação desfeita | `tests/security/supabase/phase6j_attachment_checks_rollback.sql` | 8 aprovadas |
 | Supabase real — MFA de administradores, em transação desfeita | `tests/security/supabase/phase6g_admin_mfa_rollback.sql` | 8 aprovadas |
 
 Cobertura: isolamento entre proprietários, anônimos, oficinas e admin; escalada para admin; imutabilidade; não revelação em duplicidade de placa; preservação da história na exclusão de conta.
