@@ -32,7 +32,7 @@ Concluído em 0.26.0: backup, restauração e rollback (ADR-028, `OPERATIONS.md`
 2. Fase 6 — testes de segurança, backup, homologação e lançamento.
 2. Validação ponta a ponta com credenciais de teste (KI-026) assim que o responsável cadastrar a conta de teste.
 2. Fase 5.3 a 5.5 — faturas, cotas Premium, atraso, cancelamento e reativação.
-3. **Responsável pelo produto:** ligar a proteção contra senhas vazadas no Supabase (KI-021); falta o e-mail de atendimento (KI-015).
+3. **Responsável pelo produto:** ligar a proteção contra senhas vazadas no Supabase (KI-021) e cadastrar os segredos do backup no GitHub (OPERATIONS.md §2). MFA do admin ativado e e-mail de atendimento definido em 08/11/2026.
 
 ## Riscos ativos
 
