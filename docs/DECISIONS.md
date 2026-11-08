@@ -109,6 +109,21 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-043 — Módulo Oficina (PRD 2.1), Fase 1: clientes, preços e orçamentos com aprovação por link
+**Data:** 08/11/2026 · **Status:** aceita (PRD 2.1 §25, Fase 1)
+- **Dado comercial separado do passaporte.** Clientes (`workshop_customers`) e motos da oficina (`workshop_vehicles`) são da oficina e não exigem conta no Moto Passaporte. Moto da oficina não cria passaporte nem titularidade. O vínculo com o passaporte (`motorcycle_id`) só acontece por ação da oficina **com autorização aprovada** do titular (`workshop_has_access`); nunca por coincidência de placa ou telefone (§4.3, §5).
+- **Orçamento nunca é manutenção** (§17.4): nenhuma função de orçamento grava em `maintenance_records`; teste automático confere.
+- **Versões imutáveis.** Só a versão em rascunho é editável. Ao enviar, a versão fica fixa (gatilho no banco bloqueia mudança de conteúdo e de itens, até para o administrador do banco). Mudança depois de enviado = nova versão com motivo; a anterior fica "substituída" e o link antigo para de valer. Depois de aprovado, item extra só por **orçamento complementar** (com motivo e nova aprovação); a aprovação original não vale para itens novos (§7.6).
+- **Link de aprovação**: token aleatório de 32 bytes (base64url), só o hash SHA-256 no banco, válido até o fim do dia da validade (Brasília), revogável, um link ativo por orçamento (reenviar gera outro e revoga o anterior), uso único para decidir. A página pública mostra só o necessário: sem CPF, sem ids internos. Consultas anônimas passam pelo limite por conexão (ADR-035).
+- **Aceite**: o cliente marca os itens (aprovação integral, parcial ou recusa), informa o nome e confirma o texto exibido. Fica registrado: versão, itens aprovados/recusados (por posição), total aprovado (desconto proporcional), nome, texto confirmado, versão dos termos, sessão, IP e navegador, código do comprovante. Registro imutável. É evidência do aceite comercial, **não** assinatura ICP-Brasil (§7.5).
+- **Totais sempre calculados no servidor** (quantidade × unitário; desconto em % ou em R$ com autor registrado). A tela mostra a prévia com a mesma fórmula.
+- **Preço sugerido** (§10.3): tabela escolhida (ou a padrão) → regra mais específica que bate com a moto (modelo e ano pesam mais; depois cilindrada e marca) → valor padrão do serviço → em branco. Sempre editável.
+- **Permissões** (§16): o responsável tem tudo; funcionário ganha `can_manage_quotes` (clientes e orçamentos, padrão ligado) e `can_manage_prices` (catálogo e preços, padrão desligado). Todos os membros consultam. Organização é conferida pela sessão em todas as funções (§19.9).
+- **WhatsApp** (§13.2, opção A): mensagem pronta pelo `wa.me`, sem integração paga. O sistema registra "mensagem preparada", e não "enviada": a prova é a abertura do link pelo cliente.
+- **PDF** pela impressão do navegador (mesmo layout em tela, PDF e link do cliente, com QR Code do link).
+- **Vencimento** diário (pg_cron 00:20 Brasília) avisa a equipe. Avisos novos: orçamento visualizado (opcional), respondido e vencido.
+- Fora da Fase 1 (próximas fases do PRD 2.1): ordens de serviço, checklist, fotos, integração com o histórico, agenda, peças, financeiro, relatórios, integração oficial do WhatsApp.
+
 ### ADR-042 — Telas na largura toda: menu lateral no computador, abas no celular
 **Data:** 08/11/2026 · **Status:** aceita (pedido do responsável)
 - Área logada: no computador (≥ 1024 px), menu fixo à esquerda (Minhas motos, Minha oficina, Notificações com contador, Meu plano, Minha conta e Administração com submenu) e conteúdo ocupando o resto da tela (até 1.680 px, com margens confortáveis). No celular e no app instalado, barra de abas embaixo (Motos, Oficina, Avisos, Plano, Conta), respeitando a área segura do iPhone.

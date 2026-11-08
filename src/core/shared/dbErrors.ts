@@ -12,6 +12,7 @@ export function translateDbError(error: MaybeDbError): string {
   }
   switch (error.code) {
     case 'P0001':
+    case 'P0002':
     case '22023':
       return message || 'Confira os dados informados.'
     case '42501':

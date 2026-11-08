@@ -9,6 +9,27 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.44.0] — 08/11/2026 — Módulo Oficina (PRD 2.1), Fase 1: atendimento e orçamento
+
+### Adicionado
+- **PRD 2.1** incorporado (`docs/PRD_v2.1_OFICINA.md`) e histórico de versões do documento (`docs/VERSION_HISTORY.md`).
+- **Abas da oficina**: Visão geral, Orçamentos, Clientes, Motos, Serviços e preços, Equipe e Perfil.
+- **Visão geral** com indicadores por período (hoje, 7 dias, mês ou datas): aguardando cliente, aprovados, rascunhos, vencidos/sem resposta, valor orçado × aprovado (separado de recebido) e taxa de aprovação.
+- **Clientes e motos da oficina**: cadastro rápido (só o nome é obrigatório), cliente sem conta no Moto Passaporte, várias motos por cliente, busca por nome/telefone/placa, arquivar, vínculo com o passaporte só com autorização do titular.
+- **Serviços e preços**: catálogo por categoria, valor padrão, tabelas (padrão, promocional…) e preço por marca/modelo/ano/cilindrada/complexidade.
+- **Orçamentos**: numeração por oficina, itens (mão de obra, peça, produto, material, terceiro, outros), preço sugerido do catálogo, desconto em % ou R$, validade, prazo, condições e observações; versões com motivo; orçamento complementar; cancelar; histórico de eventos.
+- **Envio** pelo WhatsApp com mensagem pronta e link seguro; PDF/impressão com QR Code.
+- **Página do cliente** (`/orcamento/:token`, sem conta): aprovar tudo, aprovar parte ou recusar (com motivo), com nome e confirmação; comprovante em PDF.
+- Permissões novas da equipe: "Clientes e orçamentos" e "Serviços e preços".
+- Avisos à oficina: orçamento visualizado, respondido e vencido (também no celular).
+
+### Segurança
+- 12 tabelas novas com RLS (leitura só para membros da própria oficina; gravação só por funções). Link com hash do token, uso único, revogação e validade; aceite e eventos imutáveis. Varredura de segurança no Supabase real: 0 violações.
+
+### Testes
+- Banco: 64 verificações novas (`phase7a_workshop_quotes_test.sql`) com duas oficinas, funcionário com e sem permissão, titular, anônimo, link vencido/revogado/substituído, versões, complementar e "orçamento não gera manutenção" — suíte completa 892 OK. Teste em produção dentro de transação desfeita.
+- Tela: 7 novos (cálculo, desconto proporcional, valores em R$, mensagem do WhatsApp, aprovação parcial, link substituído, vencido) — 217.
+
 ## [0.43.0] — 08/11/2026 — Telas na largura toda
 
 ### Alterado

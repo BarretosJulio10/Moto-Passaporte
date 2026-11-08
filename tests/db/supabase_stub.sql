@@ -128,3 +128,18 @@ returns void language sql as $$
          description = coalesce(new_description, description), updated_at = now() where id = secret_id
 $$;
 revoke all on schema vault from public;
+
+-- pg_cron e pg_net simulados (só o necessário para as migrações rodarem no banco de teste).
+create schema if not exists cron;
+create table if not exists cron.job (jobid bigserial primary key, jobname text unique, schedule text, command text);
+create or replace function cron.schedule(p_name text, p_schedule text, p_command text) returns bigint
+language sql as $$
+  insert into cron.job (jobname, schedule, command) values (p_name, p_schedule, p_command)
+  on conflict (jobname) do update set schedule = excluded.schedule, command = excluded.command
+  returning jobid $$;
+create or replace function cron.unschedule(p_jobid bigint) returns boolean
+language sql as $$ delete from cron.job where jobid = p_jobid returning true $$;
+create schema if not exists net;
+create or replace function net.http_post(url text, body jsonb default '{}', params jsonb default '{}',
+                                         headers jsonb default '{}', timeout_milliseconds int default 5000)
+returns bigint language sql as $$ select 1::bigint $$;

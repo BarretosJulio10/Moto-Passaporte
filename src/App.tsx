@@ -36,6 +36,16 @@ const TeamPage = lazy(() => import('@/modules/workshop/TeamPage').then((m) => ({
 const WorkshopMotoPage = lazy(() => import('@/modules/workshop_service/WorkshopMotoPage').then((m) => ({ default: m.WorkshopMotoPage })))
 const WorkshopServiceFormPage = lazy(() => import('@/modules/workshop_service/WorkshopMotoPage').then((m) => ({ default: m.WorkshopServiceFormPage })))
 const PreviousDiaryPage = lazy(() => import('@/modules/transfers/PreviousDiaryPage').then((m) => ({ default: m.PreviousDiaryPage })))
+const WorkshopShellRoute = lazy(() => import('@/modules/workshop/shared/WorkshopShell').then((m) => ({ default: m.ShellRoute })))
+const QuotesPage = lazy(() => import('@/modules/workshop/quotes/QuotesPage').then((m) => ({ default: m.QuotesPage })))
+const NewQuotePage = lazy(() => import('@/modules/workshop/quotes/QuotesPage').then((m) => ({ default: m.NewQuotePage })))
+const QuotePage = lazy(() => import('@/modules/workshop/quotes/QuotePage').then((m) => ({ default: m.QuotePage })))
+const CustomersPage = lazy(() => import('@/modules/workshop/customers/CustomersPage').then((m) => ({ default: m.CustomersPage })))
+const NewCustomerPage = lazy(() => import('@/modules/workshop/customers/CustomersPage').then((m) => ({ default: m.NewCustomerPage })))
+const VehiclesPage = lazy(() => import('@/modules/workshop/customers/CustomersPage').then((m) => ({ default: m.VehiclesPage })))
+const CustomerPage = lazy(() => import('@/modules/workshop/customers/CustomerPage').then((m) => ({ default: m.CustomerPage })))
+const CatalogPage = lazy(() => import('@/modules/workshop/service-catalog/CatalogPage').then((m) => ({ default: m.CatalogPage })))
+const QuoteApprovalPage = lazy(() => import('@/modules/workshop/quote-approval/QuoteApprovalPage').then((m) => ({ default: m.QuoteApprovalPage })))
 const InvitePage = lazy(() => import('@/modules/workshop/InvitePage').then((m) => ({ default: m.InvitePage })))
 const PublicWorkshopPage = lazy(() => import('@/modules/workshop/PublicWorkshopPage').then((m) => ({ default: m.PublicWorkshopPage })))
 const AdminDashboardPage = lazy(() => import('@/modules/admin/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })))
@@ -119,6 +129,7 @@ export const routes = [
           { path: '/p/:publicId', element: <PublicPassportPage /> },
           { path: '/c/:token', element: <SharedPassportPage /> },
           { path: '/oficinas/:slug', element: <PublicWorkshopPage /> },
+          { path: '/orcamento/:token', element: <QuoteApprovalPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },
@@ -147,8 +158,16 @@ export const routes = [
           { path: '/oficina', element: <WorkshopIndexPage /> },
           { path: '/oficina/nova', element: <CreateWorkshopPage /> },
           { path: '/oficina/:orgId', element: <WorkshopDashboardPage /> },
-          { path: '/oficina/:orgId/perfil', element: <WorkshopProfilePage /> },
-          { path: '/oficina/:orgId/equipe', element: <TeamPage /> },
+          { path: '/oficina/:orgId/perfil', element: <WorkshopShellRoute><WorkshopProfilePage /></WorkshopShellRoute> },
+          { path: '/oficina/:orgId/equipe', element: <WorkshopShellRoute><TeamPage /></WorkshopShellRoute> },
+          { path: '/oficina/:orgId/orcamentos', element: <QuotesPage /> },
+          { path: '/oficina/:orgId/orcamentos/novo', element: <NewQuotePage /> },
+          { path: '/oficina/:orgId/orcamentos/:quoteId', element: <QuotePage /> },
+          { path: '/oficina/:orgId/clientes', element: <CustomersPage /> },
+          { path: '/oficina/:orgId/clientes/novo', element: <NewCustomerPage /> },
+          { path: '/oficina/:orgId/clientes/:customerId', element: <CustomerPage /> },
+          { path: '/oficina/:orgId/motos', element: <VehiclesPage /> },
+          { path: '/oficina/:orgId/servicos', element: <CatalogPage /> },
           { path: '/oficina/:orgId/motos/:motoId', element: <WorkshopMotoPage /> },
           { path: '/oficina/:orgId/motos/:motoId/servico', element: <WorkshopServiceFormPage /> },
           { path: '/convite/:token', element: <InvitePage /> },

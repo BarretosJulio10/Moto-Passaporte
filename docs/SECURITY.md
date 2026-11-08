@@ -225,3 +225,13 @@ Ver `KNOWN_ISSUES.md`.
 - `scheduled-jobs` não usa login: aceita só chamadas com o segredo de 64 caracteres gerado no banco (Vault), conferido no banco (`scheduled_job_secret_ok`, service_role). Testado no Supabase real: segredo errado → 401.
 - `job_runs` fechada para o navegador; o admin vê só o resumo (`admin_job_status`). Detalhes não contêm dados pessoais nem segredos.
 - A varredura de segurança trata `job_run_*`, `scheduled_job_secret_ok` e `system_plan_storage_cleanup` como funções de servidor.
+
+## Módulo Oficina — orçamentos (PRD 2.1 §20, ADR-043)
+
+- **Isolamento entre oficinas**: 12 tabelas `workshop_*` com RLS; leitura só para membros ativos da própria oficina (`has_org_permission(org, 'member')`), nenhuma gravação direta (todas as escritas por funções `SECURITY DEFINER` com `search_path` vazio, que conferem a oficina pela sessão). Chaves compostas `(organization_id, id)` impedem cliente, moto, serviço, tabela ou versão de outra oficina num registro; gatilho bloqueia troca de `organization_id`.
+- **Permissões**: `manage_quotes` (clientes, motos, orçamentos) e `manage_prices` (catálogo e preços); ninguém altera as próprias permissões.
+- **Link de aprovação**: token de 256 bits, só o hash SHA-256 guardado, validade até o fim do dia da validade, revogação manual, um link ativo por orçamento, decisão única, versões antigas invalidadas. Funções anônimas: só `get_quote_by_token` e `decide_quote_by_token`, com limite por conexão (ADR-035). A página não mostra CPF, observações internas nem ids.
+- **Imutabilidade**: versões enviadas, itens enviados, aceites e eventos não podem ser alterados nem apagados (gatilhos).
+- **Proprietário** não acessa dados comerciais da oficina; o registro no histórico continua sendo só o fluxo existente de serviço autorizado.
+- **Dados pessoais** (LGPD): CPF opcional, visível só para a equipe da oficina (mascarado na tela); IP e navegador do aceite guardados como evidência e não exibidos na tela da oficina.
+- Testes: `tests/security/phase7a_workshop_quotes_test.sql` (duas oficinas, funcionário, titular, anônimo, link vencido/revogado/substituído).

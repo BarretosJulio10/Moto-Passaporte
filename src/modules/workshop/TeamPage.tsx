@@ -7,6 +7,7 @@ import { Notice } from '@/components/Notice'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { formatDate } from '@/core/shared/format'
 import { useMyWorkshops } from './WorkshopIndexPage'
+import { QuotePermissions } from './team/QuotePermissions'
 import {
   createInvite,
   fetchInvites,
@@ -45,8 +46,7 @@ export function TeamPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <Link to={`/oficina/${orgId}`} className="text-sm text-ink underline underline-offset-4">Voltar ao painel da oficina</Link>
-        <h1 className="heading mt-4 text-3xl text-ink">Equipe da {shop.business_name}</h1>
+        <h1 className="heading text-3xl text-ink">Equipe da {shop.business_name}</h1>
         <p className="mt-1 max-w-prose text-muted">
           Cada pessoa entra com o próprio login, e o histórico mostra quem fez cada ação.
           {responsible ? ' Você define o que cada funcionário pode fazer.' : ''}
@@ -54,6 +54,7 @@ export function TeamPage() {
       </div>
       {responsible && <InviteForm organizationId={orgId} workshopName={shop.business_name} />}
       <MemberList organizationId={orgId} responsible={responsible} />
+      {responsible && <QuotePermissions organizationId={orgId} />}
       {responsible && <PendingInvites organizationId={orgId} />}
       {!responsible && <LeaveOrganization organizationId={orgId} />}
     </div>

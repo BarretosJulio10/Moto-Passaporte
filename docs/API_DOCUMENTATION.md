@@ -346,3 +346,27 @@ Implementação em `src/modules/plans/api.ts`.
 
 ### Limite de consultas anônimas (ADR-035)
 - `get_public_passport` e `get_shared_passport` podem responder erro `P0001` com `hint = 'rate_limited'` ("Muitas consultas…"). O site trata com `isRateLimited()` (`src/core/shared/rateLimit.ts`).
+
+## Módulo Oficina — Fase 1 (PRD 2.1, ADR-043)
+
+Todas recebem `p_org` (a oficina) e conferem a sessão. Detalhes em `docs/modules/WORKSHOP.md`, `QUOTES.md`, `WORKSHOP_PRICING.md` e `WORKSHOP_APPROVALS.md`.
+
+| Função | Quem | O que faz |
+|---|---|---|
+| `get_my_workshop_permissions(org)` | Membro | Permissões do usuário na oficina |
+| `get_org_member_extra_permissions(org)` / `set_org_member_extra_permissions(member, quotes, prices)` | Responsável | Permissões de orçamento e de preços por funcionário |
+| `workshop_save_customer(org, id?, data)` / `workshop_set_customer_status` | `manage_quotes` | Cria/edita/arquiva cliente |
+| `workshop_list_customers(org, busca?, arquivados?)` / `workshop_get_customer(org, id)` | Membro | Lista e ficha (motos e orçamentos) |
+| `workshop_save_vehicle(org, id?, cliente, data)` / `workshop_list_vehicles(org, busca?)` | `manage_quotes` / membro | Motos da oficina |
+| `workshop_link_vehicle_passport(org, moto_oficina, motorcycle?)` | `manage_quotes` + autorização aprovada | Vincula/desvincula o passaporte |
+| `workshop_save_service`, `workshop_save_price_table`, `workshop_save_price_rule`, `workshop_delete_price_rule` | `manage_prices` | Catálogo e preços |
+| `workshop_list_catalog(org)` / `workshop_suggest_price(org, serviço, moto?, tabela?, complexidade?)` | Membro | Catálogo e preço sugerido `{price_cents, source, label}` |
+| `workshop_create_quote(org, cliente, moto?, original?, motivo?)` | `manage_quotes` | Novo orçamento (ou complementar) em rascunho |
+| `workshop_save_quote_draft(org, orçamento, data)` | `manage_quotes` | Salva rascunho e itens; devolve totais |
+| `workshop_send_quote(org, orçamento)` | `manage_quotes` | Envia (fecha a versão) ou reenvia; devolve `{token, expires_at}` uma única vez |
+| `workshop_revise_quote(org, orçamento, motivo)` | `manage_quotes` | Nova versão (enviado, recusado ou vencido) |
+| `workshop_revoke_quote_link`, `workshop_cancel_quote`, `workshop_log_quote_event` | `manage_quotes` / membro | Desativa link, cancela, registra WhatsApp/impressão |
+| `workshop_list_quotes(org, situação?, busca?)` / `workshop_get_quote(org, id)` / `workshop_dashboard(org, de?, até?)` | Membro | Lista, detalhe com versões/aceites/eventos e indicadores |
+| `get_quote_by_token(token)` | Anônimo | Orçamento do link (`state`: open, expired, decided, replaced, revoked, not_found) |
+| `decide_quote_by_token(token, posições[], nome, confirmado, motivo?, sessão?, termos?)` | Anônimo | Aprova tudo, parte (posições) ou recusa (lista vazia); devolve o comprovante |
+| `workshop_expire_quotes()` | Servidor (pg_cron) | Vence orçamentos sem resposta |
