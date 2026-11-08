@@ -11,6 +11,7 @@ import { Card, StatusChip, WorkshopShell } from '../shared/WorkshopShell'
 import { formatCents, formatDateTime } from '../shared/rpc'
 import { QuoteDocument, type QuoteDoc } from './QuoteDocument'
 import { QuoteEditor } from './QuoteEditor'
+import { createOrderFromQuote } from '../service-orders/api'
 import {
   approvalLink, AWAITING, cancelQuote, createQuote, EVENT_LABEL, fetchQuote, logQuoteEvent, quoteWhatsappText, reviseQuote,
   revokeQuoteLink, sendQuote, STATUS_LABEL, STATUS_TONE, VERSION_STATUS_LABEL, whatsappUrl,
@@ -205,6 +206,12 @@ function QuoteView({ orgId, canEdit }: { orgId: string; canEdit: boolean }) {
                   <div className="flex flex-col items-start gap-2">
                     {(awaiting || quote.status === 'rejected' || quote.status === 'expired') && (
                       <Button size="sm" variant="secondary" onClick={() => setAskReason('revise')}>Criar nova versão</Button>
+                    )}
+                    {(quote.status === 'approved' || quote.status === 'partially_approved') && !quote.parent_quote_id && (
+                      <Button size="sm" loading={busy === 'os'} onClick={() => run('os', async () => {
+                        const id = await createOrderFromQuote(orgId, quote.id)
+                        navigate(`/oficina/${orgId}/os/${id}`)
+                      })}>Abrir ordem de serviço</Button>
                     )}
                     {(quote.status === 'approved' || quote.status === 'partially_approved') && (
                       <Button size="sm" variant="secondary" onClick={() => setAskReason('complement')}>Orçamento complementar</Button>

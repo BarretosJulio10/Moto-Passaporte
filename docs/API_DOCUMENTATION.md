@@ -370,3 +370,21 @@ Todas recebem `p_org` (a oficina) e conferem a sessão. Detalhes em `docs/module
 | `get_quote_by_token(token)` | Anônimo | Orçamento do link (`state`: open, expired, decided, replaced, revoked, not_found) |
 | `decide_quote_by_token(token, posições[], nome, confirmado, motivo?, sessão?, termos?)` | Anônimo | Aprova tudo, parte (posições) ou recusa (lista vazia); devolve o comprovante |
 | `workshop_expire_quotes()` | Servidor (pg_cron) | Vence orçamentos sem resposta |
+
+### Ordens de serviço (Fase 2, ADR-044)
+
+| Função | Quem | O que faz |
+|---|---|---|
+| `workshop_create_order_from_quote(org, orçamento)` | `manage_quotes` | OS com os itens aprovados (devolve a existente se já houver) |
+| `workshop_create_order_manual(org, cliente, moto?, forma, quem, obs, itens, km?)` | `manage_quotes` | OS sem orçamento, com autorização registrada |
+| `workshop_add_order_item(org, os, item, forma, quem, obs)` / `workshop_add_complement_to_order(org, os, complementar)` | `manage_quotes` | Item extra autorizado / itens aprovados do complementar |
+| `workshop_set_order_status(org, os, situação, obs?)` | `execute_orders` | Situações operacionais |
+| `workshop_update_order(org, os, {mechanic_user_id, due_date, km_in, notes})` | `manage_quotes` | Mecânico (com aviso), prazo, km, observações |
+| `workshop_update_order_item(org, os, item, {status, part_brand, part_code, notes})` / `workshop_set_technical_notes` | `execute_orders` | Execução, peça, observações técnicas |
+| `workshop_save_inspection(org, os, entry\|exit, dados)` | `execute_orders` | Checklist |
+| `workshop_register_os_photo(org, os, caminho, etapa, legenda?)` / `workshop_remove_os_photo` | `execute_orders` | Foto conferida / remoção lógica |
+| `workshop_complete_order(org, os, km_final, obs, ajuste, motivo)` | `manage_quotes` | Conclui e gera o código do comprovante |
+| `workshop_notify_pickup`, `workshop_deliver_order(org, os, quem retirou)`, `workshop_cancel_order(org, os, motivo)` | `manage_quotes` | Retirada, entrega, cancelamento |
+| `workshop_list_orders(org, situação?, busca?, só minhas?)` / `workshop_get_order` / `workshop_orders_summary` / `workshop_customer_orders` | Membro | Leitura (quem não gerencia vê só as OS designadas) |
+| `workshop_create_order_link(org, os, entry_ack\|receipt)` | `manage_quotes` | Link do cliente (token uma vez) |
+| `get_service_order_by_token(token)` / `ack_service_order_entry(token, nome, confirmado)` | Anônimo | Ver checklist/comprovante e dar ciência da entrada |

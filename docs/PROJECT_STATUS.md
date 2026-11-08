@@ -1,15 +1,15 @@
 # PROJECT_STATUS — Moto Passaporte
 
-**Versão atual:** 0.44.0
+**Versão atual:** 0.45.0
 **Data:** 08/11/2026
 **Fase:** Fases 1 a 4 concluídas. Fases 1 a 5 concluídas (Mercado Pago aguardando teste ponta a ponta). Fase 6 em andamento: painel administrativo
-**Progresso geral:** PRD 2.0: 97,5% (39 de 40 itens — `PRD_CHECKLIST.md`). PRD 2.1 (módulo Oficina): Fase 1 de 5 concluída (≈ 20%)
+**Progresso geral:** PRD 2.0: 97,5% (39 de 40 itens — `PRD_CHECKLIST.md`). PRD 2.1 (módulo Oficina): Fases 1 e 2 de 5 concluídas (≈ 40%)
 
 ## Ambientes
 
 | Ambiente | URL | Banco | Situação |
 |---|---|---|---|
-| Desenvolvimento | https://moto-passaporte.vercel.app (Vercel, deploy automático da `main`) | Supabase `ripgenhykaajcnzdxoid` (MOTO_Passaporte, us-east-1, PG 17) | migrações até `workshop_quotes` aplicadas; Edge Functions `mercadopago-check`, `mercadopago-billing`, `mercadopago-webhook`, `storage-cleanup`, `scheduled-jobs`, `attachment-check`, `shared-file` e `push-send` publicadas; rotinas agendadas no pg_cron |
+| Desenvolvimento | https://moto-passaporte.vercel.app (Vercel, deploy automático da `main`) | Supabase `ripgenhykaajcnzdxoid` (MOTO_Passaporte, us-east-1, PG 17) | migrações até `workshop_service_orders` aplicadas; Edge Functions `mercadopago-check`, `mercadopago-billing`, `mercadopago-webhook`, `storage-cleanup`, `scheduled-jobs`, `attachment-check`, `shared-file` e `push-send` publicadas; rotinas agendadas no pg_cron |
 | Homologação | — | — | não configurado |
 | Produção | — | — | não configurado |
 
@@ -22,8 +22,9 @@
 | 3 — Oficinas e autorizações | concluída: cadastro, perfil, pesquisa por placa, autorizações, Oficina de Origem, equipe e serviços da oficina |
 | 4 — Transferência e compartilhamento | concluída: transferência, motos anteriores, compartilhamento controlado e revogável |
 | 5 — Monetização | concluída: planos, conta do Mercado Pago, assinaturas, Webhook, conciliação, atraso, cancelamento, benefícios Premium e faturas (falta teste real com o Mercado Pago, KI-026) |
-| PRD 2.1 — Oficina, Fase 1 (atendimento e orçamento) | concluída (v0.44.0): clientes, motos da oficina, catálogo, tabelas de preço, orçamentos com versões, WhatsApp, PDF, aprovação integral/parcial por link. **Aguardando validação do responsável antes da Fase 2** (PRD 2.1 §28.3) |
-| PRD 2.1 — Fases 2 a 5 | planejadas: ordem de serviço e checklist; integração com o histórico; agenda, peças, financeiro, relatórios; perfil avançado e WhatsApp oficial |
+| PRD 2.1 — Oficina, Fase 1 (atendimento e orçamento) | concluída (v0.44.0): clientes, motos da oficina, catálogo, tabelas de preço, orçamentos com versões, WhatsApp, PDF, aprovação integral/parcial por link. validada pelo responsável em 08/11/2026 |
+| PRD 2.1 — Oficina, Fase 2 (ordem de serviço) | concluída (v0.45.0): OS só com itens autorizados, status, mecânico, checklists, ciência do cliente, fotos, conclusão, comprovante e entrega |
+| PRD 2.1 — Fases 3 a 5 | planejadas: registro no histórico da moto; agenda, peças, financeiro, relatórios; perfil avançado e WhatsApp oficial |
 | 6 — Administração e lançamento | em andamento: painel administrativo completo, verificação de placa, armazenamento, testes/regressão e backup/restauração; falta homologação e lançamento |
 
 ## Próximos passos (em ordem)

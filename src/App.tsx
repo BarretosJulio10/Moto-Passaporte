@@ -45,6 +45,10 @@ const NewCustomerPage = lazy(() => import('@/modules/workshop/customers/Customer
 const VehiclesPage = lazy(() => import('@/modules/workshop/customers/CustomersPage').then((m) => ({ default: m.VehiclesPage })))
 const CustomerPage = lazy(() => import('@/modules/workshop/customers/CustomerPage').then((m) => ({ default: m.CustomerPage })))
 const CatalogPage = lazy(() => import('@/modules/workshop/service-catalog/CatalogPage').then((m) => ({ default: m.CatalogPage })))
+const OrdersPage = lazy(() => import('@/modules/workshop/service-orders/OrdersPage').then((m) => ({ default: m.OrdersPage })))
+const NewOrderPage = lazy(() => import('@/modules/workshop/service-orders/OrdersPage').then((m) => ({ default: m.NewOrderPage })))
+const OrderPage = lazy(() => import('@/modules/workshop/service-orders/OrderPage').then((m) => ({ default: m.OrderPage })))
+const OrderPublicPage = lazy(() => import('@/modules/workshop/service-orders/OrderPublicPage').then((m) => ({ default: m.OrderPublicPage })))
 const QuoteApprovalPage = lazy(() => import('@/modules/workshop/quote-approval/QuoteApprovalPage').then((m) => ({ default: m.QuoteApprovalPage })))
 const InvitePage = lazy(() => import('@/modules/workshop/InvitePage').then((m) => ({ default: m.InvitePage })))
 const PublicWorkshopPage = lazy(() => import('@/modules/workshop/PublicWorkshopPage').then((m) => ({ default: m.PublicWorkshopPage })))
@@ -130,6 +134,7 @@ export const routes = [
           { path: '/c/:token', element: <SharedPassportPage /> },
           { path: '/oficinas/:slug', element: <PublicWorkshopPage /> },
           { path: '/orcamento/:token', element: <QuoteApprovalPage /> },
+          { path: '/os/:token', element: <OrderPublicPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },
@@ -168,6 +173,9 @@ export const routes = [
           { path: '/oficina/:orgId/clientes/:customerId', element: <CustomerPage /> },
           { path: '/oficina/:orgId/motos', element: <VehiclesPage /> },
           { path: '/oficina/:orgId/servicos', element: <CatalogPage /> },
+          { path: '/oficina/:orgId/os', element: <OrdersPage /> },
+          { path: '/oficina/:orgId/os/nova', element: <NewOrderPage /> },
+          { path: '/oficina/:orgId/os/:orderId', element: <OrderPage /> },
           { path: '/oficina/:orgId/motos/:motoId', element: <WorkshopMotoPage /> },
           { path: '/oficina/:orgId/motos/:motoId/servico', element: <WorkshopServiceFormPage /> },
           { path: '/convite/:token', element: <InvitePage /> },

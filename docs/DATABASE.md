@@ -8,6 +8,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 |---|---|
 | `20261107003043_base.sql` | pgcrypto, utilitários (placa), auditoria imutável, triggers genéricos |
 | `20261107003102_identity.sql` | `profiles`, `user_roles`, criação automática no cadastro, `has_role`/`is_admin`, `system_settings` |
+| `20261108191115_workshop_service_orders.sql` | PRD 2.1 Fase 2 (ADR-044): `workshop_service_orders`, itens, eventos, `workshop_inspections`, `workshop_os_photos`, `workshop_os_shares`; bucket privado `workshop-files`; permissão `can_execute_orders`; aviso `service_order_assigned`. Reversão em `supabase/rollback/` |
 | `20261108184011_workshop_quotes.sql` | PRD 2.1 Fase 1 (ADR-043): clientes, motos da oficina, catálogo, tabelas de preço, orçamentos, versões, itens, links, aceites e eventos; permissões `can_manage_quotes`/`can_manage_prices`; avisos `quote_*`; vencimento diário. Reversão em `supabase/rollback/` |
 | `20261107003124_organizations.sql` | `organizations`, `organization_members`, `workshops`, `create_workshop` |
 | `20261107003222_motorcycles.sql` | `motorcycles`, `motorcycle_plates`, `motorcycle_ownerships`, `motorcycle_private`, `mileage_records`, `motorcycle_claim_requests`, operações e view `my_motorcycles` |

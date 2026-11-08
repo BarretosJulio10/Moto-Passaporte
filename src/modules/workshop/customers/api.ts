@@ -98,6 +98,8 @@ export type WorkshopPermissions = {
   register_services: boolean
   manage_quotes: boolean
   manage_prices: boolean
+  execute_orders: boolean
+  user_id?: string
 }
 
 export const fetchMyPermissions = (org: string) => rpc<WorkshopPermissions>('get_my_workshop_permissions', { p_org: org })

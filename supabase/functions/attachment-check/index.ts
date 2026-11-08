@@ -3,7 +3,12 @@
 // declarado; se não bater, apaga o arquivo. O banco só aceita registrar arquivo conferido.
 import { CORS, reply, serverClient, userClient } from '../_shared/mercadopago.ts'
 
-const BUCKET = 'attachments'
+// Também confere as fotos das ordens de serviço (bucket "workshop-files", PRD 2.1 §20.3).
+const BUCKETS = {
+  attachments: { info: 'attachment_object_info', pattern: /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp|pdf)$/ },
+  'workshop-files': { info: 'workshop_file_object_info', pattern: /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/ },
+} as const
+type BucketName = keyof typeof BUCKETS
 const EXT: Record<string, string> = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', pdf: 'application/pdf' }
 
 function matches(mime: string, b: Uint8Array): boolean {
@@ -32,16 +37,19 @@ Deno.serve(async (req) => {
   if (!user) return reply(401, { ok: false, message: 'Entre na sua conta.' })
 
   let path = ''
+  let BUCKET: BucketName = 'attachments'
   try {
-    path = String(((await req.json()) as { path?: unknown }).path ?? '')
+    const body = (await req.json()) as { path?: unknown; bucket?: unknown }
+    path = String(body.path ?? '')
+    if (body.bucket === 'workshop-files') BUCKET = 'workshop-files'
   } catch {
     return reply(400, { ok: false, message: 'Pedido inválido.' })
   }
-  const m = /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp|pdf)$/.exec(path)
+  const m = BUCKETS[BUCKET].pattern.exec(path)
   if (!m) return reply(400, { ok: false, message: 'Arquivo inválido.' })
 
   const server = serverClient()
-  const { data: info } = await server.rpc('attachment_object_info', { p_path: path })
+  const { data: info } = await server.rpc(BUCKETS[BUCKET].info, { p_path: path })
   const obj = info as { owner: string | null; mime: string | null; registered: boolean } | null
   if (!obj || obj.owner !== user.id) return reply(404, { ok: false, message: 'Arquivo não encontrado.' })
   if (obj.registered) return reply(409, { ok: false, message: 'Arquivo já registrado.' })

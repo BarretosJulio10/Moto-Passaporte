@@ -235,3 +235,9 @@ Ver `KNOWN_ISSUES.md`.
 - **Proprietário** não acessa dados comerciais da oficina; o registro no histórico continua sendo só o fluxo existente de serviço autorizado.
 - **Dados pessoais** (LGPD): CPF opcional, visível só para a equipe da oficina (mascarado na tela); IP e navegador do aceite guardados como evidência e não exibidos na tela da oficina.
 - Testes: `tests/security/phase7a_workshop_quotes_test.sql` (duas oficinas, funcionário, titular, anônimo, link vencido/revogado/substituído).
+
+### Ordens de serviço (ADR-044)
+- 6 tabelas com a mesma regra (leitura por membro, gravação só por funções). Item da OS só existe com autorização (aceite do orçamento ou forma + autor registrados) — restrição no banco; origem e valor imutáveis; itens não são apagados; tudo trava na conclusão.
+- Fotos: bucket privado `workshop-files`; envio só na pasta da própria oficina e por quem executa serviços; leitura por membros com link de 10 min; tipo e conteúdo conferidos (ADR-033) antes do registro.
+- Links do cliente (ciência e comprovante): token de 256 bits com hash, 30 dias, revogação, limite por conexão; não expõem ids, IP, valores (no link de ciência) nem observações técnicas.
+- Teste: `tests/security/phase7b_workshop_orders_test.sql`.

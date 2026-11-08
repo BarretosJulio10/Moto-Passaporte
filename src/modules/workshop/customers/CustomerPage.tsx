@@ -15,6 +15,7 @@ import { CustomerFields, VehicleForm, emptyVehicle, validateCustomer, vehicleToI
 import { Card, StatusChip, WorkshopShell } from '../shared/WorkshopShell'
 import { formatCents, formatPhone } from '../shared/rpc'
 import { STATUS_LABEL, STATUS_TONE, type QuoteStatus } from '../quotes/api'
+import { fetchCustomerOrders, ORDER_STATUS_LABEL, ORDER_STATUS_TONE } from '../service-orders/api'
 
 export function CustomerPage() {
   return <WorkshopShell>{({ orgId, perms }) => <CustomerView orgId={orgId} canEdit={perms.manage_quotes} />}</WorkshopShell>
@@ -25,6 +26,7 @@ function CustomerView({ orgId, canEdit }: { orgId: string; canEdit: boolean }) {
   const queryClient = useQueryClient()
   const key = ['ws-customer', orgId, customerId]
   const q = useQuery({ queryKey: key, queryFn: () => fetchCustomer(orgId, customerId), enabled: Boolean(customerId) })
+  const orders = useQuery({ queryKey: ['ws-customer-orders', orgId, customerId], queryFn: () => fetchCustomerOrders(orgId, customerId), enabled: Boolean(customerId) })
   const [editing, setEditing] = useState(false)
   const [vehicleForm, setVehicleForm] = useState<'new' | string | null>(null)
   const refresh = () => Promise.all([
@@ -95,6 +97,24 @@ function CustomerView({ orgId, canEdit }: { orgId: string; canEdit: boolean }) {
               ))}
             </ul>
           </Card>
+
+          {(orders.data?.length ?? 0) > 0 && (
+            <Card title="Ordens de serviço">
+              <ul className="divide-y divide-rule/70">
+                {orders.data!.map((os) => (
+                  <li key={os.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
+                    <Link to={`/oficina/${orgId}/os/${os.id}`} className="font-semibold text-ink underline-offset-4 hover:underline">
+                      OS nº {os.number} · {vehicleLabel(c.vehicles.find((v) => v.id === os.vehicle_id))}
+                    </Link>
+                    <span className="flex items-center gap-3 text-sm">
+                      {os.final_total_cents !== null && <span className="tabular-nums text-graphite">{formatCents(os.final_total_cents)}</span>}
+                      <StatusChip className={ORDER_STATUS_TONE[os.status]}>{ORDER_STATUS_LABEL[os.status]}</StatusChip>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
 
           <Card title="Orçamentos">
             {c.quotes.length === 0 ? <p className="text-muted">Nenhum orçamento ainda.</p> : (

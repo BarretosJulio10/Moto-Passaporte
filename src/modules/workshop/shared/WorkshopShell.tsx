@@ -9,6 +9,7 @@ import type { MyWorkshop } from '../api'
 const TABS: { to: string; label: string; end?: boolean }[] = [
   { to: '', label: 'Visão geral', end: true },
   { to: 'orcamentos', label: 'Orçamentos' },
+  { to: 'os', label: 'Ordens de serviço' },
   { to: 'clientes', label: 'Clientes' },
   { to: 'motos', label: 'Motos' },
   { to: 'servicos', label: 'Serviços e preços' },

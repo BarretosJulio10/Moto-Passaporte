@@ -9,6 +9,25 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.45.0] — 08/11/2026 — Módulo Oficina (PRD 2.1), Fase 2: ordem de serviço
+
+### Adicionado
+- **Ordens de serviço** (aba nova): a partir do orçamento aprovado (botão "Abrir ordem de serviço"), só com os itens aprovados; ou sem orçamento, registrando como e quem autorizou. Itens extras também exigem autorização registrada. Orçamento complementar aprovado entra na mesma OS.
+- Situação da OS com histórico (quem e quando), mecânico designado com aviso, prazo e atrasadas.
+- Execução item a item (executado / não executado), peça usada (fabricante e código), observações técnicas.
+- **Checklist de entrada e de saída** com itens padrão e itens livres; link para o cliente **dar ciência do estado na entrada** sem conta.
+- **Fotos** da entrada, do serviço e da saída (câmera do celular), em armazenamento privado com conferência do conteúdo.
+- **Conclusão** com km final, ajuste com motivo e comprovante (imprimir/PDF e link para o cliente); aviso de retirada pelo WhatsApp; registro de entrega.
+- Visão geral com OS em andamento, prontas para retirada, atrasadas e concluídas no período; ficha do cliente com as OS.
+- Permissão nova da equipe: "Executar serviços (mecânico)".
+
+### Segurança
+- 6 tabelas novas com RLS e gravação só por funções; itens com origem e valor imutáveis; bucket privado por oficina. Varredura no Supabase real: 0 violações.
+
+### Testes
+- Banco: 45 verificações novas (`phase7b_workshop_orders_test.sql`): só itens aprovados entram, recusado fica fora, autorização obrigatória, mecânico x gestão, isolamento de duas oficinas (inclusive arquivos), ciência única, conclusão, comprovante, "OS não gera manutenção" — suíte 937 OK. Fumaça em produção dentro de transação desfeita.
+- Tela: 4 novos — 221.
+
 ## [0.44.0] — 08/11/2026 — Módulo Oficina (PRD 2.1), Fase 1: atendimento e orçamento
 
 ### Adicionado

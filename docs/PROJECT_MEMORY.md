@@ -86,7 +86,8 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 | Mercado Pago, assinaturas, cotas | 5 | `planejado` |
 | Painel administrativo, testes de segurança, lançamento | 6 | `planejado` |
 | Oficina (PRD 2.1) Fase 1: clientes, catálogo, preços, orçamentos, aprovação por link | 2.1-F1 | `testado` (ADR-043, `docs/modules/`) |
-| Oficina (PRD 2.1) Fases 2–5: OS, checklist, histórico, agenda, peças, financeiro | 2.1 | `planejado` |
+| Oficina (PRD 2.1) Fase 2: ordens de serviço, checklists, fotos, comprovante | 2.1-F2 | `testado` (ADR-044) |
+| Oficina (PRD 2.1) Fases 3–5: histórico, agenda, peças, financeiro, relatórios | 2.1 | `planejado` |
 
 ## 6. Ambientes
 

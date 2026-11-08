@@ -8,6 +8,7 @@ import { todayISO } from '@/core/shared/format'
 import { PlateSearchPanel } from '@/modules/workshop_access/PlateSearchPanel'
 import { WorkshopAccessList } from '@/modules/workshop_access/WorkshopAccessList'
 import { fetchDashboard } from './quotes/api'
+import { fetchOrdersSummary } from './service-orders/api'
 import { Card, WorkshopShell } from './shared/WorkshopShell'
 import { formatCents } from './shared/rpc'
 import type { MyWorkshop } from './api'
@@ -41,7 +42,9 @@ function Dashboard({ orgId, shop, perms }: { orgId: string; shop: MyWorkshop; pe
   const [custom, setCustom] = useState(rangeFor('month'))
   const range = period === 'custom' ? custom : rangeFor(period)
   const dash = useQuery({ queryKey: ['ws-dashboard', orgId, range.from, range.to], queryFn: () => fetchDashboard(orgId, range.from, range.to) })
+  const os = useQuery({ queryKey: ['ws-orders-summary', orgId, range.from, range.to], queryFn: () => fetchOrdersSummary(orgId, range.from, range.to) })
   const d = dash.data
+  const s = os.data
   const base = `/oficina/${orgId}`
 
   return (
@@ -99,7 +102,21 @@ function Dashboard({ orgId, shop, perms }: { orgId: string; shop: MyWorkshop; pe
               </p>
             </div>
           </div>
-          <p className="mt-2 text-xs text-muted">Valor aprovado não é dinheiro recebido. Recebimentos, ordens de serviço e agenda entram nas próximas fases do módulo.</p>
+          {s && (
+            <>
+              <h2 className="heading mt-6 text-lg text-ink">Oficina hoje</h2>
+              <ul className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <Kpi to={`${base}/os?situacao=active`} label="OS em andamento" value={s.active} sub={`${s.in_progress} em execução · ${s.awaiting_parts} aguardando peças · ${s.awaiting_diagnosis} em diagnóstico`} />
+                <Kpi to={`${base}/os?situacao=ready`} label="Prontas para retirada" value={s.ready_pickup} sub="concluídas, esperando o cliente" />
+                <Kpi to={`${base}/os?situacao=active`} label="Atrasadas" value={s.late} sub="passaram do prazo" />
+                <Kpi to={`${base}/os?situacao=delivered`} label="Concluídas no período" value={s.completed_period} sub={`${formatCents(s.completed_cents_period)} concluídos`} />
+              </ul>
+              <p className="mt-2 text-xs text-muted">
+                Em execução: {formatCents(s.in_execution_cents)} autorizados.{perms.execute_orders && s.mine > 0 ? ` Você tem ${s.mine} OS designada${s.mine === 1 ? '' : 's'}.` : ''}
+              </p>
+            </>
+          )}
+          <p className="mt-2 text-xs text-muted">Valor aprovado e concluído não são dinheiro recebido. Recebimentos e agenda entram na Fase 4.</p>
         </>
       )}
 
