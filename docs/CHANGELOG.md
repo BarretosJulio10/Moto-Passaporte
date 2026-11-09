@@ -9,6 +9,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.58.1] — 09/11/2026 — Links de orçamento e instalação da pista
+
+### Corrigido
+- **Links públicos da oficina voltam a abrir** (orçamento, OS, vínculo do cliente, página pública e agendamento): o controle de acessos anônimos recusava as categorias desses links e a tela mostrava "Algum dado está fora do formato permitido" (KI-047, desde a v0.44.0).
+- Criar mecânico da pista: a função `pista-accounts` lê o usuário do token já conferido pelo Supabase (KI-046).
+
+### Adicionado
+- **App da Pista:** logo ao entrar (fora do app instalado), janela pedindo para instalar no celular — no Android abre a instalação do próprio celular; no iPhone mostra o passo a passo. "Agora não" esconde até a próxima abertura.
+
 ## [0.58.0] — 09/11/2026 — Conta da pista (mecânico sem convite)
 
 ### Adicionado

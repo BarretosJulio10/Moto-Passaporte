@@ -7,6 +7,7 @@ import { translateDbError } from '@/core/shared/dbErrors'
 import { formatKm } from '@/core/shared/format'
 import { fetchPistaContext, fetchPistaOrders, PISTA_STATUS_LABEL, PISTA_STATUS_TONE, vehicleLabel, type PistaOrderRow, type PistaShop } from './api'
 import { fetchWorkshopByCode, normalizeCode, pistaEmail, rememberCode, rememberedCode, validCode, validNickname, normalizeNickname } from './accountsApi'
+import { PistaInstallPrompt } from './PistaInstallPrompt'
 import { listOutbox, onOutboxChange, startOutbox, flush, type OutboxEntry } from './outbox'
 
 /** App da Pista (ADR-057): PWA próprio em /pista, para o mecânico registrar rápido na moto. */
@@ -292,6 +293,7 @@ function PistaGate({ userId }: { userId: string }) {
   }
   return (
     <PistaFrame header={header}>
+      <PistaInstallPrompt />
       {failed > 0 && <FailedList outbox={outbox.filter((e) => e.failed)} />}
       <Outlet context={{ shop, userId, outbox, online } satisfies PistaCtx} />
     </PistaFrame>

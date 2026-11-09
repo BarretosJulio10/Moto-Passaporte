@@ -67,3 +67,15 @@ describe('Conta da pista (ADR-058)', () => {
     expect(router.state.location.pathname).toBe('/pista')
   })
 })
+
+describe('Instalar o App da Pista', () => {
+  it('pede para instalar logo ao entrar e some com "Agora não"', async () => {
+    sessionStorage.clear()
+    const { PistaInstallPrompt } = await import('./PistaInstallPrompt')
+    render(<PistaInstallPrompt />)
+    expect(await screen.findByRole('dialog', { name: 'Instale o App da Pista' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Agora não' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(sessionStorage.getItem('pista-install-later')).toBe('1')
+  })
+})

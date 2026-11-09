@@ -55,3 +55,7 @@ Problemas conhecidos e sua situação.
 **Status:** aberto (09/11/2026)
 - Na `pista-accounts`, `getUser(jwt)` devolveu "Auth session missing!" com sessão válida (token ES256, chaves novas do Supabase). Corrigido lá: a assinatura é conferida pelo gateway (`verify_jwt`) e a função lê o `sub` do token e confirma a conta com `auth.admin.getUserById`.
 - `export-files` e `mercadopago-billing` usam o mesmo `getUser(jwt)`: conferir com um teste real (baixar comprovantes, assinar) e aplicar a mesma correção se falharem.
+
+### KI-047 — Links públicos da oficina falhavam (controle de acessos)
+**Status:** resolvido (09/11/2026, v0.58.1)
+- `anon_rate_limits` só aceitava `public_passport` e `shared_passport`; orçamento, OS, vínculo do cliente (`quote_link`), página pública (`public_workshop`) e agendamento (`public_booking`) davam erro 23514 no site real. Os testes locais não pegaram porque o limite só age com cabeçalho de requisição. Ao criar categoria nova em `anon_rate_limit_ok`, incluir na restrição.

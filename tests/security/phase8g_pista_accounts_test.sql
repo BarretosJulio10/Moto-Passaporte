@@ -101,3 +101,10 @@ reset role;
 
 \o
 \echo 'Conta da pista: ok'
+
+-- KI-047: controle de acessos anônimos aceita as categorias usadas pelos links da oficina
+\o /dev/null
+select tests.ok(pg_get_constraintdef(oid) ~ 'quote_link' and pg_get_constraintdef(oid) ~ 'public_workshop' and pg_get_constraintdef(oid) ~ 'public_booking',
+                'categorias dos links da oficina aceitas no controle de acessos')
+  from pg_constraint where conname = 'anon_rate_limits_bucket_check';
+\o
