@@ -9,6 +9,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.61.0] — 09/11/2026 — Modo toque em toda a oficina e acabamento do fluxo (Fases C e D)
+
+### Adicionado
+- **Modo toque em todas as telas da oficina** (OS, Nova entrada, Caixa, orçamentos…): botões e campos grandes e uma barra fixa "‹ Esteira · Sair do modo toque". A escolha fica no aparelho.
+- **App instalado no balcão abre direto na Esteira** da última oficina usada, quando o modo toque está ligado.
+- **WhatsApp com mensagem pronta nos cartões** da Esteira e do Caixa: "Avisar entrada", "Avisar andamento", "Cobrar resposta" e "Avisar que está pronta". Abre o WhatsApp da oficina com o texto e registra o contato no relacionamento.
+- **Relatórios → Tempo médio por etapa** das OS entregues no período: entrada → diagnóstico, diagnóstico → aprovação, aprovado → pronto, pronta → retirada e total.
+
+### Mudado
+- O cartão mostra há quanto tempo a moto está **na etapa atual** (antes contava desde a abertura da OS); o alerta "parada há muito tempo" usa essa hora. Banco: `status_changed_at` atualizado sozinho a cada mudança de situação ou diagnóstico (ADR-061).
+
 ## [0.60.0] — 09/11/2026 — Entrada antes do orçamento (fluxo da oficina, Fase B)
 
 ### Adicionado

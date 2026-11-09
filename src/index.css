@@ -53,6 +53,17 @@
 }
 
 @layer components {
+  /* Modo toque da oficina (balcão com tablet/celular): alvos de toque grandes em todas as telas. */
+  .touch-mode button:not([role="tab"]),
+  .touch-mode input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  .touch-mode select,
+  .touch-mode a.rounded-doc {
+    min-height: 3.25rem;
+    font-size: 1.05rem;
+  }
+  .touch-mode textarea { font-size: 1.05rem; }
+  .touch-mode input[type="checkbox"], .touch-mode input[type="radio"] { width: 1.5rem; height: 1.5rem; }
+
   /* Títulos em Archivo larga: lembra o letreiro estampado de placas e chassis. */
   .display {
     font-variation-settings: "wdth" 125;

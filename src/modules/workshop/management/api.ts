@@ -275,3 +275,7 @@ export function downloadCsv(filename: string, rows: (string | number | null | un
   a.remove()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
+
+// Tempo médio por etapa das OS entregues no período (fluxo da oficina, Fase D).
+export type StageTimes = { orders: number; diagnosis_hours: number | null; approval_hours: number | null; execution_hours: number | null; pickup_hours: number | null; total_hours: number | null }
+export const fetchStageTimes = (org: string, from: string, to: string) => rpc<StageTimes>('workshop_stage_times', { p_org: org, p_from: from, p_to: to })

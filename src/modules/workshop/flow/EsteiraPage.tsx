@@ -9,9 +9,10 @@ import { listQuotes } from '../quotes/api'
 import { agendaRange, fetchFinance, listAppointments } from '../management/api'
 import { WorkshopShell, type WorkshopContext } from '../shared/WorkshopShell'
 import { formatCents } from '../shared/rpc'
+import { rememberWorkshop, useTouchMode } from './touch'
+import { ContactButton } from '../management/widgets'
 import { buildFlow, isStale, matches, STAGES, waitLabel, type FlowCard, type OrderRowFlow, type StageKey } from './stages'
 
-const TOUCH_KEY = 'mp-esteira-toque'
 const REFRESH_MS = 20_000
 
 const BADGE: Record<FlowCard['badges'][number]['tone'], string> = {
@@ -42,18 +43,6 @@ export function useFlow({ orgId, perms }: Pick<WorkshopContext, 'orgId' | 'perms
   }
 }
 
-function useTouchMode(): [boolean, (v: boolean) => void] {
-  const [on, setOn] = useState(() => { try { return localStorage.getItem(TOUCH_KEY) === '1' } catch { return false } })
-  const set = (v: boolean) => { try { localStorage.setItem(TOUCH_KEY, v ? '1' : '0') } catch { /* sem armazenamento */ } setOn(v) }
-  useEffect(() => {
-    if (!on) return
-    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') set(false) }
-    window.addEventListener('keydown', esc)
-    return () => window.removeEventListener('keydown', esc)
-  }, [on])
-  return [on, set]
-}
-
 /** /oficina/:orgId — Esteira: a moto anda da Entrada até Entregue, com o próximo passo em um toque. */
 export function EsteiraPage() {
   return <WorkshopShell>{(ctx) => <Esteira {...ctx} />}</WorkshopShell>
@@ -62,6 +51,7 @@ export function EsteiraPage() {
 function Esteira({ orgId, shop, perms }: WorkshopContext) {
   const flow = useFlow({ orgId, perms })
   const [touch, setTouch] = useTouchMode()
+  useEffect(() => rememberWorkshop(orgId), [orgId])
   const [term, setTerm] = useState('')
   const [tab, setTab] = useState<StageKey>('entrada')
   const day = agendaRange('dia', new Date())
@@ -126,7 +116,7 @@ function Esteira({ orgId, shop, perms }: WorkshopContext) {
               </div>
             </div>
             <ul className="mt-3 space-y-3">
-              {byStage(tab).map((c) => <li key={`${c.kind}-${c.id}`}><FlowCardView card={c} touch={false} /></li>)}
+              {byStage(tab).map((c) => <li key={`${c.kind}-${c.id}`}><FlowCardView card={c} touch={false} orgId={orgId} workshopName={shop.business_name} /></li>)}
               {byStage(tab).length === 0 && <li className="rounded-doc border border-dashed border-rule p-6 text-center text-sm text-muted">Nada nesta etapa.</li>}
             </ul>
           </div>
@@ -141,7 +131,7 @@ function Esteira({ orgId, shop, perms }: WorkshopContext) {
                   </header>
                   <p className="px-1 pb-2 text-xs text-muted">{s.hint}</p>
                   <ul className="space-y-2">
-                    {byStage(s.key).map((c) => <li key={`${c.kind}-${c.id}`}><FlowCardView card={c} touch={touch} /></li>)}
+                    {byStage(s.key).map((c) => <li key={`${c.kind}-${c.id}`}><FlowCardView card={c} touch={touch} orgId={orgId} workshopName={shop.business_name} /></li>)}
                   </ul>
                   {byStage(s.key).length === 0 && <p className="px-1 py-4 text-center text-xs text-muted">—</p>}
                 </section>
@@ -184,7 +174,15 @@ function Stat({ label, value }: { label: string; value: number | string }) {
   )
 }
 
-export function FlowCardView({ card: c, touch }: { card: FlowCard; touch: boolean }) {
+const MESSAGE: Partial<Record<FlowCard['stage'], { reason: 'other' | 'quote_followup' | 'pickup'; label: string; text: (c: FlowCard) => string }>> = {
+  entrada: { reason: 'other', label: 'Avisar entrada', text: (c) => `Sua ${c.vehicle}${c.plate ? ` (placa ${c.plate})` : ''} deu entrada aqui na oficina (OS nº ${c.number}). Avisamos assim que o diagnóstico ficar pronto.` },
+  diagnostico: { reason: 'other', label: 'Avisar andamento', text: (c) => `Estamos fazendo o diagnóstico da sua ${c.vehicle} (OS nº ${c.number}). Em breve mandamos o orçamento.` },
+  orcamento: { reason: 'quote_followup', label: 'Cobrar resposta', text: () => '' },
+  caixa: { reason: 'pickup', label: 'Avisar que está pronta', text: (c) => `Sua ${c.vehicle} está pronta para retirada (OS nº ${c.number}).` },
+}
+
+export function FlowCardView({ card: c, touch, orgId, workshopName }: { card: FlowCard; touch: boolean; orgId?: string; workshopName?: string }) {
+  const msg = MESSAGE[c.stage]
   const stale = isStale(c)
   return (
     <article className={`rounded-doc border bg-sheet ${stale ? 'border-brass' : 'border-rule'} ${touch ? 'p-4' : 'p-3'}`}>
@@ -196,7 +194,7 @@ export function FlowCardView({ card: c, touch }: { card: FlowCard; touch: boolea
         <p className={`truncate text-graphite ${touch ? 'text-base' : 'text-sm'}`}>{c.vehicle}</p>
         <p className={`truncate font-semibold text-ink ${touch ? 'text-base' : 'text-sm'}`}>{c.customer}</p>
         <p className="mt-1 text-xs text-muted">
-          {c.kind === 'order' ? 'aberta' : c.badges.some((b) => b.label === 'Rascunho') ? 'criado' : 'enviado'} {waitLabel(c.since)}
+          nesta etapa {waitLabel(c.since)}
           {c.mechanic ? ` · ${c.mechanic}` : ''}
           {c.pendingCents ? ` · ${formatCents(c.pendingCents)} a receber` : ''}
         </p>
@@ -207,6 +205,13 @@ export function FlowCardView({ card: c, touch }: { card: FlowCard; touch: boolea
           </p>
         )}
       </Link>
+      {msg && orgId && workshopName && c.whatsapp && c.customerId && !(c.stage === 'orcamento' && c.kind === 'order' && c.action === 'Montar orçamento') && (
+        <div className="mt-2">
+          <ContactButton orgId={orgId} customerId={c.customerId} customerName={c.customer} whatsapp={c.whatsapp} workshopName={workshopName}
+            reason={msg.reason} reference={c.kind === 'quote' ? c.id : null} label={`WhatsApp: ${msg.label}`}
+            text={msg.reason === 'quote_followup' ? undefined : `Olá, ${c.customer.split(' ')[0]}! Aqui é da ${workshopName}.\n${msg.text(c)}`} />
+        </div>
+      )}
       {c.stage !== 'entregue' && (
         <Link to={c.href}
           className={`mt-3 flex w-full items-center justify-center rounded-doc bg-ink font-bold text-sheet hover:opacity-90 ${touch ? 'h-14 text-lg' : 'h-10 text-sm'}`}>

@@ -109,6 +109,12 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-061 — Modo toque e acabamento do fluxo da oficina (Fases C e D)
+**Data:** 09/11/2026 · **Status:** aceita
+- Modo toque guardado no aparelho (`mp-esteira-toque`), aplicado pelo `WorkshopShell` (classe `touch-mode` com alvos de 52 px) em todas as telas da oficina; app instalado com `?origem=app` vai para a última oficina (`mp-last-org`) quando o modo está ligado.
+- `workshop_service_orders.status_changed_at` mantido por gatilho (situação ou diagnóstico); `workshop_list_orders` traz também `customer_whatsapp`. Mensagens prontas usam o `ContactButton` (registra o contato).
+- `workshop_stage_times`: médias em horas das OS entregues no período; só para quem tem orçamentos ou financeiro.
+
 ### ADR-060 — Entrada antes do orçamento (fluxo da oficina, Fase B)
 **Data:** 09/11/2026 · **Status:** aceita (responsável pediu "continue" depois da Fase A)
 - `workshop_service_orders.opened_at_entry`: OS nasce na entrada (`workshop_create_entry`) sem itens e sem autorização; restrição `workshop_service_orders_authorized_check` = orçamento OU entrada OU autorização. `wo_has_work` impede execução/Pronto sem item autorizado (`workshop_set_order_status`, `pista_mark_ready`).

@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { touchStartWorkshop } from '@/modules/workshop/flow/touch'
+import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/core/auth/AuthProvider'
 import { Notice } from '@/components/Notice'
@@ -19,6 +20,8 @@ import { DashboardSpendingCard } from '@/modules/spending/SpendingCards'
 
 export function DashboardPage() {
   const { user } = useAuth()
+  const [params] = useSearchParams()
+  const startOrg = params.get('origem') === 'app' ? touchStartWorkshop() : null
   const firstName = ((user?.user_metadata?.full_name as string | undefined) ?? '').split(' ')[0]
 
   const motorcycles = useQuery({
@@ -30,6 +33,8 @@ export function DashboardPage() {
   const pending = useQuery({ queryKey: ['pending-access', user?.id], enabled: Boolean(user), queryFn: fetchPendingRequests })
 
   const hasMotos = Boolean(motorcycles.data && motorcycles.data.length > 0)
+  // App instalado no balcão (modo toque ligado): abre direto na Esteira da oficina.
+  if (startOrg) return <Navigate to={`/oficina/${startOrg}`} replace />
 
   return (
     <div>

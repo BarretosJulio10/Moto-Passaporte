@@ -79,5 +79,20 @@ select tests.must_fail(format($$insert into public.workshop_service_orders (orga
                        'OS fora da entrada continua exigindo orçamento ou autorização');
 select tests.ok(not has_function_privilege('authenticated', 'public.wo_has_work(uuid)', 'execute'), 'funções internas fechadas');
 
+
+-- Fase D: hora em que entrou na etapa, WhatsApp na lista e tempo médio por etapa
+select tests.ok((select status_changed_at >= created_at from public.workshop_service_orders where id = :'os'), 'OS guarda quando entrou na etapa atual');
+select set_config('request.jwt.claim.sub', :'C', false);
+set role authenticated;
+select tests.ok(exists (select 1 from jsonb_array_elements(public.workshop_list_orders(:'org_c')) e where e ->> 'id' = :'os' and e ? 'status_changed_at' and e ? 'customer_whatsapp'),
+                'lista traz hora da etapa e WhatsApp do cliente');
+select tests.ok((public.workshop_stage_times(:'org_c', current_date - 30, current_date) ? 'total_hours'), 'relatório de tempo por etapa responde');
+reset role;
+update public.organization_members set can_manage_quotes = false, can_manage_finance = false where organization_id = :'org_c' and user_id = :'D';
+select set_config('request.jwt.claim.sub', :'D', false);
+set role authenticated;
+select tests.must_fail(format($$select public.workshop_stage_times(%L, current_date - 30, current_date)$$, :'org_c'), 'mecânico sem relatórios não vê tempos');
+reset role;
+
 \o
 \echo 'Entrada antes do orçamento: ok'

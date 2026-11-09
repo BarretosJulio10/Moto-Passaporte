@@ -16,7 +16,7 @@ const GROUPS: { title: string; hint: string; pick: (c: FlowCard) => boolean }[] 
   { title: 'Aguardando retirada', hint: 'Cliente avisado. Entregue a moto quando ele chegar.', pick: (c) => c.badges.some((b) => b.label === 'Aguardando retirada') },
 ]
 
-function Caixa({ orgId, perms }: WorkshopContext) {
+function Caixa({ orgId, perms, shop }: WorkshopContext) {
   const flow = useFlow({ orgId, perms })
   const cards = flow.cards.filter((c) => c.stage === 'caixa')
   return (
@@ -39,7 +39,7 @@ function Caixa({ orgId, perms }: WorkshopContext) {
                 <h2 className="heading text-lg text-ink">{g.title} <span className="text-muted">({list.length})</span></h2>
                 <p className="text-sm text-muted">{g.hint}</p>
                 <ul className="mt-3 space-y-2">
-                  {list.map((c) => <li key={c.id}><FlowCardView card={c} touch={false} /></li>)}
+                  {list.map((c) => <li key={c.id}><FlowCardView card={c} touch={false} orgId={orgId} workshopName={shop.business_name} /></li>)}
                 </ul>
               </section>
             )

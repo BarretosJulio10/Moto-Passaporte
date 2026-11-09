@@ -28,6 +28,8 @@ export type FlowCard = {
   since: string
   due: string | null
   badges: { label: string; tone: 'warn' | 'danger' | 'ok' | 'info' }[]
+  customerId: string
+  whatsapp: string | null
   action: string
   href: string
   pendingCents: number | null
@@ -70,6 +72,8 @@ export type OrderRowFlow = OrderRow & {
   opened_at_entry?: boolean
   diagnosed_at?: string | null
   entry_quote?: { id: string; number: number; status: string } | null
+  status_changed_at?: string | null
+  customer_whatsapp?: string | null
 }
 
 const vehicleOf = (r: { brand: string | null; model: string | null }) => [r.brand, r.model].filter(Boolean).join(' ') || 'Moto sem modelo'
@@ -131,7 +135,8 @@ export function buildFlow(
     }
     cards.push({
       id: o.id, kind: 'order', stage, number: o.number, plate: o.plate, vehicle: vehicleOf(o), customer: o.customer_name,
-      mechanic: o.mechanic_name, since: o.created_at, due: o.due_date, badges,
+      mechanic: o.mechanic_name, since: o.status_changed_at ?? o.created_at, due: o.due_date, badges,
+      customerId: o.customer_id, whatsapp: o.customer_whatsapp ?? null,
       action, href, pendingCents: receivables ? (due ?? null) : null,
     })
   }
@@ -158,6 +163,7 @@ export function buildFlow(
     cards.push({
       id: q.id, kind: 'quote', stage, number: q.number, plate: q.plate, vehicle: vehicleOf(q), customer: q.customer_name,
       mechanic: null, since: q.sent_at ?? q.created_at, due: null, badges, action, href: `${base}/orcamentos/${q.id}`, pendingCents: null,
+      customerId: q.customer_id, whatsapp: null,
     })
   }
 

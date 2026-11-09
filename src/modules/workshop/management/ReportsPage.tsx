@@ -6,12 +6,17 @@ import { PageHeader } from '@/components/AppLayout'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { Card, WorkshopShell } from '../shared/WorkshopShell'
 import { formatCents } from '../shared/rpc'
-import { PAY_LABEL, PAY_METHODS, approvalRate, centsCsv, downloadCsv, fetchReports, formatDay, monthStartIso, todayIso, type Reports } from './api'
+import { PAY_LABEL, PAY_METHODS, approvalRate, centsCsv, downloadCsv, fetchReports, fetchStageTimes, formatDay, monthStartIso, todayIso, type Reports } from './api'
 import { PeriodPicker } from './FinancePage'
 
 type Err = { code?: string; message?: string }
 
 /** Relatórios da oficina (PRD 2.1 §17): comercial, operacional, por mecânico e (com permissão) financeiro. */
+function hours(h: number | null): string {
+  if (h === null || h === undefined) return '—'
+  return h >= 48 ? `${String(Math.round((h / 24) * 10) / 10).replace('.', ',')} dias` : `${String(h).replace('.', ',')} h`
+}
+
 export function ReportsPage() {
   return (
     <WorkshopShell>
@@ -26,6 +31,7 @@ function ReportsView({ orgId, workshopName }: { orgId: string; workshopName: str
   const [range, setRange] = useState({ from: monthStartIso(), to: todayIso() })
   const q = useQuery({ queryKey: ['ws-reports', orgId, range.from, range.to], queryFn: () => fetchReports(orgId, range.from, range.to) })
   const r = q.data
+  const times = useQuery({ queryKey: ['ws-stage-times', orgId, range.from, range.to], queryFn: () => fetchStageTimes(orgId, range.from, range.to) })
 
   return (
     <div>
@@ -63,6 +69,18 @@ function ReportsView({ orgId, workshopName }: { orgId: string; workshopName: str
               ['Tempo médio até concluir', r.operational.avg_hours ? `${String(r.operational.avg_hours).replace('.', ',')} h` : '—'],
               ['Itens pendentes em OS abertas', r.operational.pending_items],
             ]} />
+          </Card>
+          <Card title="Tempo médio por etapa">
+            {times.data && times.data.orders > 0 ? (
+              <Rows rows={[
+                ['OS entregues no período', times.data.orders],
+                ['Entrada → diagnóstico pronto', hours(times.data.diagnosis_hours)],
+                ['Diagnóstico → cliente aprovar', hours(times.data.approval_hours)],
+                ['Aprovado → mecânico marcar pronto', hours(times.data.execution_hours)],
+                ['Pronta → cliente retirar', hours(times.data.pickup_hours)],
+                ['Total, da entrada à entrega', hours(times.data.total_hours)],
+              ]} />
+            ) : <p className="text-sm text-muted">Nenhuma OS entregue no período.</p>}
           </Card>
           <Card title="Serviços mais feitos">
             {r.top_services.length === 0 ? <p className="text-sm text-muted">Nenhum serviço concluído no período.</p> : (

@@ -114,3 +114,24 @@ describe('Cartão da esteira', () => {
     expect(screen.getByRole('link', { name: 'Liberar para a pista ›' })).toHaveAttribute('href', '/oficina/org/os/o1')
   })
 })
+
+describe('Fases C e D', () => {
+  it('cartão usa a hora em que entrou na etapa e oferece a mensagem pronta no WhatsApp', () => {
+    const [card] = buildFlow('org', [order({ status: 'completed', status_changed_at: '2026-11-09T14:30:00', customer_whatsapp: '21999998888' })], [], null, now)
+    expect(waitLabel(card!.since, now)).toBe('há 30 min')
+    render(<MemoryRouter><FlowCardView card={card!} touch={false} orgId="org" workshopName="Oficina do Carlos" /></MemoryRouter>)
+    const link = screen.getByRole('link', { name: 'WhatsApp: Avisar que está pronta' })
+    expect(link.getAttribute('href')).toContain('wa.me/5521999998888')
+    expect(decodeURIComponent(link.getAttribute('href')!)).toContain('está pronta para retirada')
+  })
+
+  it('modo toque fica guardado no aparelho e o app instalado abre na última oficina', async () => {
+    const { setTouchMode, rememberWorkshop, touchStartWorkshop } = await import('./touch')
+    rememberWorkshop('org-1')
+    setTouchMode(false)
+    expect(touchStartWorkshop()).toBeNull()
+    setTouchMode(true)
+    expect(touchStartWorkshop()).toBe('org-1')
+    setTouchMode(false)
+  })
+})

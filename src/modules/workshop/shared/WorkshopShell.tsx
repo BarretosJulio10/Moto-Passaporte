@@ -1,3 +1,4 @@
+import { useTouchMode } from '../flow/touch'
 import { useEffect, useRef, type ReactNode } from 'react'
 import { Link, NavLink, useLocation, useParams } from 'react-router-dom'
 import { useMyWorkshops } from '../WorkshopIndexPage'
@@ -14,6 +15,9 @@ export function WorkshopShell({ children }: { children: (ctx: WorkshopContext) =
   const { orgId = '' } = useParams()
   const workshops = useMyWorkshops()
   const perms = useWorkshopPermissions(orgId)
+  const [touch, setTouch] = useTouchMode()
+  const { pathname } = useLocation()
+  const onEsteira = pathname === `/oficina/${orgId}`
 
   if (workshops.isLoading || perms.isLoading) return <p className="text-muted" role="status">Carregando…</p>
   const shop = workshops.data?.find((w) => w.organization_id === orgId)
@@ -27,8 +31,15 @@ export function WorkshopShell({ children }: { children: (ctx: WorkshopContext) =
     )
   }
   return (
-    <div>
+    <div className={touch ? 'touch-mode' : undefined}>
       <MobileWorkshopNav orgId={orgId} shop={shop} perms={perms.data} />
+      {touch && !onEsteira && (
+        <div className="sticky top-0 z-30 -mx-1 mb-4 flex items-center justify-between gap-2 rounded-doc bg-ink px-3 py-2 text-sheet print:hidden">
+          <Link to={`/oficina/${orgId}`} className="flex h-12 items-center rounded-doc bg-sheet px-4 font-bold text-ink">‹ Esteira</Link>
+          <span className="text-sm font-semibold">Modo toque</span>
+          <button type="button" onClick={() => setTouch(false)} className="h-12 rounded-doc border border-sheet/40 px-3 text-sm font-semibold">Sair do modo toque</button>
+        </div>
+      )}
       <div className="print:mt-0">{children({ orgId, shop, perms: perms.data })}</div>
     </div>
   )
