@@ -9,6 +9,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.58.3] — 09/11/2026 — Instalar a pista ao lado do app do cliente e liberar o microfone
+
+### Corrigido
+- **Instalar os dois apps no mesmo celular:** `/pista` agora abre por uma página própria (`pista.html`) que já nasce com o manifesto e o ícone da pista. Antes o celular lia primeiro o manifesto do app principal e dizia que o app "já estava instalado".
+- **Microfone e câmera liberados para o próprio site:** o cabeçalho `Permissions-Policy` bloqueava `microphone` e `camera` em todas as páginas, então a gravação de áudio nunca abria o pedido de permissão. Agora `camera=(self), microphone=(self)` (localização segue bloqueada).
+- Microfone negado: a pista mostra o caminho para liberar em cada celular (Android no navegador, Android com o app instalado, iPhone) e o botão "Tentar de novo".
+
 ## [0.58.2] — 09/11/2026 — Checklist e links públicos com conta da pista
 
 ### Corrigido

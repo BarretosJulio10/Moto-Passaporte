@@ -304,6 +304,7 @@ function AudioSection({ order, pending, canAct, queue }: { order: PistaOrder; pe
   const [blob, setBlob] = useState<{ data: Blob; mime: string; ext: string; seconds: number } | null>(null)
   const [title, setTitle] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [blocked, setBlocked] = useState(false)
   const recorder = useRef<MediaRecorder | null>(null)
   const chunks = useRef<Blob[]>([])
   const started = useRef(0)
@@ -316,6 +317,7 @@ function AudioSection({ order, pending, canAct, queue }: { order: PistaOrder; pe
 
   async function start() {
     setError(null)
+    setBlocked(false)
     if (typeof MediaRecorder === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
       setError('Este celular não grava áudio pelo app. Use a nota com o microfone do teclado.')
       return
@@ -344,8 +346,11 @@ function AudioSection({ order, pending, canAct, queue }: { order: PistaOrder; pe
         setSeconds(s)
         if (s >= MAX_SECONDS) stop()
       }, 250)
-    } catch {
-      setError('Permita o uso do microfone para gravar.')
+    } catch (err) {
+      const name = (err as { name?: string })?.name ?? ''
+      if (name === 'NotAllowedError' || name === 'SecurityError') setBlocked(true)
+      else if (name === 'NotFoundError') setError('Nenhum microfone encontrado neste celular.')
+      else setError('Não foi possível usar o microfone agora. Feche outros apps que estejam gravando e tente de novo.')
     }
   }
   function stop() {
@@ -382,6 +387,7 @@ function AudioSection({ order, pending, canAct, queue }: { order: PistaOrder; pe
         </div>
       )}
       {error && <p className="mt-2 text-sm font-semibold text-danger" role="alert">{error}</p>}
+      {blocked && <MicHelp onRetry={() => void start()} />}
       <ul className="mt-3 space-y-2">
         {local.map((e) => (
           <li key={e.id} className="rounded-xl bg-paper p-3 text-sm opacity-80">{String(e.args.title ?? 'Áudio')} · {mmss(Number(e.args.duration))} · enviando…</li>
@@ -477,5 +483,35 @@ function ChecklistSection({ order, canAct, queue }: { order: PistaOrder; canAct:
           className="mt-2 h-14 w-full rounded-xl bg-ink text-lg font-bold text-sheet">{saved ? 'Salvo ✓' : `Salvar checklist de ${phase === 'entry' ? 'entrada' : 'saída'}`}</button>
       )}
     </Section>
+  )
+}
+
+/** Microfone bloqueado: o site não consegue abrir as configurações; mostra o caminho em cada celular. */
+function MicHelp({ onRetry }: { onRetry: () => void }) {
+  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  const installed = window.matchMedia?.('(display-mode: standalone)').matches === true
+  return (
+    <div className="mt-3 rounded-xl border border-danger/40 bg-danger/5 p-3 text-sm text-graphite" role="alert">
+      <p className="font-bold text-danger">O microfone está bloqueado para o App da Pista.</p>
+      <p className="mt-1">O celular não deixa o app abrir essa configuração. Libere assim e toque em “Tentar de novo”:</p>
+      {ios ? (
+        <ol className="mt-2 list-decimal space-y-1 pl-5">
+          <li>Abra <strong>Ajustes</strong> do iPhone → <strong>Safari</strong> → <strong>Microfone</strong>.</li>
+          <li>Escolha <strong>Perguntar</strong> ou <strong>Permitir</strong>.</li>
+          <li>Volte ao app e toque em gravar: quando perguntar, toque em <strong>Permitir</strong>.</li>
+        </ol>
+      ) : installed ? (
+        <ol className="mt-2 list-decimal space-y-1 pl-5">
+          <li>Segure o dedo no ícone <strong>Pista</strong> na tela de início → <strong>Informações do app</strong> (ⓘ).</li>
+          <li><strong>Permissões</strong> → <strong>Microfone</strong> → <strong>Permitir só durante o uso</strong>.</li>
+        </ol>
+      ) : (
+        <ol className="mt-2 list-decimal space-y-1 pl-5">
+          <li>Toque no <strong>cadeado</strong> (ou ícone de ajustes) ao lado do endereço, no alto da tela.</li>
+          <li><strong>Permissões</strong> → <strong>Microfone</strong> → <strong>Permitir</strong>.</li>
+        </ol>
+      )}
+      <button type="button" onClick={onRetry} className="mt-3 h-11 w-full rounded-xl bg-ink font-bold text-sheet">Tentar de novo</button>
+    </div>
   )
 }
