@@ -9,6 +9,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.61.1] — 09/11/2026 — Esteira cabe na tela
+
+### Mudado
+- As 7 colunas da Esteira dividem a largura da tela (sem rolar para o lado): 7 lado a lado em telas largas, 4 por linha em telas médias; no modo toque, 2 ou 4 por linha conforme o aparelho. Cartões mais compactos (placa, modelo e cliente em uma linha cada, botões que quebram o texto).
+
 ## [0.61.0] — 09/11/2026 — Modo toque em toda a oficina e acabamento do fluxo (Fases C e D)
 
 ### Adicionado

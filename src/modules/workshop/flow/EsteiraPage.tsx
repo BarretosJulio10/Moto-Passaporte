@@ -120,23 +120,21 @@ function Esteira({ orgId, shop, perms }: WorkshopContext) {
               {byStage(tab).length === 0 && <li className="rounded-doc border border-dashed border-rule p-6 text-center text-sm text-muted">Nada nesta etapa.</li>}
             </ul>
           </div>
-          {/* Computador e modo toque: as 7 colunas lado a lado */}
-          <div className={`${touch ? 'mt-4' : 'mt-5 hidden lg:block'} -mx-1 overflow-x-auto pb-2`}>
-            <div className="flex min-w-max gap-3 px-1">
+          {/* Computador e modo toque: as 7 colunas dividem a largura da tela, sem rolar para o lado */}
+          <div className={`${touch ? 'mt-4 grid grid-cols-2 md:grid-cols-4' : 'mt-5 hidden lg:grid lg:grid-cols-4'} gap-2 xl:grid-cols-7`}>
               {STAGES.map((s, i) => (
-                <section key={s.key} aria-label={s.label} className={`${touch ? 'w-80' : 'w-64'} shrink-0 rounded-sheet border border-rule bg-paper/60 p-2`}>
-                  <header className="flex items-baseline justify-between gap-2 px-1 pb-2">
-                    <h2 className={`font-bold text-ink ${touch ? 'text-lg' : ''}`}><span className="text-muted">{i + 1}.</span> {s.label}</h2>
-                    <span className="rounded-full bg-sheet px-2 text-sm font-semibold tabular-nums text-ink">{byStage(s.key).length}</span>
+                <section key={s.key} aria-label={s.label} className="min-w-0 rounded-sheet border border-rule bg-paper/60 p-1.5">
+                  <header className="flex items-start justify-between gap-1 px-1 pb-1">
+                    <h2 className={`min-w-0 font-bold leading-tight text-ink ${touch ? 'text-lg' : 'text-sm 2xl:text-base'}`}><span className="text-muted">{i + 1}.</span> {s.label}</h2>
+                    <span className="shrink-0 rounded-full bg-sheet px-2 text-sm font-semibold tabular-nums text-ink">{byStage(s.key).length}</span>
                   </header>
-                  <p className="px-1 pb-2 text-xs text-muted">{s.hint}</p>
+                  <p className="truncate px-1 pb-2 text-xs text-muted" title={s.hint}>{s.hint}</p>
                   <ul className="space-y-2">
                     {byStage(s.key).map((c) => <li key={`${c.kind}-${c.id}`}><FlowCardView card={c} touch={touch} orgId={orgId} workshopName={shop.business_name} /></li>)}
                   </ul>
                   {byStage(s.key).length === 0 && <p className="px-1 py-4 text-center text-xs text-muted">—</p>}
                 </section>
               ))}
-            </div>
           </div>
         </>
       )}
@@ -185,36 +183,36 @@ export function FlowCardView({ card: c, touch, orgId, workshopName }: { card: Fl
   const msg = MESSAGE[c.stage]
   const stale = isStale(c)
   return (
-    <article className={`rounded-doc border bg-sheet ${stale ? 'border-brass' : 'border-rule'} ${touch ? 'p-4' : 'p-3'}`}>
+    <article className={`min-w-0 rounded-doc border bg-sheet ${stale ? 'border-brass' : 'border-rule'} ${touch ? 'p-3' : 'p-2'}`}>
       <Link to={c.href} className="block">
-        <div className="flex items-start justify-between gap-2">
-          <p className={`font-mono font-bold tracking-wider text-ink ${touch ? 'text-2xl' : 'text-lg'}`}>{c.plate ?? 'SEM PLACA'}</p>
-          <p className="shrink-0 text-xs text-muted">{c.kind === 'order' ? `OS ${c.number}` : `Orç. ${c.number}`}</p>
+        <div className="flex flex-wrap items-baseline justify-between gap-x-2">
+          <p className={`font-mono font-bold tracking-wide text-ink ${touch ? 'text-xl' : 'text-base'}`}>{c.plate ?? 'SEM PLACA'}</p>
+          <p className="text-xs text-muted">{c.kind === 'order' ? `OS ${c.number}` : `Orç. ${c.number}`}</p>
         </div>
-        <p className={`truncate text-graphite ${touch ? 'text-base' : 'text-sm'}`}>{c.vehicle}</p>
-        <p className={`truncate font-semibold text-ink ${touch ? 'text-base' : 'text-sm'}`}>{c.customer}</p>
+        <p className={`truncate text-graphite ${touch ? 'text-base' : 'text-xs'}`} title={c.vehicle}>{c.vehicle}</p>
+        <p className={`truncate font-semibold text-ink ${touch ? 'text-base' : 'text-sm'}`} title={c.customer}>{c.customer}</p>
         <p className="mt-1 text-xs text-muted">
           nesta etapa {waitLabel(c.since)}
           {c.mechanic ? ` · ${c.mechanic}` : ''}
           {c.pendingCents ? ` · ${formatCents(c.pendingCents)} a receber` : ''}
         </p>
         {(c.badges.length > 0 || stale) && (
-          <p className="mt-2 flex flex-wrap gap-1">
+          <p className="mt-1.5 flex flex-wrap gap-1">
             {stale && <span className="rounded-full bg-brass/20 px-2 py-0.5 text-xs font-semibold text-graphite">Parada há muito tempo</span>}
             {c.badges.map((b) => <span key={b.label} className={`rounded-full px-2 py-0.5 text-xs font-semibold ${BADGE[b.tone]}`}>{b.label}</span>)}
           </p>
         )}
       </Link>
       {msg && orgId && workshopName && c.whatsapp && c.customerId && !(c.stage === 'orcamento' && c.kind === 'order' && c.action === 'Montar orçamento') && (
-        <div className="mt-2">
+        <div className="mt-2 [&_a]:w-full [&_a]:justify-center [&_a]:px-2 [&_a]:text-center [&_a]:text-xs">
           <ContactButton orgId={orgId} customerId={c.customerId} customerName={c.customer} whatsapp={c.whatsapp} workshopName={workshopName}
-            reason={msg.reason} reference={c.kind === 'quote' ? c.id : null} label={`WhatsApp: ${msg.label}`}
+            reason={msg.reason} reference={c.kind === 'quote' ? c.id : null} label={`WhatsApp · ${msg.label}`}
             text={msg.reason === 'quote_followup' ? undefined : `Olá, ${c.customer.split(' ')[0]}! Aqui é da ${workshopName}.\n${msg.text(c)}`} />
         </div>
       )}
       {c.stage !== 'entregue' && (
         <Link to={c.href}
-          className={`mt-3 flex w-full items-center justify-center rounded-doc bg-ink font-bold text-sheet hover:opacity-90 ${touch ? 'h-14 text-lg' : 'h-10 text-sm'}`}>
+          className={`mt-2 flex w-full items-center justify-center rounded-doc bg-ink px-2 text-center font-bold leading-tight text-sheet hover:opacity-90 ${touch ? 'min-h-14 text-base' : 'min-h-9 py-1.5 text-xs 2xl:text-sm'}`}>
           {c.action} ›
         </Link>
       )}
