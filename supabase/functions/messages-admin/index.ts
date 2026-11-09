@@ -97,9 +97,10 @@ Deno.serve(async (req) => {
       return reply(200, { connected: Boolean(s.data?.connected), loggedIn: Boolean(s.data?.loggedIn) })
     }
     case 'wa_qr': {
-      const r = await fzap<{ QRCode?: string }>(cfg, '/session/qr')
+      // A FZAP devolve "qrCode"; a documentação antiga mostra "QRCode". Aceita os dois.
+      const r = await fzap<{ qrCode?: string; QRCode?: string }>(cfg, '/session/qr')
       if (!r.ok) return reply(502, { message: r.error ?? 'QR Code indisponível. Toque em Conectar de novo.' })
-      const qr = r.data?.QRCode ?? ''
+      const qr = r.data?.qrCode ?? r.data?.QRCode ?? ''
       return reply(200, { qr: qr.startsWith('data:image/') ? qr : '' })
     }
     case 'wa_logout': {

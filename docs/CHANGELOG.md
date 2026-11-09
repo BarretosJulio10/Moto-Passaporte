@@ -9,6 +9,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.66.3] — 09/11/2026 — QR Code do WhatsApp aparece
+
+### Corrigido
+- `messages-admin` (`wa_qr`): a FZAP devolve o QR no campo `qrCode`, e o sistema lia só `QRCode`, então a tela ficava em "Gerando o QR Code…". Agora aceita os dois. Função publicada (v3).
+
 ## [0.66.2] — 09/11/2026 — Um só lugar para conectar o WhatsApp
 
 ### Alterado
