@@ -9,6 +9,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.67.0] — 09/11/2026 — App da Google Play (casca TWA)
+
+### Adicionado
+- `android/`: configuração da casca (`twa-manifest.json`, pacote `br.com.motopassaporte.app`, abre em `/painel?origem=play`) e gerador com o Bubblewrap 1.27.
+- Workflow "Android (TWA)": gera o `.aab` sem assinatura no ramo `twa-build`, com `targetSdk 36` (exigência da Play para apps novos desde 31/08/2026; o modelo do Bubblewrap/PWABuilder ainda vem com 35) e `minSdk 24`. A assinatura é feita fora do GitHub com a chave de envio, que nunca vai para o repositório.
+- `assetlinks.json` com a impressão digital da chave de envio (falta a da chave de assinatura da Google, depois do primeiro envio).
+
+### Alterado
+- Política de privacidade 0.3: avisos, fornecedores (Supabase, Vercel, Resend, WhatsApp, Mercado Pago), onde ficam os dados, retenção, como excluir a conta e contato. Não exige novo aceite (o aceite segue a versão dos Termos).
+
 ## [0.66.4] — 09/11/2026 — Conectar o WhatsApp pelo número
 
 ### Adicionado
