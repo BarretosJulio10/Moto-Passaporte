@@ -3,6 +3,7 @@ import { Link, Outlet } from 'react-router-dom'
 import { Logo } from '@/components/Logo'
 import { ButtonLink } from '@/components/Button'
 import { useAuth } from '@/core/auth/AuthProvider'
+import { isStoreApp } from '@/core/pwa/storeApp'
 
 export function PublicLayout() {
   const { user } = useAuth()
@@ -20,7 +21,7 @@ export function PublicLayout() {
           <nav aria-label="Principal" className="hidden items-center gap-6 text-sm font-medium text-ink md:flex">
             <a href="/#como-funciona" className="hover:underline underline-offset-4">Como funciona</a>
             <a href="/#oficinas" className="hover:underline underline-offset-4">Para oficinas</a>
-            <a href="/#planos" className="hover:underline underline-offset-4">Planos</a>
+            {!isStoreApp() && <a href="/#planos" className="hover:underline underline-offset-4">Planos</a>}
             <Link to="/perguntas-frequentes" className="hover:underline underline-offset-4">Dúvidas</Link>
           </nav>
           <div className="flex items-center gap-1 sm:gap-2">
@@ -50,6 +51,7 @@ export function PublicLayout() {
             <Link to="/contato" className="hover:text-ink hover:underline underline-offset-4">Contato</Link>
             <Link to="/termos" className="hover:text-ink hover:underline underline-offset-4">Termos de uso</Link>
             <Link to="/privacidade" className="hover:text-ink hover:underline underline-offset-4">Política de privacidade</Link>
+            <Link to="/excluir-conta" className="hover:text-ink hover:underline underline-offset-4">Excluir conta</Link>
           </nav>
         </div>
       </footer>

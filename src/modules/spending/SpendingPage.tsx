@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Button, ButtonLink } from '@/components/Button'
+import { Button } from '@/components/Button'
 import { CheckboxField, SelectField, TextField } from '@/components/Field'
 import { Notice } from '@/components/Notice'
 import { PageHeader } from '@/components/AppLayout'
@@ -14,6 +14,7 @@ import {
   filtersToParams, formatPerKm, monthLabel, buildSpendingCsv, downloadText, fetchSpendingExport, type PeriodKey, type SpendingFilters, type SpendingSummary,
 } from './api'
 import { EntryList, ExpenseForm } from './Expenses'
+import { PremiumLink } from '@/modules/plans/PremiumLink'
 
 type Err = { code?: string; message?: string }
 const SOURCES = [['', 'Todas as origens'], ['owner', 'Informado por mim'], ['document', 'Com comprovante'], ['workshop', 'Confirmado por oficina']] as const
@@ -185,7 +186,7 @@ function Locked() {
       <p className="mt-2 max-w-2xl text-graphite">
         No Premium você vê o gasto mês a mês, compara com o ano anterior, separa por categoria e por oficina, calcula o custo por km, a projeção do ano e soma todas as motos.
       </p>
-      <ButtonLink className="mt-4" to="/painel/plano">Conhecer o Premium</ButtonLink>
+      <PremiumLink button className="mt-4">Conhecer o Premium</PremiumLink>
     </section>
   )
 }

@@ -6,7 +6,6 @@ import { Notice } from '@/components/Notice'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { formatDate } from '@/core/shared/format'
 import { downloadQrPng, qrSvg } from './qr'
-import { Link } from 'react-router-dom'
 import { fetchMyVault } from '@/modules/maintenance/api'
 import {
   createShare,
@@ -20,6 +19,7 @@ import {
   type ShareOptions,
   type ShareStatus,
 } from './sharesApi'
+import { PremiumLink } from '@/modules/plans/PremiumLink'
 
 const errText = (e: unknown) => translateDbError(e as { code?: string; message?: string })
 const EXPIRY: Record<string, string> = { '7': '7 dias', '30': '30 dias', '90': '90 dias', none: 'Sem prazo' }
@@ -82,7 +82,7 @@ export function ShareSection({ motorcycleId }: { motorcycleId: string }) {
           {vault.data?.applies && (
             <Notice tone="info" title="Seu comprador verá só um resumo">
               No plano gratuito, o link mostra quantos serviços a moto tem, quantos foram feitos por oficina e o último serviço, mas não a lista com detalhes e comprovantes.{' '}
-              <Link to="/painel/plano" className="font-semibold text-ink underline underline-offset-4">Liberar o histórico completo com o Premium</Link>
+              <PremiumLink>Liberar o histórico completo com o Premium</PremiumLink>
             </Notice>
           )}
           <div className="grid gap-4 sm:grid-cols-2">

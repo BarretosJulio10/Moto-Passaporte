@@ -91,6 +91,7 @@ import { PlansGrid } from './PlansGrid'
 import { AdminSubscriptionsPage } from '@/modules/admin/AdminSubscriptionsPage'
 import { ReceiptPage } from './ReceiptPage'
 import { Route, Routes } from 'react-router-dom'
+import { setStoreAppForTests } from '@/core/pwa/storeApp'
 
 function wrap(node: React.ReactNode, path = '/painel/plano') {
   render(
@@ -170,6 +171,25 @@ describe('Meu plano — bônus Premium', () => {
     sub = { ...active(), status: 'pending' }
     wrap(<MyPlanPage />)
     expect(await screen.findByText(/A primeira cobrança acontece em 08\/02\/2027/)).toBeVisible()
+  })
+})
+
+describe('Meu plano no app da Google Play (modo loja, ADR-063)', () => {
+  const BONUS = { ...FREE_PLAN, code: 'premium_anual', kind: 'premium', name: 'Premium (boas-vindas)', max_motorcycles: 2, bonus: true, bonus_source: 'welcome', bonus_until: '2027-02-09T03:00:00Z' }
+
+  it('mostra a situação do plano sem preço, botão ou link de compra', async () => {
+    setStoreAppForTests(true)
+    myPlan = BONUS
+    sub = { ...active(), status: 'past_due', grace_until: '2026-12-10T12:00:00Z' }
+    passes = []
+    wrap(<MyPlanPage />)
+    expect(await screen.findByText(/Depois disso, o plano gratuito cobre 1 moto/)).toBeVisible()
+    expect(screen.queryByRole('button', { name: /Assinar|Pagar|moto extra/i })).not.toBeInTheDocument()
+    expect(screen.queryByText(/R\$/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Mercado Pago/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/a não ser que você assine/)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cancelar assinatura' })).toBeVisible()
+    setStoreAppForTests(null)
   })
 })
 

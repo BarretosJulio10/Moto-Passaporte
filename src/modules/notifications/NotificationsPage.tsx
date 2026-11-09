@@ -7,6 +7,10 @@ import { translateDbError } from '@/core/shared/dbErrors'
 import { PushCard } from './PushCard'
 import { PageHeader } from '@/components/AppLayout'
 import { KIND_LABEL, fetchNotifications, fetchPreferences, markRead, setPreference, type NotificationPreference } from './api'
+import { storeSafeText } from '@/core/pwa/storeApp'
+
+// Avisos de plano: no app da Google Play, sem convite para comprar (ADR-063).
+const PLAN_KINDS = new Set(['subscription_ending', 'payment_failed', 'payment_approved', 'storage_limit'])
 
 const when = (iso: string) => new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
 
@@ -99,7 +103,7 @@ export function NotificationsPage() {
                 </p>
                 <span className="text-sm text-muted">{when(n.created_at)}</span>
               </div>
-              {n.body && <p className="mt-1 break-words text-graphite">{n.body}</p>}
+              {n.body && <p className="mt-1 break-words text-graphite">{PLAN_KINDS.has(n.kind) ? storeSafeText(n.body) : n.body}</p>}
             </li>
           ))}
         </ol>

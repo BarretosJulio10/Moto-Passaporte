@@ -16,6 +16,7 @@ import { TransferSection } from '@/modules/transfers/TransferSection'
 import { ShareSection } from '@/modules/sharing/ShareSection'
 import { MotoSpendingCard } from '@/modules/spending/SpendingCards'
 import { RemindersSection } from '@/modules/reminders/RemindersSection'
+import { PremiumLink } from '@/modules/plans/PremiumLink'
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
@@ -59,7 +60,7 @@ export function MotorcyclePage() {
         <div className="mt-6">
           <Notice tone="info" title="Moto só para leitura">
             Esta moto passou do limite do seu plano. O histórico continua guardado, mas novos registros ficam bloqueados.{' '}
-            <Link to="/painel/plano" className="font-semibold underline underline-offset-4">Incluir moto extra no plano</Link>
+            <PremiumLink className="font-semibold underline underline-offset-4">Incluir moto extra no plano</PremiumLink>
           </Notice>
         </div>
       )}

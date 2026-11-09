@@ -6,6 +6,7 @@ import { HomePage } from '@/modules/public_site/HomePage'
 import { LegalPage } from '@/modules/public_site/LegalPage'
 import { FaqPage } from '@/modules/public_site/FaqPage'
 import { ContactPage } from '@/modules/public_site/ContactPage'
+import { DeleteAccountPage } from '@/modules/public_site/DeleteAccountPage'
 import { InstallPage } from '@/modules/public_site/InstallPage'
 import { UpdateBanner } from '@/core/pwa/PwaBanners'
 import { SignUpPage } from '@/modules/auth/SignUpPage'
@@ -152,6 +153,7 @@ export const routes = [
           { path: '/', element: <HomePage /> },
           { path: '/perguntas-frequentes', element: <FaqPage /> },
           { path: '/contato', element: <ContactPage /> },
+          { path: '/excluir-conta', element: <DeleteAccountPage /> },
           { path: '/instalar', element: <InstallPage /> },
           { path: '/criar-conta', element: <SignUpPage /> },
           { path: '/entrar', element: <SignInPage /> },

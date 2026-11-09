@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/Button'
 import { SelectField, TextField } from '@/components/Field'
@@ -23,6 +22,7 @@ import {
   type Reminder,
   type ReminderInput,
 } from './api'
+import { PremiumLink } from '@/modules/plans/PremiumLink'
 
 const STATUS_STYLE: Record<Reminder['status'], string> = {
   due: 'bg-danger text-sheet',
@@ -133,7 +133,7 @@ export function RemindersSection({ motorcycleId }: { motorcycleId: string }) {
         <p className="mt-1 max-w-2xl text-muted">
           Avisos de troca de óleo, revisão, pneus e o que mais você quiser, por quilometragem ou por data. Recurso do Premium.
         </p>
-        <Link to="/painel/plano" className="mt-3 inline-block font-semibold text-ink underline underline-offset-4">Conhecer o Premium</Link>
+        <PremiumLink className="mt-3 inline-block font-semibold text-ink underline underline-offset-4">Conhecer o Premium</PremiumLink>
       </section>
     )
   }
@@ -150,7 +150,7 @@ export function RemindersSection({ motorcycleId }: { motorcycleId: string }) {
       {!premium && (
         <p className="mt-2 text-sm text-muted">
           Seu plano atual não cria nem edita lembretes. Você ainda pode concluir, pausar ou excluir os que já tem.{' '}
-          <Link to="/painel/plano" className="font-semibold text-ink underline underline-offset-4">Ver planos</Link>
+          <PremiumLink>Ver planos</PremiumLink>
         </p>
       )}
       {error && <div className="mt-3"><Notice tone="error">{error}</Notice></div>}

@@ -5,6 +5,7 @@ import { Button } from '@/components/Button'
 import { Notice } from '@/components/Notice'
 import { LEGAL_VERSIONS } from '@/core/config/env'
 import { getSupabase } from '@/lib/supabase'
+import { PremiumLink } from '@/modules/plans/PremiumLink'
 
 async function fetchAcceptedVersion(userId: string): Promise<string | null> {
   const { data, error } = await getSupabase().from('profiles').select('terms_version').eq('id', userId).maybeSingle()
@@ -59,7 +60,7 @@ export function TermsGate({ userId }: { userId: string }) {
         {error && <div className="mt-3"><Notice tone="error">{error}</Notice></div>}
         <div className="mt-5 flex flex-wrap gap-2">
           <Button loading={busy} onClick={accept}>Li e aceito</Button>
-          <Link to="/painel/plano" className="px-3 py-2 text-sm font-semibold text-ink underline underline-offset-4">Ver planos</Link>
+          <PremiumLink className="px-3 py-2 text-sm font-semibold text-ink underline underline-offset-4">Ver planos</PremiumLink>
         </div>
       </div>
     </div>

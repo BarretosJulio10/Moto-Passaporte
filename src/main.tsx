@@ -6,7 +6,10 @@ import { App } from './App'
 import './index.css'
 import { installStaleChunkReload } from '@/core/shared/staleChunk'
 import { registerServiceWorker } from '@/core/pwa/pwa'
+import { isStoreApp } from '@/core/pwa/storeApp'
 
+// Detecta o app da Google Play antes de qualquer redirecionamento apagar o ?origem=play (ADR-063).
+if (isStoreApp()) document.documentElement.classList.add('store-app')
 installStaleChunkReload()
 registerServiceWorker()
 

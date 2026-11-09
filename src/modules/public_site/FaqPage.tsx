@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { usePublicSettings } from './usePublicSettings'
+import { isStoreApp } from '@/core/pwa/storeApp'
 
 // Respostas fiéis ao que existe hoje. Recursos ainda não lançados são indicados como "em breve" (PRD 3.4).
 
@@ -100,10 +101,10 @@ export function FaqPage() {
           q: 'Preciso pagar para usar?',
           a: `Não. O plano gratuito permite ${limitText}, com histórico básico e compartilhamento com compradores. O Premium, com mais espaço para anexos, relatórios em PDF e lembretes, chega em breve.`,
         },
-        {
+        ...(isStoreApp() ? [] : [{
           q: 'Como será o pagamento do Premium?',
           a: 'Pelo Mercado Pago, em ambiente seguro do próprio Mercado Pago. O Moto Passaporte não guarda número de cartão.',
-        },
+        }]),
         {
           q: 'Se eu cancelar, perco o histórico?',
           a: 'Não. O cancelamento encerra os benefícios Premium, mas a identidade da moto e o histórico continuam. Antes de qualquer mudança nos anexos, você será avisado e poderá exportar seus dados.',

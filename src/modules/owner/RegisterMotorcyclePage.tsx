@@ -1,3 +1,4 @@
+import { storeSafeText } from '@/core/pwa/storeApp'
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
@@ -11,6 +12,7 @@ import { registerMotorcycleSchema } from '@/modules/motorcycles/schemas'
 import { registerMotorcycle } from '@/modules/motorcycles/api'
 import { OIL_SUGGESTED_KM, setCare } from '@/modules/motorcycles/careApi'
 import { useFipeSuggestions } from '@/components/Autofill'
+import { PremiumLink } from '@/modules/plans/PremiumLink'
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -87,8 +89,8 @@ export function RegisterMotorcyclePage() {
       </p>
 
       <form onSubmit={onSubmit} noValidate className="mt-8 flex flex-col gap-8">
-        {formError && <Notice tone="error">{formError}{/limite/i.test(formError) && (
-          <> <Link to="/painel/plano" className="font-semibold underline underline-offset-4">O Premium inclui 2 motos e cada moto a mais custa a partir de R$ 3,90 por mês.</Link></>
+        {formError && <Notice tone="error">{storeSafeText(formError)}{/limite/i.test(formError) && (
+          <> <PremiumLink className="font-semibold underline underline-offset-4">O Premium inclui 2 motos e cada moto a mais custa a partir de R$ 3,90 por mês.</PremiumLink></>
         )}</Notice>}
 
         <Group title="Identificação">

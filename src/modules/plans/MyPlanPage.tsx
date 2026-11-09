@@ -29,6 +29,7 @@ import {
 } from './billingApi'
 import { PlansGrid } from './PlansGrid'
 import { PageHeader } from '@/components/AppLayout'
+import { isStoreApp } from '@/core/pwa/storeApp'
 
 function Meter({ label, used, total, text }: { label: string; used: number; total: number; text: string }) {
   const pct = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0
@@ -59,7 +60,7 @@ export function PlanSummary() {
         <span className="font-semibold text-danger">{daysLeft(p.paid_until) <= 1 ? 'vence hoje' : `vence em ${daysLeft(p.paid_until)} dias`} · </span>
       )}
       <Link to="/painel/plano" className="font-semibold text-ink underline underline-offset-4">
-        {p.paid_until && daysLeft(p.paid_until) <= 7 ? 'Renovar' : 'Ver plano'}
+        {p.paid_until && daysLeft(p.paid_until) <= 7 && !isStoreApp() ? 'Renovar' : 'Ver plano'}
       </Link>
     </p>
   )
@@ -81,7 +82,7 @@ export function PaidUntil({ until, now = new Date() }: { until: string; now?: Da
   return (
     <div className={`mt-3 rounded-doc border p-3 text-sm ${urgent ? 'border-danger bg-paper text-danger' : 'border-rule bg-paper text-graphite'}`} role={urgent ? 'alert' : 'status'}>
       <p className="font-semibold">{text}</p>
-      {soon && (
+      {soon && !isStoreApp() && (
         <p className="mt-1">
           Renove por Pix, débito ou boleto: o novo período começa quando o atual terminar, sem perder dias.{' '}
           <a href="#planos" className="font-semibold text-ink underline underline-offset-4">Renovar agora</a>
@@ -100,7 +101,7 @@ function SubscriptionCard({ sub, onCancel, canceling, bonusUntil }: { sub: MySub
         <span className="rounded-doc bg-paper px-2 py-0.5 text-sm text-graphite">{STATUS_LABEL[sub.status]}</span>
       </div>
       <p className="mt-1 text-sm text-muted">
-        {formatPlanPrice(sub.price_cents)} · {PERIOD_LABEL[sub.billing_period]}
+        {isStoreApp() ? '' : `${formatPlanPrice(sub.price_cents)} · `}{PERIOD_LABEL[sub.billing_period]}
         {sub.environment === 'test' ? ' · ambiente de teste' : ''}
       </p>
       <div className="mt-3 text-sm text-graphite">
@@ -111,7 +112,7 @@ function SubscriptionCard({ sub, onCancel, canceling, bonusUntil }: { sub: MySub
         {sub.status === 'active' && <p>Próxima renovação em {date(sub.current_period_end)}.</p>}
         {sub.status === 'past_due' && (
           <p className="text-danger">
-            A última cobrança não foi aprovada. O Premium continua até {date(sub.grace_until)}; confira o cartão no Mercado Pago.
+            A última cobrança não foi aprovada. O Premium continua até {date(sub.grace_until)}{isStoreApp() ? '.' : '; confira o cartão no Mercado Pago.'}
           </p>
         )}
         {sub.status === 'paused' && <p>Assinatura pausada. O Premium vale até {date(sub.current_period_end)}.</p>}
@@ -212,10 +213,13 @@ export function MyPlanPage() {
   const used = plan.data?.motorcycles_used ?? 0
   const extraCount = extras ?? Math.max(0, used - 2)
   const hasOpen = Boolean(s && ['active', 'past_due', 'paused'].includes(s.status))
+  // App da Google Play: só a situação do plano, sem preços, compra ou histórico de pagamentos (ADR-063).
+  const store = isStoreApp()
+  const freeMax = settings?.freePlanMaxMotorcycles ?? 1
 
   return (
     <div>
-      <PageHeader title="Meu plano" intro="Uso, assinatura, pagamentos e opções do Premium." />
+      <PageHeader title="Meu plano" intro={store ? 'Uso e situação do seu plano.' : 'Uso, assinatura, pagamentos e opções do Premium.'} />
       {message && <div className="mt-4 max-w-3xl"><Notice tone={message.tone}>{message.text}</Notice></div>}
       <div className="mt-2 grid items-start gap-x-10 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]">
       <div className="min-w-0">
@@ -228,7 +232,9 @@ export function MyPlanPage() {
           {plan.data.bonus && (
             <p className="mt-1 text-sm text-graphite">
               {plan.data.bonus_until
-                ? <>{plan.data.bonus_source === 'welcome' ? 'Premium de boas-vindas' : 'Bônus Premium'} sem cobrança até <strong>{bonusLastDay(plan.data.bonus_until)}</strong>. Depois disso a conta volta ao gratuito, a não ser que você assine. Se assinar agora, a primeira cobrança só acontece quando o bônus terminar.</>
+                ? store
+                  ? <>{plan.data.bonus_source === 'welcome' ? 'Premium de boas-vindas' : 'Bônus Premium'} até <strong>{bonusLastDay(plan.data.bonus_until)}</strong>. Depois disso, o plano gratuito cobre {freeMax} {freeMax === 1 ? 'moto' : 'motos'}.</>
+                  : <>{plan.data.bonus_source === 'welcome' ? 'Premium de boas-vindas' : 'Bônus Premium'} sem cobrança até <strong>{bonusLastDay(plan.data.bonus_until)}</strong>. Depois disso a conta volta ao gratuito, a não ser que você assine. Se assinar agora, a primeira cobrança só acontece quando o bônus terminar.</>
                 : 'Bônus Premium sem cobrança, sem prazo para terminar.'}
             </p>
           )}
@@ -251,11 +257,11 @@ export function MyPlanPage() {
         </section>
       )}
 
-      <ExtraMotorcyclesCard />
+      {!store && <ExtraMotorcyclesCard />}
 
       {s && <SubscriptionCard sub={s} onCancel={() => cancel.mutate()} canceling={cancel.isPending} bonusUntil={plan.data?.bonus ? plan.data.bonus_until : null} />}
 
-      {invoices.data && invoices.data.length > 0 && (
+      {!store && invoices.data && invoices.data.length > 0 && (
         <section className="mt-8" aria-labelledby="invoices-title">
           <h2 id="invoices-title" className="heading text-xl text-ink">Faturas</h2>
           <ul className="mt-3 divide-y divide-rule border-y border-rule text-sm">
@@ -282,7 +288,7 @@ export function MyPlanPage() {
         </section>
       )}
 
-      {passes.data && passes.data.length > 0 && (
+      {!store && passes.data && passes.data.length > 0 && (
         <section className="mt-8" aria-labelledby="passes-title">
           <h2 id="passes-title" className="heading text-xl text-ink">Pagamentos por Pix, débito ou boleto</h2>
           <ul className="mt-3 divide-y divide-rule border-y border-rule text-sm">
@@ -310,7 +316,7 @@ export function MyPlanPage() {
         </section>
       )}
 
-      {payments.data && payments.data.length > 0 && (
+      {!store && payments.data && payments.data.length > 0 && (
         <section className="mt-8" aria-labelledby="payments-title">
           <h2 id="payments-title" className="heading text-xl text-ink">Tentativas de pagamento</h2>
           <ul className="mt-3 divide-y divide-rule border-y border-rule text-sm">
@@ -330,7 +336,7 @@ export function MyPlanPage() {
 
       </div>
       <div className="min-w-0">
-      {settings && settings.plans.length > 0 && !hasOpen && (
+      {!store && settings && settings.plans.length > 0 && !hasOpen && (
         <section className="mt-8 rounded-sheet border border-rule bg-sheet p-5 sm:p-6" id="planos" aria-labelledby="options-title">
           <h2 id="options-title" className="heading text-2xl text-ink">{plan.data?.paid_until ? 'Renovar ou mudar de plano' : 'Planos disponíveis'}</h2>
           {settings.billingEnabled && <ExtrasPicker value={extraCount} onChange={setExtras} used={used} />}

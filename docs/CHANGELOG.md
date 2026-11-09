@@ -9,6 +9,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.65.0] — 09/11/2026 — Modo loja (app na Google Play, fase 1)
+
+### Adicionado
+- **Modo loja (ADR-063):** dentro do app baixado da Google Play não aparece preço, botão, link nem texto de compra. Meu plano mostra só a situação do plano e das motos ("Depois disso, o plano gratuito cobre 1 moto"); some a seção Planos da página inicial e a pergunta sobre pagamento. O site e o app instalado pelo navegador continuam iguais.
+- Página pública **Como excluir sua conta** (`/excluir-conta`), com link no rodapé (exigência da Google Play).
+- `/.well-known/assetlinks.json` para o app da loja abrir sem barra de navegador (a impressão digital entra quando o Play Console gerar a chave).
+
+### Mudado
+- Notificações de plano no celular saem sem convite para comprar ou renovar; o texto completo continua no sino do site.
+
 ## [0.64.1] — 09/11/2026 — Domínio próprio
 
 ### Mudado

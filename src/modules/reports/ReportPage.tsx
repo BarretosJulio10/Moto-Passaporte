@@ -14,6 +14,7 @@ import { hasEntitlement } from '@/modules/plans/api'
 import { useMyPlan } from '@/modules/plans/useMyPlan'
 import { fetchMotorcycleAccess } from '@/modules/workshop_access/api'
 import { registerReport } from './api'
+import { PremiumLink } from '@/modules/plans/PremiumLink'
 
 const KIND_LABEL: Record<string, string> = {
   invoice: 'nota fiscal',
@@ -91,7 +92,7 @@ export function ReportPage() {
           Um documento organizado com a identificação da moto, a quilometragem documentada e todo o histórico de serviços, pronto para imprimir ou
           enviar a um comprador. Recurso do Premium.
         </p>
-        <Link to="/painel/plano" className="mt-4 inline-block font-semibold text-ink underline underline-offset-4">Conhecer o Premium</Link>
+        <PremiumLink className="mt-4 inline-block font-semibold text-ink underline underline-offset-4">Conhecer o Premium</PremiumLink>
       </div>
     )
   }

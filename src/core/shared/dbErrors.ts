@@ -1,3 +1,5 @@
+import { storeSafeText } from '@/core/pwa/storeApp'
+
 // Converte erros do banco (PostgREST/RPC) em mensagens para o usuário.
 // As funções do banco já lançam mensagens em português para regras de negócio
 // (códigos P0001 e 22023); essas são exibidas como vieram.
@@ -28,10 +30,10 @@ export function translateDbError(error: MaybeDbError): string {
     case 'P0001':
     case 'P0002':
     case '22023':
-      return message || 'Confira os dados informados.'
+      return message ? storeSafeText(message) : 'Confira os dados informados.'
     case '42501':
       // As funções do banco usam 42501 com motivo em português (ex.: "conta desligada").
-      return message && !SYSTEM_MESSAGE.test(message) ? message : 'Você não tem permissão para esta operação.'
+      return message && !SYSTEM_MESSAGE.test(message) ? storeSafeText(message) : 'Você não tem permissão para esta operação.'
     case '23505':
       return 'Já existe um registro com esses dados.'
     case '23514':

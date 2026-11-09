@@ -16,6 +16,16 @@ type Item = {
 
 const URGENT = new Set(['workshop_access_request', 'transfer_received', 'payment_failed'])
 
+// Avisos de plano: no celular vão sem convite para comprar ou renovar, porque o app da Google Play
+// mostra essas notificações e lá a compra não pode ser oferecida (ADR-063). O sino e o e-mail levam o texto completo.
+const PLAN_KINDS = new Set(['subscription_ending', 'payment_failed', 'payment_approved', 'storage_limit'])
+const PURCHASE_HINT = /moto extra|meu plano|assin|premium|pagamento|pix|r\$|renov|mercado pago|conheça/i
+export function neutralBody(kind: string, body: string): string {
+  if (!PLAN_KINDS.has(kind)) return body
+  const kept = body.split(/(?<=[.!?])\s+/).filter((s) => !PURCHASE_HINT.test(s)).join(' ').trim()
+  return kept || 'Toque para ver a situação do seu plano.'
+}
+
 async function loadKeys(server: Server): Promise<{ keys: VapidKeys; subject: string }> {
   const { data, error } = await server.rpc('push_get_keys')
   if (error) throw new Error(`chaves: ${error.message}`)
@@ -45,7 +55,7 @@ async function deliver(server: Server): Promise<{ sent: number; devices: number;
       sent++
       const payload = {
         title: it.title,
-        body: (it.body ?? '').slice(0, 180),
+        body: neutralBody(it.kind, it.body ?? '').slice(0, 180),
         url: it.link && it.link.startsWith('/') ? it.link : '/painel/notificacoes',
         tag: it.kind,
         id: it.notification_id,

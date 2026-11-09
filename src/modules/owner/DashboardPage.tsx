@@ -18,6 +18,7 @@ import { PageHeader } from '@/components/AppLayout'
 import { daysSince, fetchCare } from '@/modules/motorcycles/careApi'
 import { MyWorkshopsCard } from '@/modules/customer_link/MyWorkshopsCard'
 import { DashboardSpendingCard } from '@/modules/spending/SpendingCards'
+import { isStoreApp } from '@/core/pwa/storeApp'
 
 export function DashboardPage() {
   const { user } = useAuth()
@@ -143,7 +144,7 @@ function MotoCard({ moto: m }: { moto: Moto }) {
 function QuickLinks() {
   const links: [string, string, string][] = [
     ['/painel/notificacoes', 'Notificações e avisos no celular', 'Ative os avisos e escolha o que receber.'],
-    ['/painel/plano', 'Meu plano', 'Uso, pagamentos e Premium.'],
+    ['/painel/plano', 'Meu plano', isStoreApp() ? 'Uso e situação do plano.' : 'Uso, pagamentos e Premium.'],
     ['/instalar', 'Instalar o app', 'Ícone na tela inicial e avisos com o app fechado.'],
   ]
   return (

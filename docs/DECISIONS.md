@@ -109,6 +109,14 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-063 — App na Google Play (casca TWA) e modo loja
+**Data:** 09/11/2026 · **Status:** aceita (responsável: publicar na Play com conta pessoal; compra só pelo site; avisos com link por e-mail e WhatsApp, fora do app)
+- O app da Play é uma casca (Trusted Web Activity, gerada pelo PWABuilder) que abre `https://www.motopassaporte.com.br/painel?origem=play`; pacote `br.com.motopassaporte.app`, nome "Moto Passaporte". Atualizações do site valem no app sem nova versão na loja.
+- Regra de pagamentos da Play no Brasil: dentro do app não pode haver preço, botão, link nem texto levando a pagar fora da Google (link externo só existe nos programas dos EUA, EEE e Japão). Por isso o **modo loja**: `src/core/pwa/storeApp.ts` detecta a casca por `?origem=play` ou `document.referrer = android-app://br.com.motopassaporte.app` e guarda só na `sessionStorage` (a casca divide o armazenamento com o Chrome; guardar para sempre esconderia a compra no navegador).
+- No modo loja: `PremiumLink` não aparece; Meu plano mostra só a situação (sem preços, moto extra, faturas, Pix, planos); página inicial sem a seção Planos; dúvidas sem a pergunta de pagamento; mensagens do servidor e avisos de plano passam por `storeSafeText` (tira frases de compra). Notificações no celular de plano vão sempre neutras (`push-send`), porque a casca as exibe.
+- Exigências da Play: `/.well-known/assetlinks.json` (falta a impressão digital SHA-256 que o Play Console gera) e página pública `/excluir-conta`.
+- O convite para comprar vai por fora do app: e-mail (Resend) e WhatsApp (FZAP), fases seguintes.
+
 ### ADR-062 — Premium com 2 motos e moto extra
 **Data:** 09/11/2026 · **Status:** aceita (responsável: 2 motos no Premium, moto extra a R$ 3,90; aceitou as sugestões de R$ 19,90/semestre, R$ 34,90/ano, teste com 2 motos e moto excedente só leitura)
 - `subscription_plans.extra_motorcycle_cents` (editável no admin com motivo). Assinatura e período Pix guardam `extra_motorcycles` e o valor na compra; `max_motorcycles`/`price_cents` já somam as extras (contrato não muda com o catálogo).

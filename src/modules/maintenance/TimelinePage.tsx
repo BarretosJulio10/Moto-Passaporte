@@ -13,6 +13,7 @@ import { formatBRL } from './schemas'
 import { timelineToSpendingQuery, timelineTotal } from '@/modules/spending/api'
 import { getStorageUsage, uploadAll } from '@/modules/attachments/api'
 import type { PendingAttachment } from '@/modules/attachments/AttachmentPicker'
+import { PremiumLink } from '@/modules/plans/PremiumLink'
 
 const SOURCES = Object.keys(SOURCE_LABEL) as RecordSource[]
 
@@ -103,7 +104,7 @@ export function TimelinePage() {
           <Notice tone="info" title={`${lockedCount} ${lockedCount === 1 ? 'registro está' : 'registros estão'} no cofre`}>
             No plano gratuito, só os {vault.data?.open_records ?? 2} registros mais recentes de cada moto mostram detalhes e comprovantes.
             Os demais estão guardados e seguros, e você pode exportar tudo em Minha conta.{' '}
-            <Link to="/painel/plano" className="font-semibold text-ink underline underline-offset-4">Abrir o histórico completo com o Premium</Link>
+            <PremiumLink>Abrir o histórico completo com o Premium</PremiumLink>
           </Notice>
         </div>
       )}

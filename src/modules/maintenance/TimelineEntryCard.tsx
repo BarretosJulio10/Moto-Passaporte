@@ -10,6 +10,7 @@ import type { TimelineEntry } from './api'
 import { AttachmentList } from '@/modules/attachments/AttachmentList'
 import { AttachmentPicker, type PendingAttachment } from '@/modules/attachments/AttachmentPicker'
 import { MAX_FILES_PER_RECORD, type StorageUsage } from '@/modules/attachments/files'
+import { PremiumLink } from '@/modules/plans/PremiumLink'
 
 type Props = {
   entry: TimelineEntry
@@ -103,7 +104,7 @@ export function TimelineEntryCard({ entry: e, successor, original, onVoid, onAtt
         </div>
         <p className="mt-3 text-sm text-graphite">
           Detalhes e comprovantes deste serviço estão guardados e disponíveis no Premium.{' '}
-          <Link to="/painel/plano" className="font-semibold text-ink underline underline-offset-4">Ver planos</Link>
+          <PremiumLink>Ver planos</PremiumLink>
         </p>
       </article>
     )

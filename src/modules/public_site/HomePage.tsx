@@ -2,6 +2,7 @@ import { ButtonLink } from '@/components/Button'
 import { PassportSpecimen } from './PassportSpecimen'
 import { usePublicSettings, welcomeLabel } from './usePublicSettings'
 import { PlansGrid } from '@/modules/plans/PlansGrid'
+import { isStoreApp } from '@/core/pwa/storeApp'
 
 const STEPS = [
   {
@@ -164,8 +165,8 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Planos — valores vêm da configuração; nada fixo no código */}
-      <section id="planos" className="scroll-mt-20 border-t border-rule bg-sheet">
+      {/* Planos — valores vêm da configuração; nada fixo no código. Fora do app da Google Play (ADR-063). */}
+      {!isStoreApp() && <section id="planos" className="scroll-mt-20 border-t border-rule bg-sheet">
         <div className="mx-auto max-w-6xl px-5 py-16">
           <h2 className="heading text-3xl text-ink">Planos</h2>
           {(settings?.welcomePremiumDays ?? 0) > 0 && (
@@ -201,7 +202,7 @@ export function HomePage() {
           </div>
           )}
         </div>
-      </section>
+      </section>}
     </>
   )
 }

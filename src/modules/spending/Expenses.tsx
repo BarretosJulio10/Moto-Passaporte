@@ -1,3 +1,4 @@
+import { isStoreApp } from '@/core/pwa/storeApp'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -11,6 +12,7 @@ import {
   EXPENSE_CATEGORIES, EXPENSE_CATEGORY_LABEL, categoryLabel, deleteExpense, isExpenseCategory, receiptUrl, saveExpense,
   type ExpenseCategory, type SpendingEntry,
 } from './api'
+import { PremiumLink } from '@/modules/plans/PremiumLink'
 
 const centsToInput = (c: number | null) => (c == null ? '' : (c / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
 
@@ -74,7 +76,8 @@ export function ExpenseForm({ motos, motoId, entry, left, onDone }: {
       </p>
       {blocked ? (
         <div className="mt-3"><Notice tone="info" title="Limite do mês atingido">
-          Você já lançou as despesas que o plano gratuito permite neste mês. <Link to="/painel/plano" className="underline underline-offset-4">Conheça o Premium</Link> para lançar sem limite.
+          Você já lançou as despesas que o plano gratuito permite neste mês.{isStoreApp() ? '' : ' '}
+          {!isStoreApp() && <><PremiumLink className="underline underline-offset-4">Conheça o Premium</PremiumLink> para lançar sem limite.</>}
         </Notice></div>
       ) : (
         <>
