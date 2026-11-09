@@ -75,7 +75,7 @@ function Dashboard({ orgId, shop, perms }: { orgId: string; shop: MyWorkshop; pe
           </Notice>
         </div>
       )}
-      <PageHeader title="Visão geral"
+      <PageHeader title="Resultados"
         intro={<>{place} · {shop.role === 'responsible' ? 'você é o responsável' : 'você é da equipe'} ·{' '}
           <a href={`/oficinas/${shop.public_slug}`} target="_blank" rel="noreferrer" className="underline underline-offset-4">ver perfil público</a></>}
         actions={<>

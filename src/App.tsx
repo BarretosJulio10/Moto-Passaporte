@@ -56,6 +56,8 @@ const ReportsPage = lazy(() => import('@/modules/workshop/management/ReportsPage
 const RelationshipPage = lazy(() => import('@/modules/workshop/management/RelationshipPage').then((m) => ({ default: m.RelationshipPage })))
 const ReviewsPage = lazy(() => import('@/modules/workshop/growth/ReviewsPage').then((m) => ({ default: m.ReviewsPage })))
 const CampaignsPage = lazy(() => import('@/modules/workshop/growth/CampaignsPage').then((m) => ({ default: m.CampaignsPage })))
+const EsteiraPage = lazy(() => import('@/modules/workshop/flow/EsteiraPage').then((m) => ({ default: m.EsteiraPage })))
+const CaixaPage = lazy(() => import('@/modules/workshop/flow/CaixaPage').then((m) => ({ default: m.CaixaPage })))
 const PistaLayout = lazy(() => import('@/modules/pista/PistaApp').then((m) => ({ default: m.PistaLayout })))
 const PistaHomePage = lazy(() => import('@/modules/pista/PistaApp').then((m) => ({ default: m.PistaHomePage })))
 const PistaOrderPage = lazy(() => import('@/modules/pista/PistaOrderPage').then((m) => ({ default: m.PistaOrderPage })))
@@ -192,7 +194,9 @@ export const routes = [
           { path: '/painel/motos/:id/diario/:entryId/editar', element: <DiaryFormPage /> },
           { path: '/oficina', element: <WorkshopIndexPage /> },
           { path: '/oficina/nova', element: <CreateWorkshopPage /> },
-          { path: '/oficina/:orgId', element: <WorkshopDashboardPage /> },
+          { path: '/oficina/:orgId', element: <EsteiraPage /> },
+          { path: '/oficina/:orgId/resultados', element: <WorkshopDashboardPage /> },
+          { path: '/oficina/:orgId/caixa', element: <CaixaPage /> },
           { path: '/oficina/:orgId/perfil', element: <WorkshopShellRoute><WorkshopProfilePage /></WorkshopShellRoute> },
           { path: '/oficina/:orgId/equipe', element: <WorkshopShellRoute><TeamPage /></WorkshopShellRoute> },
           { path: '/oficina/:orgId/pista', element: <WorkshopShellRoute><PistaInstallPage /></WorkshopShellRoute> },

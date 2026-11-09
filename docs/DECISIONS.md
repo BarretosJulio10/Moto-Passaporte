@@ -109,6 +109,13 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-059 — Esteira da oficina (fluxo em ordem de trabalho)
+**Data:** 09/11/2026 · **Status:** aceita (Fase A; responsável pediu "execute" sobre o plano https://claude.ai/artifact/MutLTuC3J7vzqxyEJsF9JZ)
+- Tela inicial da oficina = Esteira; as 13 situações da OS e as do orçamento são agrupadas em 7 etapas só na tela (`src/modules/workshop/flow/stages.ts`), sem mudar o banco. Orçamento aprovado sem OS aparece em "Aprovado" com "Abrir OS".
+- Valores (saldo, pago) só para quem tem financeiro. Sem arrastar cartões: o cartão anda pelo botão do próximo passo, que abre a tela atual da OS ou do orçamento.
+- Decisões assumidas pelas sugestões do plano até o responsável dizer o contrário: serviço rápido sem orçamento continua ("Abrir OS direto"); entregar com saldo em aberto continua permitido; tablet usa a conta de quem atende.
+- Próximas fases (B entrada antes do orçamento, com mudança no banco; C/D acabamento) aguardam validação.
+
 ### ADR-058 — Conta da pista (mecânico criado pelo responsável)
 **Data:** 09/11/2026 · **Status:** aceita (decisões do responsável: apelido + senha; cada mecânico digita o próprio apelido; convidados viram conta da pista)
 - Login no Supabase Auth com e-mail interno `<apelido>.<código>@pista.motopassaporte.com.br` (subdomínio sem e-mail), criado pela Edge Function `pista-accounts` com `email_confirm` e `app_metadata.account_kind = 'pista'`. Apelido `^[a-z0-9]{2,20}$`, único na oficina; código da oficina em `organizations.pista_code` (6 caracteres, sem ambíguos).

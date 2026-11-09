@@ -14,13 +14,14 @@ export type NavGroup = { label: string; items: NavItem[] }
 
 export const WORKSHOP_NAV: NavGroup[] = [
   {
-    label: 'Dia a dia',
+    // Na ordem em que a moto anda na oficina (plano do fluxo, Fase A).
+    label: 'Trabalho',
     items: [
-      { to: '', label: 'Visão geral', end: true },
-      { to: 'pista', label: 'App da Pista' },
+      { to: '', label: 'Esteira', end: true },
       { to: 'agenda', label: 'Agenda' },
       { to: 'orcamentos', label: 'Orçamentos' },
       { to: 'os', label: 'Ordens de serviço' },
+      { to: 'caixa', label: 'Caixa' },
     ],
   },
   {
@@ -36,6 +37,7 @@ export const WORKSHOP_NAV: NavGroup[] = [
   {
     label: 'Gestão',
     items: [
+      { to: 'resultados', label: 'Resultados' },
       { to: 'financeiro', label: 'Financeiro', show: (p) => p.manage_finance },
       { to: 'relatorios', label: 'Relatórios', show: (p) => p.manage_quotes || p.manage_finance },
       { to: 'servicos', label: 'Serviços e preços' },
@@ -46,6 +48,7 @@ export const WORKSHOP_NAV: NavGroup[] = [
     label: 'Oficina',
     items: [
       { to: 'equipe', label: 'Equipe' },
+      { to: 'pista', label: 'App da Pista' },
       { to: 'perfil', label: 'Perfil da oficina', show: (_p, shop) => shop.role === 'responsible' },
     ],
   },

@@ -9,6 +9,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.59.0] — 09/11/2026 — Esteira da oficina (fluxo em ordem de trabalho, Fase A)
+
+### Adicionado
+- **Esteira** como tela inicial da oficina (`/oficina/:id`): 7 etapas na ordem em que a moto anda (Entrada, Diagnóstico, Orçamento, Aprovado, Na pista, Caixa, Entregue hoje). Cada moto é um cartão com placa grande, cliente, mecânico, há quanto tempo, selos (atrasada, cliente não abriu, aguardando peça, pronto, pago, saldo a receber) e o botão do próximo passo. Busca por placa, cliente ou número; contadores do dia; "Chegam hoje" da agenda; atualiza sozinha a cada 20 s.
+- **Modo toque:** tela cheia para tablet ou celular no balcão, cartões e botões grandes; o aparelho lembra a escolha.
+- **Caixa** (`/oficina/:id/caixa`): prontas pelo mecânico, concluídas para cobrar e aguardando retirada; cada cartão abre a OS com pagamento e entrega.
+
+### Mudado
+- Menu da oficina na ordem do trabalho: **Trabalho** (Esteira, Agenda, Orçamentos, Ordens de serviço, Caixa) · Clientes · **Gestão** (Resultados, Financeiro, Relatórios, Serviços e preços, Peças) · **Oficina** (Equipe, App da Pista, Perfil).
+- A antiga Visão geral virou **Resultados** (`/oficina/:id/resultados`), sem mudar o conteúdo.
+- Sem mudança no banco: a esteira lê as OS, os orçamentos e o financeiro que já existem.
+
 ## [0.58.3] — 09/11/2026 — Instalar a pista ao lado do app do cliente e liberar o microfone
 
 ### Corrigido
