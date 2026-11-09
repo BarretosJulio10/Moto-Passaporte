@@ -1,6 +1,6 @@
 # PRD 2.5 — App da Pista (PWA do mecânico)
 
-**Status: implementado e no ar em 09/11/2026 (v0.57.0, ADR-057).** A seção "Conta da pista" (abaixo) está em estudo e aguarda decisões do responsável.
+**Status: implementado e no ar em 09/11/2026 (v0.57.0, ADR-057; conta da pista v0.58.0, ADR-058).**
 
 Plano completo: https://claude.ai/artifact/Kvc2BhR74LdciZbrV2FFsc
 
@@ -25,30 +25,13 @@ Plano completo: https://claude.ai/artifact/Kvc2BhR74LdciZbrV2FFsc
 ## Relacionado (v0.57.1)
 - Janela de pedido de acesso de oficina: abre ao entrar e a cada troca de tela enquanto houver pedido pendente. Opções: Autorizar, Recusar, Ver detalhes, Decidir depois.
 
-## Em estudo — Conta da pista (pedido de 09/11/2026)
-Pedido do responsável:
-- O responsável cadastra o mecânico direto, sem convite, informando nome e apelido (e senha).
-- O mecânico só acessa o App da Pista.
-- O sistema encontra a oficina e loga o mecânico nela.
-- O nome da oficina aparece dentro do app.
+## Conta da pista (v0.58.0, ADR-058) — no ar
+Decisões do responsável em 09/11/2026: login por apelido + senha; no celular compartilhado cada mecânico digita o próprio apelido; quem já foi convidado vira conta da pista e o responsável define a senha.
 
-Proposta:
-1. **Cadastro:** Equipe → "Novo mecânico", com nome, apelido (único na oficina) e senha. "Executar OS" já vem ligado.
-2. **Link por oficina:** `/pista/<código-da-oficina>`. A tela de entrada mostra o nome da oficina e pede apelido + senha.
-3. **Conta marcada "conta da pista":**
-   - Só abre `/pista`; o bloqueio também vale no banco.
-   - Não cadastra moto, não cria oficina, não assina plano e não ganha os 3 meses de Premium.
-4. **Login:** usa um e-mail interno invisível, `apelido.codigo@pista.<domínio>`. A conta é criada por uma Edge Function com service role, que confere se quem pede é o responsável e cria a conta já confirmada. Nada de chave secreta no frontend.
-5. **Gestão pelo responsável:** trocar senha (não existe "esqueci a senha"), desligar o mecânico (bloqueio e saída na hora) e ver o último acesso.
-6. **Convite atual:** continua como opção para quem já tem conta.
-7. **Cuidados:**
-   - Limite de tentativas de login.
-   - LGPD com dados mínimos; aviso de uso no primeiro acesso.
-   - Subdomínio sem serviço de e-mail, de preferência junto com a migração para `motopassaporte.com.br`.
-
-Esforço: médio.
-
-Decisões pendentes:
-1. Formato do login: apelido + senha (sugerido) ou apelido + PIN de 6 números.
-2. "Trocar mecânico" no celular compartilhado: mostrar a lista de apelidos ou cada um digita o seu.
-3. Mecânicos já convidados: manter no convite atual ou converter em "conta da pista".
+- Equipe → "Mecânicos da pista": nome, apelido (único na oficina) e senha (mín. 6). Sem e-mail e sem convite; "Executar OS" já vem ligado.
+- Lista com último acesso, Trocar senha, Desligar (sai na hora; OS em andamento ficam sem mecânico) e Reativar. Não existe "esqueci a senha": o responsável cria outra.
+- Funcionário convidado por e-mail: botão "Virar conta da pista" (apelido e senha); as OS em andamento passam para a conta nova e a conta pessoal sai da equipe.
+- Entrada: `/pista/<código>` mostra o nome da oficina e pede apelido e senha. Sem o link, o app pede o código (aparece no menu "App da Pista" e na Equipe) e guarda no aparelho. "Entrar com e-mail" para o responsável.
+- A conta só usa o App da Pista: bloqueio no banco para toda chamada fora de `pista_*`, envio de arquivos só no bucket da oficina, sem plano nem Premium de boas-vindas; o painel redireciona para `/pista`.
+- Login interno: `apelido.código@pista.motopassaporte.com.br` (ninguém vê; criado no servidor pela função `pista-accounts`).
+- Pendências: tentativas de login seguem o limite padrão do Supabase Auth; trocar o apelido exige criar outro acesso.

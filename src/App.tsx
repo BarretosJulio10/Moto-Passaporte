@@ -140,6 +140,7 @@ export const routes = [
         children: [
           { index: true, element: <Suspense fallback={null}><PistaHomePage /></Suspense> },
           { path: 'os/:orderId', element: <Suspense fallback={null}><PistaOrderPage /></Suspense> },
+          { path: ':code', element: <Suspense fallback={null}><PistaHomePage /></Suspense> },
         ],
       },
       {

@@ -20,5 +20,9 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   if (!user) {
     return <Navigate to="/entrar" replace state={{ from: location.pathname }} />
   }
+  // Conta da pista (ADR-058) só usa o App da Pista; o banco também recusa o resto.
+  if (user.app_metadata?.account_kind === 'pista') {
+    return <Navigate to="/pista" replace />
+  }
   return <>{children}</>
 }

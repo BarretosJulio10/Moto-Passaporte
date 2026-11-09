@@ -38,7 +38,8 @@ describe('App da Pista (ADR-057)', () => {
   })
 
   it('link de instalação e nome da moto', () => {
-    expect(pistaUrl('https://exemplo.com.br')).toBe('https://exemplo.com.br/pista')
+    expect(pistaUrl(undefined, 'https://exemplo.com.br')).toBe('https://exemplo.com.br/pista')
+    expect(pistaUrl('ab12cd', 'https://exemplo.com.br')).toBe('https://exemplo.com.br/pista/ab12cd')
     expect(vehicleLabel({ brand: 'Honda', model: 'CG 160', year: 2022 })).toBe('Honda CG 160 2022')
     expect(vehicleLabel(null)).toBe('Moto sem cadastro')
   })

@@ -14,8 +14,10 @@ export function PistaInstallPage() {
 }
 
 function Content({ orgId, name, responsible }: { orgId: string; name: string; responsible: boolean }) {
-  const url = pistaUrl()
-  const message = `App da Pista da ${name} (Moto Passaporte): abra no celular e instale na tela de início. Entre com o seu e-mail da equipe.\n${url}`
+  const ctx = useQuery({ queryKey: ['pista-context-panel'], queryFn: fetchPistaContext })
+  const code = ctx.data?.find((s) => s.organization_id === orgId)?.code
+  const url = pistaUrl(code)
+  const message = `App da Pista da ${name} (Moto Passaporte): abra no celular e instale na tela de início. Entre com o apelido e a senha que o responsável criou para você. Código da oficina: ${code ?? ''}\n${url}`
   const [svg, setSvg] = useState('')
   const [copied, setCopied] = useState(false)
   useEffect(() => { void qrSvg(url).then(setSvg) }, [url])
@@ -38,13 +40,14 @@ function Content({ orgId, name, responsible }: { orgId: string; name: string; re
         <h1 className="heading text-3xl text-ink">App da Pista</h1>
         <p className="mt-2 max-w-2xl text-graphite">
           O app do mecânico: fotos, notas, áudio, itens feitos e checklist direto na moto, mesmo sem internet.
-          Entra quem é da equipe com a permissão “Executar OS”, com o mesmo e-mail e senha do painel.
+          O mecânico entra com o apelido e a senha que você cria em Equipe → “Novo mecânico”. Essa conta só abre o App da Pista.
         </p>
       </header>
 
       <div className="grid gap-5 lg:grid-cols-[1fr_auto]">
         <Card title="Link para instalar">
           <p className="break-all rounded-doc border border-rule bg-paper px-3 py-2 font-mono text-lg text-ink">{url}</p>
+          {code && <p className="mt-2 text-graphite">Código da oficina: <strong className="font-mono text-lg tracking-widest text-ink">{code}</strong> (o mecânico só digita se abrir o app sem o link).</p>}
           <div className="mt-4 flex flex-wrap gap-2">
             <a href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer"
               className="inline-flex h-11 items-center rounded-doc bg-[#1f7a4d] px-4 font-semibold text-white">Enviar pelo WhatsApp</a>
@@ -55,13 +58,13 @@ function Content({ orgId, name, responsible }: { orgId: string; name: string; re
             )}
             <Button variant="secondary" onClick={() => void copy()}>{copied ? 'Link copiado ✓' : 'Copiar link'}</Button>
             <Button variant="secondary" onClick={() => void downloadQrPng(url, `app-da-pista-${name}`)}>Baixar QR code</Button>
-            <a href="/pista" target="_blank" rel="noopener" className="inline-flex h-11 items-center px-2 font-semibold text-ink underline underline-offset-4">Abrir aqui</a>
+            <a href={code ? `/pista/${code}` : '/pista'} target="_blank" rel="noopener" className="inline-flex h-11 items-center px-2 font-semibold text-ink underline underline-offset-4">Abrir aqui</a>
           </div>
           <ol className="mt-5 list-decimal space-y-1.5 pl-5 text-graphite">
             <li>O mecânico abre o link no celular dele (ou aponta a câmera para o QR code).</li>
             <li><strong>Android (Chrome):</strong> toque em “Instalar app” ou no menu ⋮ → “Instalar app”.</li>
             <li><strong>iPhone (Safari):</strong> toque em Compartilhar → “Adicionar à Tela de Início”.</li>
-            <li>O ícone laranja “Pista” aparece na tela de início. É só entrar com o e-mail da equipe.</li>
+            <li>O ícone laranja “Pista” aparece na tela de início. É só entrar com o apelido e a senha.</li>
           </ol>
         </Card>
         <Card title="QR code">

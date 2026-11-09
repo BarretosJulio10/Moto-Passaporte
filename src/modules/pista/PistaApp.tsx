@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
-import { Link, Outlet, useNavigate, useOutletContext } from 'react-router-dom'
+import { Link, Outlet, useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/core/auth/AuthProvider'
 import { getSupabase } from '@/lib/supabase'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { formatKm } from '@/core/shared/format'
 import { fetchPistaContext, fetchPistaOrders, PISTA_STATUS_LABEL, PISTA_STATUS_TONE, vehicleLabel, type PistaOrderRow, type PistaShop } from './api'
+import { fetchWorkshopByCode, normalizeCode, pistaEmail, rememberCode, rememberedCode, validCode, validNickname, normalizeNickname } from './accountsApi'
 import { listOutbox, onOutboxChange, startOutbox, flush, type OutboxEntry } from './outbox'
 
 /** App da Pista (ADR-057): PWA próprio em /pista, para o mecânico registrar rápido na moto. */
@@ -100,37 +101,106 @@ function PistaFrame({ children, header }: { children: ReactNode; header?: ReactN
 }
 
 function PistaLogin() {
+  const params = useParams()
+  const fromLink = normalizeCode(params.code ?? '')
+  const [code, setCode] = useState(() => (validCode(fromLink) ? fromLink : rememberedCode()))
+  const [mode, setMode] = useState<'nickname' | 'email'>('nickname')
+  const [nickname, setNickname] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const shop = useQuery({
+    queryKey: ['pista-code', code],
+    queryFn: () => fetchWorkshopByCode(code),
+    enabled: validCode(code),
+    staleTime: 5 * 60_000,
+  })
+  useEffect(() => { if (validCode(fromLink)) setCode(fromLink) }, [fromLink])
+
   async function submit(e: FormEvent) {
     e.preventDefault()
-    setBusy(true)
     setError(null)
-    const { error: err } = await getSupabase().auth.signInWithPassword({ email: email.trim(), password })
-    if (err) setError(/invalid/i.test(err.message) ? 'E-mail ou senha incorretos.' : 'Não foi possível entrar. Verifique a internet.')
+    if (mode === 'nickname') {
+      if (!validCode(code)) return setError('Digite o código da oficina (6 letras ou números).')
+      if (shop.data === null) return setError('Código da oficina não encontrado.')
+      if (!validNickname(normalizeNickname(nickname))) return setError('Digite o seu apelido.')
+    }
+    setBusy(true)
+    const login = mode === 'nickname' ? pistaEmail(nickname, code) : email.trim()
+    const { error: err } = await getSupabase().auth.signInWithPassword({ email: login, password })
+    if (err) {
+      setError(/banned/i.test(err.message) ? 'Seu acesso foi desligado pela oficina.'
+        : /invalid/i.test(err.message) ? (mode === 'nickname' ? 'Apelido ou senha incorretos.' : 'E-mail ou senha incorretos.')
+        : /rate|many/i.test(err.message) ? 'Muitas tentativas. Espere alguns minutos e tente de novo.'
+        : 'Não foi possível entrar. Verifique a internet.')
+    } else if (mode === 'nickname') {
+      rememberCode(code)
+    }
     setBusy(false)
   }
+
+  const input = 'mt-1 h-14 w-full rounded-xl border border-rule bg-sheet px-4 text-lg'
   return (
     <form onSubmit={submit} className="space-y-4 p-5" noValidate>
-      <h1 className="text-2xl font-bold">Entrar na pista</h1>
-      <p className="text-graphite">Use o mesmo e-mail e senha do painel da oficina. Você fica conectado neste celular.</p>
-      <label className="block">
-        <span className="text-sm font-semibold">E-mail</span>
-        <input type="email" autoComplete="username" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 h-14 w-full rounded-xl border border-rule bg-sheet px-4 text-lg" />
-      </label>
+      {mode === 'nickname' && shop.data?.name ? (
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wide text-muted">Oficina</p>
+          <h1 className="text-2xl font-bold">{shop.data.name}</h1>
+        </div>
+      ) : (
+        <h1 className="text-2xl font-bold">Entrar na pista</h1>
+      )}
+      {mode === 'nickname' ? (
+        <>
+          <p className="text-graphite">Entre com o apelido e a senha que o responsável da oficina criou para você. Você fica conectado neste celular.</p>
+          {!validCode(fromLink) && (
+            <label className="block">
+              <span className="text-sm font-semibold">Código da oficina</span>
+              <input autoCapitalize="none" autoCorrect="off" spellCheck={false} maxLength={6} value={code}
+                onChange={(e) => setCode(normalizeCode(e.target.value))} className={`${input} font-mono tracking-widest`} />
+              {validCode(code) && shop.data === null && <span className="mt-1 block text-sm text-danger">Código não encontrado.</span>}
+            </label>
+          )}
+          <label className="block">
+            <span className="text-sm font-semibold">Apelido</span>
+            <input autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} value={nickname}
+              onChange={(e) => setNickname(e.target.value)} className={input} />
+          </label>
+        </>
+      ) : (
+        <>
+          <p className="text-graphite">Para o responsável ou quem entra com e-mail: use o mesmo e-mail e senha do painel.</p>
+          <label className="block">
+            <span className="text-sm font-semibold">E-mail</span>
+            <input type="email" autoComplete="username" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} className={input} />
+          </label>
+        </>
+      )}
       <label className="block">
         <span className="text-sm font-semibold">Senha</span>
-        <input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 h-14 w-full rounded-xl border border-rule bg-sheet px-4 text-lg" />
+        <input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className={input} />
       </label>
       {error && <p role="alert" className="rounded-xl bg-danger/10 px-4 py-3 font-semibold text-danger">{error}</p>}
-      <button type="submit" disabled={busy || !email || !password} className="h-14 w-full rounded-xl bg-[#D66C20] text-lg font-bold text-white disabled:opacity-60">
+      <button type="submit" disabled={busy || !password || (mode === 'nickname' ? !nickname : !email)}
+        className="h-14 w-full rounded-xl bg-[#D66C20] text-lg font-bold text-white disabled:opacity-60">
         {busy ? 'Entrando…' : 'Entrar'}
       </button>
-      <Link to="/recuperar-senha" className="block text-center font-semibold underline underline-offset-4">Esqueci a senha</Link>
+      {mode === 'nickname' ? (
+        <>
+          <p className="text-center text-sm text-muted">Esqueceu a senha? Peça ao responsável da oficina para criar uma nova.</p>
+          <button type="button" onClick={() => { setMode('email'); setError(null) }} className="block w-full text-center font-semibold underline underline-offset-4">
+            Entrar com e-mail
+          </button>
+        </>
+      ) : (
+        <>
+          <Link to="/recuperar-senha" className="block text-center font-semibold underline underline-offset-4">Esqueci a senha</Link>
+          <button type="button" onClick={() => { setMode('nickname'); setError(null) }} className="block w-full text-center font-semibold underline underline-offset-4">
+            Entrar com apelido
+          </button>
+        </>
+      )}
     </form>
   )
 }
@@ -164,7 +234,7 @@ function PistaGate({ userId }: { userId: string }) {
     <div className="flex items-center justify-between gap-3">
       <Link to="/pista" className="min-w-0">
         <p className="truncate text-lg font-bold leading-tight">{shop?.name ?? 'Pista'}</p>
-        <p className="truncate text-xs text-sheet/70">{shop?.user_name || 'Moto Passaporte'}</p>
+        <p className="truncate text-xs text-sheet/70">{shop ? `${shop.user_name || 'Mecânico'}${shop.nickname ? ` · ${shop.nickname}` : ''}` : 'Moto Passaporte'}</p>
       </Link>
       <div className="flex shrink-0 items-center gap-2">
         <button type="button" onClick={() => void flush(userId)}
@@ -181,7 +251,7 @@ function PistaGate({ userId }: { userId: string }) {
                 {s.name}
               </button>
             ))}
-            <Link to="/oficina" className="block rounded-lg px-3 py-2 text-sm">Abrir o painel completo</Link>
+            {!shop?.pista_account && <Link to="/oficina" className="block rounded-lg px-3 py-2 text-sm">Abrir o painel completo</Link>}
             <button type="button" onClick={() => { localStorage.removeItem(ORG_KEY); void signOut() }}
               className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-danger">
               Trocar mecânico (sair)

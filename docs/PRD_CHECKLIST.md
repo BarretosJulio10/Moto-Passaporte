@@ -4,7 +4,7 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 09/11/2026 — v0.57.1
+**Última conferência:** 09/11/2026 — v0.58.0
 **Item atual na ordem:** Fase 6 → homologação e publicação (6.6)
 
 ## Progresso
@@ -114,7 +114,7 @@ Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0
 | 2.2 — Controle de Gastos | `publicado` — Fases A a C (100%) |
 | 2.3 — Todos os veículos | `planejado` — guardado, só iniciar quando pedido (0%) |
 | 2.4 — Planos: modelo cofre | `publicado` — Fases A a C (100%); revisão jurídica pendente (KI-044) |
-| 2.5 — App da Pista | `publicado` (100% do plano); "conta da pista" em estudo |
+| 2.5 — App da Pista | `publicado` (100%), inclusive conta da pista (v0.58.0) |
 
 ## Pendências transversais
 

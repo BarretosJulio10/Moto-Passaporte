@@ -21,7 +21,7 @@
 
 > **Complemento — Versão 2.4 (09/11/2026, implementado v0.56.0):** planos no modelo cofre (gratuito vê detalhes só dos 2 registros mais recentes de cada moto; exportação sempre grátis; cortesia e teste de 3 meses liberam tudo) está em [`PRD_v2.4_PLANOS_COFRE.md`](PRD_v2.4_PLANOS_COFRE.md). Pendente: revisão jurídica dos Termos 0.2 (KI-044).
 
-> **Complemento — Versão 2.5 (09/11/2026, implementado v0.57.0):** App da Pista, PWA do mecânico (fotos, notas, áudio arquivado por 90 dias, fila sem internet) está em [`PRD_v2.5_APP_DA_PISTA.md`](PRD_v2.5_APP_DA_PISTA.md). Em estudo: "conta da pista" criada pelo responsável (nome, apelido e senha, sem convite).
+> **Complemento — Versão 2.5 (09/11/2026, implementado v0.57.0):** App da Pista, PWA do mecânico (fotos, notas, áudio arquivado por 90 dias, fila sem internet) está em [`PRD_v2.5_APP_DA_PISTA.md`](PRD_v2.5_APP_DA_PISTA.md). Conta da pista (v0.58.0): mecânico criado pelo responsável com nome, apelido e senha, sem convite, com acesso só à pista.
 
 ## Controle do documento
 

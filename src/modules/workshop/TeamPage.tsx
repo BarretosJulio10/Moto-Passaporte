@@ -8,6 +8,7 @@ import { translateDbError } from '@/core/shared/dbErrors'
 import { formatDate } from '@/core/shared/format'
 import { useMyWorkshops } from './WorkshopIndexPage'
 import { QuotePermissions } from './team/QuotePermissions'
+import { ConvertToPista, PistaMechanics, usePistaAccounts } from './team/PistaMechanics'
 import {
   createInvite,
   fetchInvites,
@@ -52,8 +53,9 @@ export function TeamPage() {
           {responsible ? ' Você define o que cada funcionário pode fazer.' : ''}
         </p>
       </div>
-      {responsible && <InviteForm organizationId={orgId} workshopName={shop.business_name} />}
+      {responsible && <PistaMechanics organizationId={orgId} />}
       <MemberList organizationId={orgId} responsible={responsible} />
+      {responsible && <InviteForm organizationId={orgId} workshopName={shop.business_name} />}
       {responsible && <QuotePermissions organizationId={orgId} />}
       {responsible && <PendingInvites organizationId={orgId} />}
       {!responsible && <LeaveOrganization organizationId={orgId} />}
@@ -122,8 +124,9 @@ function InviteForm({ organizationId, workshopName }: { organizationId: string; 
 
   return (
     <section aria-labelledby="invite-title" className="rounded-doc border border-rule bg-sheet p-5">
-      <h2 id="invite-title" className="heading text-xl text-ink">Convidar funcionário</h2>
+      <h2 id="invite-title" className="heading text-xl text-ink">Convidar por e-mail</h2>
       <p className="mt-1 max-w-prose text-sm text-muted">
+        Para quem já tem conta no Moto Passaporte e vai usar o painel (atendimento, orçamentos). Mecânico da pista não precisa de convite: crie em “Mecânicos da pista”.
         Você recebe um link de convite para enviar à pessoa. Ele vale por 7 dias, funciona uma vez e só com a conta do e-mail informado.
       </p>
       <form noValidate onSubmit={onSubmit} className="mt-4 flex max-w-xl flex-col gap-4">
@@ -163,13 +166,16 @@ function InviteForm({ organizationId, workshopName }: { organizationId: string; 
 
 function MemberList({ organizationId, responsible }: { organizationId: string; responsible: boolean }) {
   const members = useQuery({ queryKey: ['org-members', organizationId], queryFn: () => fetchMembers(organizationId) })
+  const pista = usePistaAccounts(organizationId, responsible)
+  const pistaIds = new Set((pista.data?.accounts ?? []).map((a) => a.user_id))
+  const list = (members.data ?? []).filter((m) => !pistaIds.has(m.user_id))
   if (members.isLoading) return <p className="text-muted" role="status">Carregando equipe…</p>
   if (members.isError) return <Notice tone="error">Não foi possível carregar a equipe.</Notice>
   return (
     <section aria-labelledby="members-title">
-      <h2 id="members-title" className="heading text-xl text-ink">Equipe ({members.data?.length ?? 0})</h2>
+      <h2 id="members-title" className="heading text-xl text-ink">Equipe com e-mail ({list.length})</h2>
       <ul className="mt-3 divide-y divide-rule border-y border-rule">
-        {(members.data ?? []).map((m) => (
+        {list.map((m) => (
           <MemberRow key={m.id} member={m} organizationId={organizationId} editable={responsible && !m.is_me} />
         ))}
       </ul>
@@ -183,6 +189,7 @@ function MemberRow({ member: m, organizationId, editable }: { member: Member; or
   const [role, setRole] = useState<MemberRole>(m.role)
   const [perms, setPerms] = useState<Permissions>({ can_request_access: m.can_request_access, can_register_services: m.can_register_services })
   const [confirmRemove, setConfirmRemove] = useState(false)
+  const [converting, setConverting] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -216,8 +223,9 @@ function MemberRow({ member: m, organizationId, editable }: { member: Member; or
           {m.email && <p className="truncate text-sm text-muted">{m.email}</p>}
           <p className="mt-1 text-sm text-graphite"><span className="font-semibold">{ROLE_LABEL[m.role]}.</span> {summary}</p>
         </div>
-        {editable && !editing && !confirmRemove && (
-          <div className="flex gap-1">
+        {editable && !editing && !confirmRemove && !converting && (
+          <div className="flex flex-wrap gap-1">
+            {m.role === 'staff' && <Button type="button" size="sm" variant="quiet" onClick={() => setConverting(true)}>Virar conta da pista</Button>}
             <Button type="button" size="sm" variant="quiet" onClick={() => setEditing(true)}>Alterar</Button>
             <Button type="button" size="sm" variant="quiet" onClick={() => setConfirmRemove(true)}>Remover</Button>
           </div>
@@ -237,6 +245,11 @@ function MemberRow({ member: m, organizationId, editable }: { member: Member; or
             <Button type="button" size="sm" variant="secondary" disabled={busy} onClick={() => setEditing(false)}>Cancelar</Button>
           </div>
         </div>
+      )}
+
+      {converting && (
+        <ConvertToPista organizationId={organizationId} memberId={m.id} fullName={m.full_name ?? ''}
+          onDone={() => setConverting(false)} onCancel={() => setConverting(false)} />
       )}
 
       {confirmRemove && (

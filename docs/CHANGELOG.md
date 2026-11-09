@@ -9,6 +9,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.58.0] — 09/11/2026 — Conta da pista (mecânico sem convite)
+
+### Adicionado
+- **Equipe → Mecânicos da pista:** o responsável cria o mecânico com nome, apelido e senha, sem e-mail e sem convite. Lista com último acesso, Trocar senha, Desligar e Reativar.
+- **Entrada por oficina:** link `/pista/<código>` mostra o nome da oficina e pede só apelido e senha. Sem o link, o app pede o código da oficina (6 letras/números) e guarda no aparelho. "Entrar com e-mail" continua para o responsável.
+- **Virar conta da pista:** funcionário convidado por e-mail ganha acesso só da pista (apelido e senha); as OS em andamento passam para a conta nova e a conta pessoal sai da equipe.
+- Edge Function `pista-accounts` (cria, troca senha, desliga, reativa, converte), com a chave de serviço só no servidor.
+
+### Segurança
+- Conta da pista só chama funções `pista_*`: trava antes de toda requisição da API (`pista_request_guard`, pré-requisição do PostgREST), envio de arquivos só no bucket da oficina, sem assinatura de plano, sem Premium de boas-vindas, não vira responsável. Desligar bloqueia na hora.
+- Telas: conta da pista que abre o painel volta para `/pista`.
+
 ## [0.57.1] — 09/11/2026 — Pedido de acesso de oficina em destaque
 
 ### Mudado

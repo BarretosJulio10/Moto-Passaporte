@@ -12,6 +12,9 @@ export type PistaShop = {
   allow_unassigned: boolean
   allow_ready: boolean
   user_name: string
+  code?: string
+  nickname?: string | null
+  pista_account?: boolean
 }
 
 export type PistaStatus =
@@ -163,8 +166,8 @@ export function audioFormat(mimeType: string): { mime: 'audio/mp4' | 'audio/webm
   return null
 }
 
-export function pistaUrl(origin = typeof window !== 'undefined' ? window.location.origin : '') {
-  return `${origin}/pista`
+export function pistaUrl(code?: string, origin = typeof window !== 'undefined' ? window.location.origin : '') {
+  return code ? `${origin}/pista/${code}` : `${origin}/pista`
 }
 
 export function vehicleLabel(v: { brand: string | null; model: string | null; year?: number | null } | null) {

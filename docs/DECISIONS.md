@@ -109,6 +109,15 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-058 — Conta da pista (mecânico criado pelo responsável)
+**Data:** 09/11/2026 · **Status:** aceita (decisões do responsável: apelido + senha; cada mecânico digita o próprio apelido; convidados viram conta da pista)
+- Login no Supabase Auth com e-mail interno `<apelido>.<código>@pista.motopassaporte.com.br` (subdomínio sem e-mail), criado pela Edge Function `pista-accounts` com `email_confirm` e `app_metadata.account_kind = 'pista'`. Apelido `^[a-z0-9]{2,20}$`, único na oficina; código da oficina em `organizations.pista_code` (6 caracteres, sem ambíguos).
+- `pista_accounts` liga a conta a uma oficina; membro `staff` só com "Executar OS". Funções de serviço `pista_account_prepare/register/manage` sempre conferem o responsável (`pista_assert_actor`).
+- Trava central: `pgrst.db_pre_request = public.pista_request_guard` — conta da pista só acessa `/rpc/pista_*`; desligada, nada. A função não derruba a API em erro inesperado (só a recusa é levantada). Política restritiva em `storage.objects` (insert só em `workshop-files`); `billing_prepare_subscription` e `update_org_member` recusam conta da pista; `profiles_welcome_premium` não dá bônus.
+- Desligar: marca `disabled_at`, tira da equipe, solta as OS em andamento e bane no Auth. Sem "esqueci a senha": o responsável cria outra.
+- Converter convidado: cria a conta da pista, passa as OS em andamento e remove a conta pessoal da equipe (a conta pessoal continua do dono).
+- Ao criar nova função que a conta da pista precise usar, o nome deve começar com `pista_`.
+
 ### ADR-057 — App da Pista (PWA do mecânico)
 **Data:** 09/11/2026 · **Status:** aceita
 - Segundo PWA no mesmo domínio, em `/pista`, com manifesto (`/pista.webmanifest`, escopo `/pista`) e ícone próprios; o app troca o manifesto ao abrir a rota. Mesmas contas; entra quem é membro ativo com "Executar OS" ou o responsável (`pista_context`).
