@@ -184,7 +184,9 @@ describe('relatório em PDF', () => {
     await within(sheet).findByText('Óleo 10W30')
     await user.click(screen.getByLabelText('Valores dos serviços'))
     await user.click(screen.getByLabelText('Placa'))
-    expect(within(sheet).getByText(/R\$\s?180,00/)).toBeVisible()
+    expect(within(sheet).getAllByText(/R\$\s?180,00/).length).toBeGreaterThan(0)
+    const values = within(sheet).getByRole('region', { name: 'Valores dos serviços' })
+    expect(within(values).getByText(/Total informado/)).toBeVisible()
     expect(within(sheet).queryByText('ABC1D23')).not.toBeInTheDocument()
   })
 

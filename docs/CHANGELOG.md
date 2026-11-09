@@ -9,6 +9,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.53.0] — 08/11/2026 — Controle de Gastos, Fase C (PRD 2.2)
+
+### Adicionado
+- **Exportar CSV** (Premium) na página de gastos: lançamentos dos filtros escolhidos, separador ";", vírgula decimal e acentos certos para o Excel, com linha de total (igual ao total da tela).
+- **Relatório PDF**: com "Valores dos serviços" marcado, o relatório traz o total informado e o total por categoria. Despesas avulsas nunca entram.
+- **"Meus dados" (LGPD)** inclui as despesas avulsas.
+- Exclusão de conta apaga as despesas avulsas; comprovantes sem despesa entram na limpeza automática de arquivos (KI-042 resolvido).
+
 ## [0.52.0] — 08/11/2026 — Controle de Gastos, Fase B (PRD 2.2)
 
 ### Adicionado

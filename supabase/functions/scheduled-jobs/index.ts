@@ -4,6 +4,39 @@
 import { CORS, MpError, accessToken, reply, serverClient, syncPass, syncPreapproval } from '../_shared/mercadopago.ts'
 
 const BUCKET = 'attachments'
+
+// Caminhos com prefixo "expense-receipts:" são comprovantes de despesa (ADR-052); o resto é do bucket de anexos.
+const RECEIPTS_PREFIX = 'expense-receipts:'
+async function removePlanned(
+  // deno-lint-ignore no-explicit-any
+  server: any,
+  paths: string[],
+): Promise<{ deleted: string[]; failed: number }> {
+  const deleted: string[] = []
+  let failed = 0
+  const groups: Array<[string, string[]]> = [
+    [BUCKET, paths.filter((p) => !p.startsWith(RECEIPTS_PREFIX))],
+    ['expense-receipts', paths.filter((p) => p.startsWith(RECEIPTS_PREFIX))],
+  ]
+  for (const [bucket, list] of groups) {
+    const prefix = bucket === BUCKET ? '' : RECEIPTS_PREFIX
+    for (let i = 0; i < list.length; i += 100) {
+      const chunk = list.slice(i, i + 100)
+      const names = chunk.map((p) => p.slice(prefix.length))
+      const { data, error } = await server.storage.from(bucket).remove(names)
+      if (error) {
+        failed += chunk.length
+        continue
+      }
+      const removed = new Set(((data ?? []) as { name: string }[]).map((o) => o.name))
+      for (const p of chunk) {
+        if (removed.has(p.slice(prefix.length))) deleted.push(p)
+        else failed += 1
+      }
+    }
+  }
+  return { deleted, failed }
+}
 type Server = ReturnType<typeof serverClient>
 type Outcome = { status: 'ok' | 'failed' | 'skipped'; detail: string }
 
@@ -58,21 +91,7 @@ async function storageCleanup(server: Server): Promise<Outcome> {
   const { cleanup_id: id, paths, busy } = plan as { cleanup_id: string | null; paths: string[]; busy?: boolean }
   if (busy) return { status: 'skipped', detail: 'Outra limpeza em andamento.' }
   if (!id || paths.length === 0) return { status: 'ok', detail: 'Nada para limpar.' }
-  const deleted: string[] = []
-  let failed = 0
-  for (let i = 0; i < paths.length; i += 100) {
-    const chunk = paths.slice(i, i + 100)
-    const { data, error: rmError } = await server.storage.from(BUCKET).remove(chunk)
-    if (rmError) {
-      failed += chunk.length
-      continue
-    }
-    const removed = new Set((data ?? []).map((o) => o.name))
-    for (const p of chunk) {
-      if (removed.has(p)) deleted.push(p)
-      else failed++
-    }
-  }
+  const { deleted, failed } = await removePlanned(server, paths)
   const { data: fin, error: finError } = await server.rpc('storage_cleanup_finish', { p_cleanup_id: id, p_deleted: deleted, p_failed: failed })
   if (finError) throw new Error(`Falha ao registrar: ${finError.message}`)
   const r = fin as { deleted_files: number; deleted_bytes: number }

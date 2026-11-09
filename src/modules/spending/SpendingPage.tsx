@@ -11,7 +11,7 @@ import { formatBRL } from '@/modules/maintenance/schemas'
 import { fetchMyMotorcycles } from '@/modules/motorcycles/api'
 import {
   DEFAULT_FILTERS, PERIODS, categoryLabel, fetchSpendingEntries, fetchSpendingSnapshot, fetchSpendingSummary, filtersFromParams,
-  filtersToParams, formatPerKm, monthLabel, type PeriodKey, type SpendingFilters, type SpendingSummary,
+  filtersToParams, formatPerKm, monthLabel, buildSpendingCsv, downloadText, fetchSpendingExport, type PeriodKey, type SpendingFilters, type SpendingSummary,
 } from './api'
 import { EntryList, ExpenseForm } from './Expenses'
 
@@ -33,6 +33,8 @@ export function AllSpendingPage() {
 function SpendingView({ motoId }: { motoId: string | null }) {
   const [params, setParams] = useSearchParams()
   const [adding, setAdding] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
   const f = useMemo(() => filtersFromParams(params), [params])
   const set = (patch: Partial<SpendingFilters>) => setParams(filtersToParams({ ...f, ...patch }), { replace: true })
   const key = motoId ?? 'all'
@@ -44,6 +46,19 @@ function SpendingView({ motoId }: { motoId: string | null }) {
   const s = q.data
   const label = motoId ? motos.find((m) => m.id === motoId)?.label ?? 'Moto' : 'Todas as motos'
   const back = motoId ? `/painel/motos/${motoId}` : '/painel'
+  const exportCsv = async () => {
+    setExporting(true)
+    setExportError(null)
+    try {
+      const rows = await fetchSpendingExport(motoId, f)
+      const slug = (motoId ? label : 'todas-as-motos').normalize('NFD').replace(/[^\w]+/g, '-').replace(/^-|-$/g, '').toLowerCase()
+      downloadText(`gastos-${slug}-${new Date().toISOString().slice(0, 10)}.csv`, buildSpendingCsv(rows))
+    } catch (e) {
+      setExportError((e as Error).message)
+    } finally {
+      setExporting(false)
+    }
+  }
 
   return (
     <div>
@@ -79,8 +94,13 @@ function SpendingView({ motoId }: { motoId: string | null }) {
       <section className="mt-6 rounded-sheet border border-rule bg-sheet p-4 sm:p-5" aria-labelledby="lancamentos">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="lancamentos" className="heading text-lg text-ink">Lançamentos</h2>
-          {!adding && motos.length > 0 && <Button size="sm" onClick={() => setAdding(true)}>Lançar despesa</Button>}
+          <div className="flex flex-wrap gap-2">
+            {s?.entitled && <Button size="sm" variant="secondary" onClick={exportCsv} loading={exporting}>Exportar CSV</Button>}
+            {!adding && motos.length > 0 && <Button size="sm" onClick={() => setAdding(true)}>Lançar despesa</Button>}
+          </div>
         </div>
+        {exportError && <div className="mt-3"><Notice tone="error">{exportError}</Notice></div>}
+        {s?.entitled && <p className="mt-1 text-xs text-muted">O CSV leva os lançamentos dos filtros acima e abre no Excel ou no Google Planilhas.</p>}
         {adding && (
           <div className="mt-3">
             <ExpenseForm motos={motos} motoId={motoId} left={snap.data?.expenses_left_this_month} onDone={() => setAdding(false)} />

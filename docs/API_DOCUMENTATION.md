@@ -413,3 +413,4 @@ Contrato em `docs/modules/WORKSHOP_CUSTOMER_LINK.md`: `workshop_create_customer_
 ## Controle de Gastos (PRD 2.2, ADR-050)
 - `get_spending_summary(...)` e `get_spending_snapshot(p_motorcycle)` — só `authenticated`, só motos de que a pessoa é dona atual. Contrato completo em `docs/modules/SPENDING.md`. A análise (meses, categoria, oficina, sem valor) só vem com o benefício `spending_insights`.
 - Fase B (ADR-051): `save_owner_expense`, `delete_owner_expense`, `get_spending_entries`; `get_spending_summary` ganhou `p_kind`. Comprovantes no bucket privado `expense-receipts`, pasta = id do usuário. Detalhes em `docs/modules/SPENDING.md`.
+- Fase C (ADR-052): `get_spending_export` (Premium) para o CSV; `export_my_data` inclui `expenses`.

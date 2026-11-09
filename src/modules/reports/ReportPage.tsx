@@ -67,6 +67,15 @@ export function ReportPage() {
   )
   const origin = (access.data ?? []).find((a) => a.access_type === 'origin' && a.status === 'approved')
   const workshops = new Set(records.filter((r) => r.workshop_name).map((r) => r.workshop_name))
+  const valued = records.filter((r) => r.service_value_cents !== null)
+  const valuesTotal = valued.reduce((a, r) => a + (r.service_value_cents ?? 0), 0)
+  const valuesByCategory = Object.entries(
+    valued.reduce<Record<string, { cents: number; n: number }>>((acc, r) => {
+      const c = acc[r.category] ?? { cents: 0, n: 0 }
+      acc[r.category] = { cents: c.cents + (r.service_value_cents ?? 0), n: c.n + 1 }
+      return acc
+    }, {}),
+  ).sort((a, b) => b[1].cents - a[1].cents)
   const bySource = records.reduce<Record<string, number>>((acc, r) => ({ ...acc, [r.evidence_level]: (acc[r.evidence_level] ?? 0) + 1 }), {})
 
   if (moto.isLoading || plan.isLoading) return <p className="text-muted" role="status">Carregando…</p>
@@ -151,6 +160,35 @@ export function ReportPage() {
             {workshops.size === 1 ? 'oficina' : 'oficinas'} · {readings.length} {readings.length === 1 ? 'leitura' : 'leituras'} de quilometragem
           </p>
         </section>
+
+        {opts.values && valued.length > 0 && (
+          <section className="report-break-avoid mt-6" aria-label="Valores dos serviços">
+            <h3 className="heading text-lg">Valores dos serviços</h3>
+            <p className="mt-1">
+              Total informado: <strong>{formatBRL(valuesTotal)}</strong> em {valued.length} {valued.length === 1 ? 'serviço' : 'serviços'}
+              {records.length > valued.length ? ` (${records.length - valued.length} sem valor informado)` : ''}.
+            </p>
+            <table className="mt-2 w-full border-collapse text-left">
+              <thead>
+                <tr className="border-b border-rule text-xs text-muted">
+                  <th className="py-1 pr-3 font-semibold">Categoria</th>
+                  <th className="py-1 pr-3 font-semibold">Serviços</th>
+                  <th className="py-1 pr-3 text-right font-semibold">Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                {valuesByCategory.map(([cat, v]) => (
+                  <tr key={cat} className="border-b border-rule/60">
+                    <td className="py-1 pr-3">{CATEGORY_LABEL[cat as keyof typeof CATEGORY_LABEL] ?? cat}</td>
+                    <td className="py-1 pr-3">{v.n}</td>
+                    <td className="py-1 pr-3 text-right tabular-nums">{formatBRL(v.cents)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="mt-1 text-xs text-muted">Valores informados no histórico (vigentes, sem anulados). Despesas pessoais do dono não entram no relatório.</p>
+          </section>
+        )}
 
         {readings.length > 0 && (
           <section className="mt-6" aria-label="Quilometragem documentada">

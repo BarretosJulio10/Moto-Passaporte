@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_FILTERS, categoryLabel, formatPerKm, filtersFromParams, filtersToParams, monthLabel, periodRange, timelineToSpendingQuery, timelineTotal } from './api'
+import { DEFAULT_FILTERS, buildSpendingCsv, categoryLabel, formatPerKm, filtersFromParams, filtersToParams, monthLabel, periodRange, timelineToSpendingQuery, timelineTotal } from './api'
 
 describe('gastos — filtros', () => {
   it('padrão não suja o endereço e volta igual', () => {
@@ -47,5 +47,21 @@ describe('gastos — soma da linha do tempo', () => {
   })
   it('rótulo de mês', () => {
     expect(monthLabel('2026-03')).toBe('mar/26')
+  })
+})
+
+describe('gastos — CSV', () => {
+  it('separador ;, vírgula decimal, acentos com BOM, aspas escapadas e total no fim', () => {
+    const csv = buildSpendingCsv([
+      { kind: 'expense', id: '1', motorcycle_id: 'm', motorcycle: 'Honda CG', category: 'fuel', title: 'Posto "Ipiranga"; centro', date: '2026-11-05',
+        workshop_name: null, mileage: 19430, value_cents: 8590, has_receipt: false, receipt_path: null, receipt_name: null },
+      { kind: 'service', id: '2', motorcycle_id: 'm', motorcycle: 'Honda CG', category: 'tires', title: 'Pneu', date: '2026-03-01',
+        workshop_name: 'Pneus Já', mileage: null, value_cents: 123456, has_receipt: true, receipt_path: null, receipt_name: null },
+    ])
+    expect(csv.startsWith('\uFEFFData;Tipo;Moto;Categoria;Descrição;Oficina;Km;Valor (R$)\r\n')).toBe(true)
+    const lines = csv.trim().split('\r\n')
+    expect(lines[1]).toBe('01/03/2026;Serviço;Honda CG;Pneus;Pneu;Pneus Já;;1234,56')
+    expect(lines[2]).toBe('05/11/2026;Despesa avulsa;Honda CG;Combustível;"Posto ""Ipiranga""; centro";;19430;85,90')
+    expect(lines[3]).toBe(';;;;Total;;;1320,46')
   })
 })

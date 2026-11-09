@@ -10,7 +10,39 @@ const CORS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 const BUCKET = 'attachments'
-const BATCH = 100
+
+// Caminhos com prefixo "expense-receipts:" são comprovantes de despesa (ADR-052); o resto é do bucket de anexos.
+const RECEIPTS_PREFIX = 'expense-receipts:'
+async function removePlanned(
+  // deno-lint-ignore no-explicit-any
+  server: any,
+  paths: string[],
+): Promise<{ deleted: string[]; failed: number }> {
+  const deleted: string[] = []
+  let failed = 0
+  const groups: Array<[string, string[]]> = [
+    [BUCKET, paths.filter((p) => !p.startsWith(RECEIPTS_PREFIX))],
+    ['expense-receipts', paths.filter((p) => p.startsWith(RECEIPTS_PREFIX))],
+  ]
+  for (const [bucket, list] of groups) {
+    const prefix = bucket === BUCKET ? '' : RECEIPTS_PREFIX
+    for (let i = 0; i < list.length; i += 100) {
+      const chunk = list.slice(i, i + 100)
+      const names = chunk.map((p) => p.slice(prefix.length))
+      const { data, error } = await server.storage.from(bucket).remove(names)
+      if (error) {
+        failed += chunk.length
+        continue
+      }
+      const removed = new Set(((data ?? []) as { name: string }[]).map((o) => o.name))
+      for (const p of chunk) {
+        if (removed.has(p.slice(prefix.length))) deleted.push(p)
+        else failed += 1
+      }
+    }
+  }
+  return { deleted, failed }
+}
 
 function reply(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } })
@@ -43,21 +75,7 @@ Deno.serve(async (req) => {
   if (paths.length === 0) return reply(200, { ok: true, deleted_files: 0, deleted_bytes: 0, failed_files: 0 })
 
   const server = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } })
-  const deleted: string[] = []
-  let failed = 0
-  for (let i = 0; i < paths.length; i += BATCH) {
-    const chunk = paths.slice(i, i + BATCH)
-    const { data, error } = await server.storage.from(BUCKET).remove(chunk)
-    if (error) {
-      failed += chunk.length
-      continue
-    }
-    const removed = new Set((data ?? []).map((o) => o.name))
-    for (const p of chunk) {
-      if (removed.has(p)) deleted.push(p)
-      else failed += 1
-    }
-  }
+  const { deleted, failed } = await removePlanned(server, paths)
 
   const { data: fin, error: finError } = await server.rpc('storage_cleanup_finish', {
     p_cleanup_id: cleanupId,

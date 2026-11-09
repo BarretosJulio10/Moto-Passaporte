@@ -87,6 +87,7 @@ select set_config('request.jwt.claim.sub', :'F', false);
 set role authenticated;
 select public.register_motorcycle('Yamaha', 'Fazer 250', 2021, 'FAB1A11', 20000) ->> 'motorcycle_id' as moto_f \gset
 select public.create_diary_entry(:'moto_f', 'trip', 'Viagem com a Fazer', current_date, 'Fui até a serra.') as diary_f \gset
+select public.save_owner_expense(null, :'moto_f', 'fuel', current_date, 5000, 'Gasolina');
 reset role;
 select :'moto_f' || '/' || gen_random_uuid() || '.jpg' as p_diary \gset
 insert into storage.objects (bucket_id, name, metadata) values ('attachments', :'p_diary', '{"size": 3000, "mimetype": "image/jpeg"}');
@@ -130,6 +131,7 @@ select tests.ok((select full_name = 'Conta excluída' and (email is null or emai
 select tests.ok((select email = 'excluida-' || :'F' || '@anon.invalid' and raw_user_meta_data = '{}'::jsonb and banned_until = 'infinity' from auth.users where id = :'F'),
                 'login sem e-mail real e bloqueado');
 select tests.ok((select count(*) = 0 from public.notifications where user_id = :'F') and (select count(*) = 0 from public.motorcycle_diary where author_id = :'F'), 'avisos e diário apagados');
+select tests.ok((select count(*) = 0 from public.owner_expenses where user_id = :'F'), 'despesas avulsas apagadas');
 select tests.ok(exists (select 1 from storage.objects where name = :'p_diary') and not exists (select 1 from public.attachments where storage_path = :'p_diary'),
                 'foto do diário fica sem registro (sai na limpeza automática)');
 select tests.ok((select count(*) from public.maintenance_records where motorcycle_id = :'moto_f') = :hist_before

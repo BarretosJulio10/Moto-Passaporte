@@ -1,6 +1,6 @@
-# Controle de Gastos (PRD 2.2) — Fases A e B
+# Controle de Gastos (PRD 2.2) — Fases A, B e C
 
-Decisões: ADR-050 (Fase A), ADR-051 (Fase B). PRD: `docs/PRD_v2.2_GASTOS.md`.
+Decisões: ADR-050 (Fase A), ADR-051 (Fase B), ADR-052 (Fase C). PRD: `docs/PRD_v2.2_GASTOS.md`.
 
 ## O que existe
 - **Página** `/painel/motos/:id/gastos`: filtros (período, categoria, oficina, origem, "incluir antes da compra", comparar com o ano anterior) gravados no endereço; total, média por mês, nº de serviços com valor; aviso dos serviços sem valor com link para "Corrigir".
@@ -15,6 +15,11 @@ Decisões: ADR-050 (Fase A), ADR-051 (Fase B). PRD: `docs/PRD_v2.2_GASTOS.md`.
 - Premium: custo por km, projeção do ano (≥ 90 dias no ano), `/painel/gastos` com total por moto.
 - Filtro "Tipo" (`tipo=servicos|despesas`). Oficina e origem só filtram serviços.
 
+## Fase C
+- **CSV** (Premium): botão "Exportar CSV" nos lançamentos; colunas Data; Tipo; Moto; Categoria; Descrição; Oficina; Km; Valor (R$); última linha = total. Fonte: `get_spending_export` (até 5.000 linhas).
+- **PDF**: com "Valores dos serviços", total informado e tabela por categoria. Sem despesas avulsas.
+- **LGPD**: "Meus dados" traz `expenses`; exclusão da conta apaga as despesas; comprovantes órfãos saem na limpeza automática (`expense-receipts:` na lista de limpeza).
+
 ## Regras de cálculo (iguais na linha do tempo e no banco)
 - Conta o serviço **vigente**: não anulado e sem correção posterior. Correção de valor substitui o original.
 - Sem valor (`service_value_cents` nulo) fica **fora da soma** e é contado à parte.
@@ -28,7 +33,8 @@ Decisões: ADR-050 (Fase A), ADR-051 (Fase B). PRD: `docs/PRD_v2.2_GASTOS.md`.
 - `get_spending_snapshot(p_motorcycle | null)` → `{month_cents, year_cents, year_entries, year_missing, entitled, expenses_left_this_month}`.
 - `get_spending_entries(...mesmos filtros, p_kind, p_limit ≤ 2000)` → lançamentos (serviços e despesas) do recorte.
 - `save_owner_expense(p_id | null, p_motorcycle, p_category, p_expense_date, p_value_cents, p_description, p_mileage, p_receipt_path, p_receipt_name, p_remove_receipt)` → `{id, remove_path}`; `delete_owner_expense(p_id)` → `{remove_path}`. O site apaga o arquivo indicado em `remove_path`.
+- `get_spending_export(...mesmos filtros, p_kind)` → lançamentos com `motorcycle` (Premium).
 - Internas (sem acesso direto): `sp_records`, `sp_ownership_start`, `sp_entries`, `sp_km`.
 
 ## Testes
-`tests/security/phase8b_spending_test.sql`, `phase8c_spending_b_test.sql`; `src/modules/spending/spending.test.ts`, `Expenses.test.tsx`.
+`tests/security/phase8b_spending_test.sql`, `phase8c_spending_b_test.sql`, `phase8d_spending_c_test.sql`; `src/modules/spending/spending.test.ts`, `Expenses.test.tsx`.

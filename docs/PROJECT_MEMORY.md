@@ -89,6 +89,7 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 | Oficina (PRD 2.1) Fase 2: ordens de serviço, checklists, fotos, comprovante | 2.1-F2 | `testado` (ADR-044) |
 | Oficina (PRD 2.1) Fase 3: OS concluída no histórico da moto | 2.1-F3 | `testado` (ADR-045) |
 | Oficina (PRD 2.1) Fase 4: agenda, peças, financeiro, relacionamento, relatórios | 2.1-F4 | `testado` (ADR-046) |
+| Gastos (PRD 2.2) Fase C: CSV, total no PDF, LGPD, limpeza de comprovantes | 2.2-C | `testado` (ADR-052) |
 | Gastos (PRD 2.2) Fase B: despesas avulsas, custo por km, projeção, todas as motos | 2.2-B | `testado` (ADR-051) |
 | Gastos (PRD 2.2) Fase A: página de gastos, cartões, total na linha do tempo | 2.2-A | `testado` (ADR-050) |
 | Premium de boas-vindas (3 meses) no cadastro | — | `testado` (ADR-049) |

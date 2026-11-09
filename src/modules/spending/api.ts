@@ -284,3 +284,46 @@ export function formatPerKm(cents: number | null | undefined): string {
   if (cents == null) return '—'
   return `${(cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}/km`
 }
+
+// Exportar CSV (RF-11, Premium) ------------------------------------------------------
+export type ExportRow = SpendingEntry & { motorcycle: string }
+
+export async function fetchSpendingExport(motorcycleId: string | null, f: SpendingFilters): Promise<ExportRow[]> {
+  const r = periodRange(f.period, new Date(), { from: f.from, to: f.to })
+  const { data, error } = await getSupabase().rpc('get_spending_export' as never, {
+    p_motorcycle: motorcycleId, p_from: r.from, p_to: r.to, p_scope: f.scope,
+    p_category: f.category || null, p_workshop: f.workshop === '__none__' ? '' : f.workshop || null,
+    p_source: f.source || null, p_kind: f.kind || null,
+  } as never)
+  if (error) throw new Error(translateDbError(error))
+  return (data ?? []) as unknown as ExportRow[]
+}
+
+const csvCell = (v: string) => (/[;"\n\r]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v)
+const brDate = (iso: string) => iso.split('-').reverse().join('/')
+const brMoney = (cents: number) => (cents / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false })
+
+/** CSV para o Excel brasileiro: separador ";", vírgula decimal, BOM para os acentos. Última linha = total. */
+export function buildSpendingCsv(rows: ExportRow[]): string {
+  const head = ['Data', 'Tipo', 'Moto', 'Categoria', 'Descrição', 'Oficina', 'Km', 'Valor (R$)']
+  const lines = [...rows]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map((r) => [
+      brDate(r.date), r.kind === 'service' ? 'Serviço' : 'Despesa avulsa', r.motorcycle ?? '', categoryLabel(r.category),
+      r.title ?? '', r.workshop_name ?? '', r.mileage != null ? String(r.mileage) : '', r.value_cents != null ? brMoney(r.value_cents) : '',
+    ].map(csvCell).join(';'))
+  const total = rows.reduce((a, r) => a + (r.value_cents ?? 0), 0)
+  lines.push(['', '', '', '', 'Total', '', '', brMoney(total)].join(';'))
+  return '﻿' + [head.join(';'), ...lines].join('\r\n') + '\r\n'
+}
+
+export function downloadText(name: string, text: string, type = 'text/csv;charset=utf-8') {
+  const url = URL.createObjectURL(new Blob([text], { type }))
+  const a = document.createElement('a')
+  a.href = url
+  a.download = name
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+}

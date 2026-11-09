@@ -109,6 +109,13 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-052 — Controle de Gastos, Fase C: levar para fora
+**Data:** 08/11/2026 · **Status:** aceita (PRD 2.2 RF-11, RF-12, §7)
+- CSV montado no navegador a partir de `get_spending_export` (Premium conferido no banco, até 5.000 linhas): ";" e vírgula decimal (padrão do Excel no Brasil), BOM UTF-8, linha de total.
+- PDF: o total e as categorias saem dos mesmos registros vigentes da linha do tempo e só aparecem com "Valores dos serviços" ligado. Despesas avulsas nunca entram no relatório.
+- LGPD: `export_my_data` ganhou `expenses`; `admin_anonymize_account` apaga `owner_expenses`.
+- Limpeza de arquivos: a lista `storage_unlinked_objects` passa a incluir comprovantes de despesa sem registro, com o prefixo `expense-receipts:`; as Edge Functions `storage-cleanup` e `scheduled-jobs` apagam cada caminho no bucket certo.
+
 ### ADR-051 — Controle de Gastos, Fase B: despesas avulsas pessoais, fora do histórico
 **Data:** 08/11/2026 · **Status:** aceita (PRD 2.2 §5, §7 e §12)
 - Tabela própria `owner_expenses` (não `maintenance_records`): o histórico técnico segue imutável e transferível; a despesa é pessoal, editável e apagável (exclusão lógica + auditoria só com metadados, nunca a descrição).
