@@ -7,6 +7,9 @@
 Documento completo (fonte oficial): https://claude.ai/artifact/Y92XDzi8QNn62XbsNon1RU
 Estudo que originou: https://claude.ai/artifact/CGRPGhxxsVo4V5thCHCPSN
 
+## Atualização 09/11/2026 (v0.63.0, ADR-062)
+- Premium inclui **2 motos**; moto extra R$ 3,90/mês, R$ 19,90/semestre, R$ 34,90/ano. Teste de 3 meses com 2 motos. Moto acima do limite fica só para leitura (cofre). Assinantes antigos mantêm o contratado até renovar.
+
 ## Regra central
 - Gratuito: lista completa da linha do tempo; só os 2 registros mais recentes de cada moto com detalhes e comprovantes (`free_open_records`, padrão 2). O resto fica "no cofre": guardado, nunca apagado.
 - Premium: benefício novo `full_history` abre tudo, além de PDF, lembretes e análise de gastos.

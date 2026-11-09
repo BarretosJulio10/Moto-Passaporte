@@ -168,3 +168,19 @@ describe('administração de planos', () => {
     expect(within(hist).getByText(/Criação do plano/)).toBeVisible()
   })
 })
+
+import { ExtrasPicker } from './ExtraMotorcycles'
+
+describe('Moto extra no Premium (ADR-062)', () => {
+  it('escolhe quantas motos extras e avisa quando sobra moto só para leitura', async () => {
+    const { render, screen } = await import('@testing-library/react')
+    const userEvent = (await import('@testing-library/user-event')).default
+    let value = 0
+    const { rerender } = render(<ExtrasPicker value={value} onChange={(n) => { value = n }} used={4} />)
+    expect(screen.getByText(/fica|ficam/)).toHaveTextContent('2 ficam só para leitura')
+    await userEvent.click(screen.getByRole('button', { name: 'Mais uma moto extra' }))
+    expect(value).toBe(1)
+    rerender(<ExtrasPicker value={2} onChange={() => {}} used={4} />)
+    expect(screen.queryByText(/só para leitura/)).not.toBeInTheDocument()
+  })
+})

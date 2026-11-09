@@ -1,3 +1,4 @@
+import { useMotorcycleSlots } from '@/modules/plans/ExtraMotorcycles'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Notice } from '@/components/Notice'
@@ -32,6 +33,7 @@ export function MotorcyclePage() {
   const justTransferred = (location.state as { transferred?: boolean } | null)?.transferred === true
 
   const moto = useQuery({ queryKey: ['motorcycle', id], queryFn: () => fetchMotorcycle(id), enabled: Boolean(id) })
+  const slots = useMotorcycleSlots(Boolean(id))
 
   if (moto.isLoading) return <p className="text-muted" role="status">Carregando…</p>
   if (moto.isError) return <Notice tone="error">Não foi possível carregar esta moto. Recarregue a página.</Notice>
@@ -53,6 +55,14 @@ export function MotorcyclePage() {
   return (
     <div>
       <MotoHeader motorcycleId={motoId} />
+      {slots.data?.over_limit.includes(motoId) && (
+        <div className="mt-6">
+          <Notice tone="info" title="Moto só para leitura">
+            Esta moto passou do limite do seu plano. O histórico continua guardado, mas novos registros ficam bloqueados.{' '}
+            <Link to="/painel/plano" className="font-semibold underline underline-offset-4">Incluir moto extra no plano</Link>
+          </Notice>
+        </div>
+      )}
       {justTransferred && (
         <div className="mt-6">
           <Notice tone="success" title="Agora o passaporte é seu">

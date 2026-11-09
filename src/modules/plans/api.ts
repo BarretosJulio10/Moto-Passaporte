@@ -21,6 +21,8 @@ export type PublicPlan = {
   cancellation_text: string | null
   entitlements: Entitlement[]
   max_share_links: number
+  /** Valor de cada moto além das incluídas no plano, no mesmo período (ADR-062). */
+  extra_motorcycle_cents?: number
 }
 
 export type Entitlement = 'pdf_reports' | 'maintenance_reminders' | 'spending_insights'
@@ -141,6 +143,12 @@ export async function adminSavePlan(p: PlanInput): Promise<string> {
   })
   if (e2) throw e2
   return data
+}
+
+/** Preço de cada moto além das incluídas no plano (ADR-062), com motivo auditado. */
+export async function adminSetPlanExtraPrice(id: string, cents: number, reason: string): Promise<void> {
+  const { error } = await getSupabase().rpc('admin_set_plan_extra_price' as never, { p_id: id, p_cents: cents, p_reason: reason } as never)
+  if (error) throw error
 }
 
 export async function adminSetPlanActive(id: string, active: boolean): Promise<void> {

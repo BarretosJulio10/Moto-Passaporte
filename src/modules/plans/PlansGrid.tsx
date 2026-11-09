@@ -62,6 +62,7 @@ export function PlansGrid({
                   <span className="font-semibold text-ink">{formatPlanPrice(p.price_cents)}</span>{' '}
                   <span className="text-sm text-muted">{PERIOD_SUFFIX[p.billing_period]}</span>
                   {p.price_note && <span className="block text-sm text-muted">{p.price_note}</span>}
+                  {p.extra_motorcycle_cents ? <span className="block text-xs text-muted">+{formatPlanPrice(p.extra_motorcycle_cents)} por moto extra</span> : null}
                 </span>
                 {billingEnabled && onSubscribe && (
                   <div className="mt-1 flex w-full flex-wrap gap-2">
@@ -81,7 +82,8 @@ export function PlansGrid({
             ))}
           </ul>
           <p className="mt-3 text-muted">
-            Até {lead.max_motorcycles} {lead.max_motorcycles === 1 ? 'moto' : 'motos'} e {formatQuota(lead.storage_quota_mb)} para anexos.
+            {lead.max_motorcycles} {lead.max_motorcycles === 1 ? 'moto incluída' : 'motos incluídas'} e {formatQuota(lead.storage_quota_mb)} para anexos.
+            {lead.extra_motorcycle_cents ? ` Cada moto a mais: ${formatPlanPrice(lead.extra_motorcycle_cents)} ${PERIOD_SUFFIX[lead.billing_period]}.` : ''}
             {lead.trial_days > 0 ? ` ${lead.trial_days} dias grátis para experimentar.` : ''}
           </p>
           <Features items={lead.features} />

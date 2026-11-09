@@ -9,6 +9,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.63.0] — 09/11/2026 — Premium com 2 motos e moto extra
+
+### Mudado
+- **Premium inclui 2 motos** (antes 3). **Moto extra:** R$ 3,90/mês, R$ 19,90/semestre ou R$ 34,90/ano. O teste de 3 meses e a cortesia seguem o plano (2 motos). Quem já assinava mantém o que contratou até renovar.
+- **Moto acima do limite fica só para leitura** para o dono (as mais antigas ficam liberadas): histórico guardado, novos registros bloqueados até incluir moto extra. Oficinas continuam registrando normalmente.
+- Termos 0.3 (seção "Quantidade de motos"): pede novo aceite.
+
+### Adicionado
+- **Meu plano → Motos no plano:** uso e motos extras; na assinatura, "+ Incluir uma moto" e "Tirar uma moto extra" (o novo valor vale a partir da próxima cobrança no Mercado Pago); no Pix, comprar moto extra até o fim do período pago (R$ 3,90 por mês que falta).
+- Ao contratar (cartão ou Pix), escolher quantas motos extras levar; o valor do Mercado Pago já sai somado.
+- Planos mostram o preço da moto extra; aviso "Moto só para leitura" na página da moto; link para Meu plano quando o cadastro bate no limite.
+- Admin → Planos: "Moto extra" para mudar o preço, com motivo auditado.
+
+### Corrigido
+- `mercadopago-billing` lia a conta com `getUser`, que falha com as chaves novas do Supabase (KI-046): agora lê o usuário do token conferido pelo gateway.
+
 ## [0.62.0] — 09/11/2026 — Checklist de entrada na chegada, de saída na entrega
 
 ### Mudado

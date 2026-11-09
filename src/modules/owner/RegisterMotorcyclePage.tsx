@@ -87,7 +87,9 @@ export function RegisterMotorcyclePage() {
       </p>
 
       <form onSubmit={onSubmit} noValidate className="mt-8 flex flex-col gap-8">
-        {formError && <Notice tone="error">{formError}</Notice>}
+        {formError && <Notice tone="error">{formError}{/limite/i.test(formError) && (
+          <> <Link to="/painel/plano" className="font-semibold underline underline-offset-4">O Premium inclui 2 motos e cada moto a mais custa a partir de R$ 3,90 por mês.</Link></>
+        )}</Notice>}
 
         <Group title="Identificação">
           {fipe.lists}

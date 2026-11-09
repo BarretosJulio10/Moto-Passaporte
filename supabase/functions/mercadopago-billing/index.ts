@@ -6,6 +6,22 @@ import {
 
 const MONTHS: Record<string, number> = { monthly: 1, semiannual: 6, annual: 12 }
 
+function readClaims(jwt: string): { sub?: string; role?: string; exp?: number } | null {
+  try {
+    const part = jwt.split('.')[1] ?? ''
+    const b64 = part.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(part.length / 4) * 4, '=')
+    return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))))
+  } catch {
+    return null
+  }
+}
+
+/** Quantidade de motos extras pedida (0 a 50). */
+function extrasOf(v: unknown): number | null {
+  const n = Number(v ?? 0)
+  return Number.isInteger(n) && n >= 0 && n <= 50 ? n : null
+}
+
 function backUrl(req: Request, kind: 'assinatura' | 'pagamento' = 'assinatura'): string | null {
   const origin = req.headers.get('Origin') ?? ''
   if (/^https:\/\/[a-z0-9.-]+$/i.test(origin) || /^http:\/\/localhost(:\d+)?$/.test(origin)) {
@@ -21,11 +37,16 @@ Deno.serve(async (req) => {
   const authHeader = req.headers.get('Authorization') ?? ''
   const jwt = authHeader.replace(/^Bearer\s+/i, '')
   const asUser = userClient(authHeader)
-  const { data: auth } = await asUser.auth.getUser(jwt)
-  const user = auth?.user
+  // KI-046: a assinatura do token já foi conferida pelo Supabase (verify_jwt); confirma a conta pelo servidor.
+  const claims = readClaims(jwt)
+  if (!claims?.sub || claims.role !== 'authenticated' || (claims.exp ?? 0) < Math.floor(Date.now() / 1000)) {
+    return reply(401, { message: 'Entre na sua conta.' })
+  }
+  const { data: found } = await serverClient().auth.admin.getUserById(claims.sub)
+  const user = found?.user
   if (!user) return reply(401, { message: 'Entre na sua conta.' })
 
-  let body: { action?: string; plan_code?: string } = {}
+  let body: { action?: string; plan_code?: string; extras?: number } = {}
   try {
     body = await req.json()
   } catch {
@@ -38,7 +59,9 @@ Deno.serve(async (req) => {
       if (!body.plan_code || !/^[a-z0-9_]{2,40}$/.test(body.plan_code)) return reply(400, { message: 'Plano inválido.' })
       const back = backUrl(req)
       if (!back) return reply(400, { message: 'Origem do pedido não reconhecida.' })
-      const { data: prep, error } = await server.rpc('billing_prepare_subscription', { p_user: user.id, p_plan_code: body.plan_code })
+      const extras = extrasOf(body.extras)
+      if (extras === null) return reply(400, { message: 'Quantidade de motos extras inválida.' })
+      const { data: prep, error } = await server.rpc('billing_prepare_subscription_v2', { p_user: user.id, p_plan_code: body.plan_code, p_extra: extras })
       if (error) return reply(409, { message: error.message })
       const p = prep as {
         subscription_id: string; payer_email: string; plan_name: string; billing_period: string
@@ -82,12 +105,36 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Moto extra numa assinatura ativa (cartão): novo valor vale a partir da próxima cobrança (ADR-062).
+    if (body.action === 'set_extras') {
+      const extras = extrasOf(body.extras)
+      if (extras === null) return reply(400, { message: 'Quantidade de motos extras inválida.' })
+      const { data: prep, error } = await server.rpc('billing_prepare_extras', { p_user: user.id, p_extra: extras })
+      if (error) return reply(409, { message: error.message })
+      const p = prep as { subscription_id: string; provider_subscription_id: string; currency: string; extra_motorcycle_cents: number; price_cents: number }
+      const token = await accessToken(server)
+      await mp(token, `/preapproval/${encodeURIComponent(p.provider_subscription_id)}`, {
+        method: 'PUT',
+        body: JSON.stringify({ auto_recurring: { transaction_amount: p.price_cents / 100, currency_id: p.currency } }),
+      })
+      const { error: applyError } = await server.rpc('billing_apply_extras', {
+        p_user: user.id, p_subscription: p.subscription_id, p_extra: extras, p_cents: p.extra_motorcycle_cents,
+      })
+      if (applyError) return reply(500, { message: 'O valor mudou no Mercado Pago, mas não foi salvo aqui. Fale com o suporte.' })
+      return reply(200, { ok: true, price_cents: p.price_cents })
+    }
+
     // Período pago à vista: Pix, débito, boleto ou saldo, sem cartão salvo (ADR-039).
-    if (body.action === 'pay_pass') {
-      if (!body.plan_code || !/^[a-z0-9_]{2,40}$/.test(body.plan_code)) return reply(400, { message: 'Plano inválido.' })
+    if (body.action === 'pay_pass' || body.action === 'pay_extra') {
+      const addon = body.action === 'pay_extra'
+      if (!addon && (!body.plan_code || !/^[a-z0-9_]{2,40}$/.test(body.plan_code))) return reply(400, { message: 'Plano inválido.' })
       const back = backUrl(req, 'pagamento')
       if (!back) return reply(400, { message: 'Origem do pedido não reconhecida.' })
-      const { data: prep, error } = await server.rpc('billing_prepare_pass', { p_user: user.id, p_plan_code: body.plan_code })
+      const extras = extrasOf(body.extras)
+      if (extras === null) return reply(400, { message: 'Quantidade de motos extras inválida.' })
+      const { data: prep, error } = addon
+        ? await server.rpc('billing_prepare_pass_addon', { p_user: user.id, p_extra: extras })
+        : await server.rpc('billing_prepare_pass_v2', { p_user: user.id, p_plan_code: body.plan_code, p_extra: extras })
       if (error) return reply(409, { message: error.message })
       const p = prep as { pass_id: string; payer_email: string; plan_name: string; months: number; price_cents: number; currency: string }
       const token = await accessToken(server)
@@ -97,8 +144,8 @@ Deno.serve(async (req) => {
           headers: { 'X-Idempotency-Key': p.pass_id },
           body: JSON.stringify({
             items: [{
-              id: body.plan_code,
-              title: `Moto Passaporte — ${p.plan_name} (${p.months} ${p.months === 1 ? 'mês' : 'meses'})`,
+              id: addon ? 'moto_extra' : body.plan_code,
+              title: addon ? `Moto Passaporte — ${p.plan_name}` : `Moto Passaporte — ${p.plan_name} (${p.months} ${p.months === 1 ? 'mês' : 'meses'})`,
               quantity: 1,
               unit_price: p.price_cents / 100,
               currency_id: p.currency,

@@ -72,8 +72,8 @@ async function billing<T>(body: Record<string, unknown>): Promise<T> {
   return data as T
 }
 
-export async function startSubscription(planCode: string): Promise<string> {
-  const r = await billing<{ checkout_url: string }>({ action: 'subscribe', plan_code: planCode })
+export async function startSubscription(planCode: string, extras = 0): Promise<string> {
+  const r = await billing<{ checkout_url: string }>({ action: 'subscribe', plan_code: planCode, extras })
   if (!/^https:\/\/([a-z0-9-]+\.)*mercadopago\.com(\.br)?\//.test(r.checkout_url)) throw new Error('Endereço de pagamento inesperado.')
   return r.checkout_url
 }
@@ -81,8 +81,8 @@ export async function startSubscription(planCode: string): Promise<string> {
 export const syncSubscription = () => billing<{ ok: boolean }>({ action: 'sync' })
 
 // Premium por período pago à vista: Pix, débito, boleto ou saldo, sem cartão salvo (ADR-039).
-export async function startPassPayment(planCode: string): Promise<string> {
-  const r = await billing<{ checkout_url: string }>({ action: 'pay_pass', plan_code: planCode })
+export async function startPassPayment(planCode: string, extras = 0): Promise<string> {
+  const r = await billing<{ checkout_url: string }>({ action: 'pay_pass', plan_code: planCode, extras })
   if (!/^https:\/\/([a-z0-9-]+\.)*mercadopago\.com(\.br)?\//.test(r.checkout_url)) throw new Error('Endereço de pagamento inesperado.')
   return r.checkout_url
 }
@@ -154,4 +154,28 @@ export async function fetchInvoiceReceipt(id: string): Promise<InvoiceReceipt> {
   const { data, error } = await getSupabase().rpc('get_invoice_receipt', { p_invoice_id: id })
   if (error) throw error
   return data as unknown as InvoiceReceipt
+}
+
+// Motos extras (ADR-062): Premium inclui 2 motos; cada moto a mais tem preço próprio.
+export type MotorcycleSlots = {
+  mode: 'subscription' | 'pass' | 'grant' | 'free'
+  max: number
+  used: number
+  extras: number
+  extra_cents: number
+  billing_period: string | null
+  pass_until: string | null
+  pass_months_left: number | null
+  over_limit: string[]
+}
+export async function fetchMotorcycleSlots(): Promise<MotorcycleSlots> {
+  const { data, error } = await getSupabase().rpc('get_my_motorcycle_slots' as never)
+  if (error) throw error
+  return data as unknown as MotorcycleSlots
+}
+export const setSubscriptionExtras = (extras: number) => billing<{ ok: boolean; price_cents: number }>({ action: 'set_extras', extras })
+export async function payExtraMotorcycles(extras: number): Promise<string> {
+  const r = await billing<{ checkout_url: string }>({ action: 'pay_extra', extras })
+  if (!/^https:\/\/([a-z0-9-]+\.)*mercadopago\.com(\.br)?\//.test(r.checkout_url)) throw new Error('Endereço de pagamento inesperado.')
+  return r.checkout_url
 }

@@ -7,6 +7,7 @@ import { Notice } from '@/components/Notice'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { parseBRL } from '@/modules/maintenance/schemas'
 import {
+  adminSetPlanExtraPrice,
   adminListPlans,
   adminPlanHistory,
   adminSavePlan,
@@ -246,6 +247,7 @@ export function AdminPlansPage() {
   const qc = useQueryClient()
   const plans = useQuery({ queryKey: ['admin-plans'], queryFn: adminListPlans })
   const [editing, setEditing] = useState<string | 'new' | null>(null)
+  const [extraOf, setExtraOf] = useState<string | null>(null)
   const [historyOf, setHistoryOf] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -282,12 +284,14 @@ export function AdminPlansPage() {
                 <p className="text-sm text-muted">
                   {formatPlanPrice(p.price_cents)} · {PERIOD_LABEL[p.billing_period as BillingPeriod]} · {p.max_motorcycles}{' '}
                   {p.max_motorcycles === 1 ? 'moto' : 'motos'} · {formatQuota(p.storage_quota_mb)}
+                  {p.kind === 'premium' ? ` · moto extra ${formatPlanPrice((p as { extra_motorcycle_cents?: number }).extra_motorcycle_cents ?? 0)}` : ''}
                   {p.trial_days > 0 ? ` · ${p.trial_days} dias grátis` : ''} · {p.max_share_links} links
                   {p.entitlements.length > 0 ? ` · ${p.entitlements.map((e) => ENTITLEMENT_LABEL[e as Entitlement] ?? e).join(', ')}` : ''} · versão {p.version}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="secondary" onClick={() => setEditing(p.id)}>Editar</Button>
+                {p.kind === 'premium' && <Button size="sm" variant="quiet" onClick={() => setExtraOf(extraOf === p.id ? null : p.id)}>Moto extra</Button>}
                 <Button size="sm" variant="quiet" onClick={() => setHistoryOf(historyOf === p.id ? null : p.id)} aria-expanded={historyOf === p.id}>
                   Histórico
                 </Button>
@@ -301,6 +305,7 @@ export function AdminPlansPage() {
             </div>
             {editing === p.id && <PlanForm plan={p} onDone={() => setEditing(null)} />}
             {historyOf === p.id && <PlanHistory planId={p.id} />}
+            {extraOf === p.id && <ExtraPriceForm planId={p.id} current={(p as { extra_motorcycle_cents?: number }).extra_motorcycle_cents ?? 0} onDone={() => setExtraOf(null)} />}
           </li>
         ))}
       </ul>
@@ -311,6 +316,40 @@ export function AdminPlansPage() {
         ) : (
           <Button variant="secondary" onClick={() => setEditing('new')}>Novo plano Premium</Button>
         )}
+      </div>
+    </div>
+  )
+}
+
+function ExtraPriceForm({ planId, current, onDone }: { planId: string; current: number; onDone: () => void }) {
+  const qc = useQueryClient()
+  const [value, setValue] = useState((current / 100).toFixed(2).replace('.', ','))
+  const [reason, setReason] = useState('')
+  const [err, setErr] = useState('')
+  const [busy, setBusy] = useState(false)
+  async function save() {
+    const cents = Math.round(Number(value.replace(/\./g, '').replace(',', '.')) * 100)
+    if (!Number.isFinite(cents) || cents < 0) return setErr('Valor inválido.')
+    setBusy(true)
+    setErr('')
+    try {
+      await adminSetPlanExtraPrice(planId, cents, reason)
+      await qc.invalidateQueries({ queryKey: ['admin-plans'] })
+      onDone()
+    } catch (e) {
+      setErr((e as { message?: string }).message ?? 'Não foi possível salvar.')
+      setBusy(false)
+    }
+  }
+  return (
+    <div className="mt-3 flex max-w-xl flex-col gap-3 rounded-doc border border-rule bg-paper p-3">
+      <p className="text-sm text-graphite">Preço de cada moto além das incluídas, no mesmo período do plano. Vale para novas contratações; quem já assina mantém o valor contratado.</p>
+      <TextField label="Valor por moto extra (R$)" value={value} onChange={(e) => setValue(e.target.value)} inputMode="decimal" />
+      <TextField label="Motivo (fica na auditoria)" value={reason} onChange={(e) => setReason(e.target.value)} />
+      {err && <p className="text-sm text-danger" role="alert">{err}</p>}
+      <div className="flex gap-2">
+        <Button size="sm" loading={busy} onClick={() => void save()}>Salvar</Button>
+        <Button size="sm" variant="secondary" disabled={busy} onClick={onDone}>Cancelar</Button>
       </div>
     </div>
   )

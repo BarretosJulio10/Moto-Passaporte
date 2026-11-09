@@ -8,6 +8,7 @@ import { getStorageUsage } from '@/modules/attachments/api'
 import { formatBytes } from '@/modules/attachments/files'
 import { usePublicSettings } from '@/modules/public_site/usePublicSettings'
 import { fetchMyPlan, formatPlanPrice, formatQuota, PERIOD_LABEL } from './api'
+import { ExtraMotorcyclesCard, ExtrasPicker } from './ExtraMotorcycles'
 import {
   cancelSubscription,
   fetchMyInvoices,
@@ -150,6 +151,7 @@ export function MyPlanPage() {
         : null,
   )
   const [subscribing, setSubscribing] = useState<string | null>(null)
+  const [extras, setExtras] = useState<number | null>(null)
   const plan = useQuery({ queryKey: ['my-plan', user?.id], enabled: Boolean(user), queryFn: fetchMyPlan })
   const usage = useQuery({ queryKey: ['storage-usage', user?.id], enabled: Boolean(user), queryFn: getStorageUsage })
   const sub = useQuery({ queryKey: ['my-subscription', user?.id], enabled: Boolean(user), queryFn: fetchMySubscription })
@@ -186,7 +188,7 @@ export function MyPlanPage() {
     setSubscribing(`pass:${code}`)
     setMessage(null)
     try {
-      const url = await startPassPayment(code)
+      const url = await startPassPayment(code, extraCount)
       window.location.assign(url)
     } catch (e) {
       setMessage({ tone: 'error', text: e instanceof Error ? e.message : 'Não foi possível abrir o pagamento.' })
@@ -198,7 +200,7 @@ export function MyPlanPage() {
     setSubscribing(code)
     setMessage(null)
     try {
-      const url = await startSubscription(code)
+      const url = await startSubscription(code, extraCount)
       window.location.assign(url)
     } catch (e) {
       setMessage({ tone: 'error', text: e instanceof Error ? e.message : 'Não foi possível iniciar a assinatura.' })
@@ -207,6 +209,8 @@ export function MyPlanPage() {
   }
 
   const s = sub.data
+  const used = plan.data?.motorcycles_used ?? 0
+  const extraCount = extras ?? Math.max(0, used - 2)
   const hasOpen = Boolean(s && ['active', 'past_due', 'paused'].includes(s.status))
 
   return (
@@ -246,6 +250,8 @@ export function MyPlanPage() {
           )}
         </section>
       )}
+
+      <ExtraMotorcyclesCard />
 
       {s && <SubscriptionCard sub={s} onCancel={() => cancel.mutate()} canceling={cancel.isPending} bonusUntil={plan.data?.bonus ? plan.data.bonus_until : null} />}
 
@@ -327,6 +333,7 @@ export function MyPlanPage() {
       {settings && settings.plans.length > 0 && !hasOpen && (
         <section className="mt-8 rounded-sheet border border-rule bg-sheet p-5 sm:p-6" id="planos" aria-labelledby="options-title">
           <h2 id="options-title" className="heading text-2xl text-ink">{plan.data?.paid_until ? 'Renovar ou mudar de plano' : 'Planos disponíveis'}</h2>
+          {settings.billingEnabled && <ExtrasPicker value={extraCount} onChange={setExtras} used={used} />}
           <PlansGrid plans={settings.plans} billingEnabled={settings.billingEnabled} showSignup={false}
             onSubscribe={subscribe} onPayOnce={payOnce} subscribingCode={subscribing} />
         </section>

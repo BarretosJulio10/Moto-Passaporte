@@ -54,7 +54,7 @@ Problemas conhecidos e sua situação.
 ### KI-046 — `auth.getUser(jwt)` nas Edge Functions com tokens ES256
 **Status:** aberto (09/11/2026)
 - Na `pista-accounts`, `getUser(jwt)` devolveu "Auth session missing!" com sessão válida (token ES256, chaves novas do Supabase). Corrigido lá: a assinatura é conferida pelo gateway (`verify_jwt`) e a função lê o `sub` do token e confirma a conta com `auth.admin.getUserById`.
-- `export-files` e `mercadopago-billing` usam o mesmo `getUser(jwt)`: conferir com um teste real (baixar comprovantes, assinar) e aplicar a mesma correção se falharem.
+- `mercadopago-billing` corrigida na v0.63.0. `export-files` ainda usa `getUser(jwt)`: conferir com um teste real (baixar comprovantes) e aplicar a mesma correção se falhar.
 
 ### KI-047 — Links públicos da oficina falhavam (controle de acessos)
 **Status:** resolvido (09/11/2026, v0.58.1)

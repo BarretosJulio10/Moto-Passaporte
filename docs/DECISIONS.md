@@ -109,6 +109,13 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-062 — Premium com 2 motos e moto extra
+**Data:** 09/11/2026 · **Status:** aceita (responsável: 2 motos no Premium, moto extra a R$ 3,90; aceitou as sugestões de R$ 19,90/semestre, R$ 34,90/ano, teste com 2 motos e moto excedente só leitura)
+- `subscription_plans.extra_motorcycle_cents` (editável no admin com motivo). Assinatura e período Pix guardam `extra_motorcycles` e o valor na compra; `max_motorcycles`/`price_cents` já somam as extras (contrato não muda com o catálogo).
+- Cartão: `billing_prepare_subscription_v2` na contratação; `set_extras` na Edge Function atualiza o `transaction_amount` do preapproval no Mercado Pago e depois `billing_apply_extras` (sem cobrança proporcional).
+- Pix: `billing_prepare_pass_v2` na compra; moto extra no meio do período = `premium_passes.addon_for` (complemento) com preço de R$ 3,90 × meses restantes (arredonda para cima), válido até o fim do período principal; `user_active_pass`/`user_pass_until` ignoram complementos e `user_plan` soma `pass_addon_extras`.
+- Excedente: `motorcycle_over_limit` (ordem de cadastro, as mais antigas liberadas) e gatilho `block_over_limit_owner_write` nas inserções do dono (manutenção, km, diário, gastos, links, lembretes). `get_my_motorcycle_slots` alimenta a tela.
+
 ### ADR-061 — Modo toque e acabamento do fluxo da oficina (Fases C e D)
 **Data:** 09/11/2026 · **Status:** aceita
 - Modo toque guardado no aparelho (`mp-esteira-toque`), aplicado pelo `WorkshopShell` (classe `touch-mode` com alvos de 52 px) em todas as telas da oficina; app instalado com `?origem=app` vai para a última oficina (`mp-last-org`) quando o modo está ligado.

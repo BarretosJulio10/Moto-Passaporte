@@ -84,7 +84,15 @@ select tests.ok((select count(*) = 1 from storage.objects where name = :'ph1'), 
 select tests.ok(((public.get_storage_usage() ->> 'used_bytes')::bigint = (select sum(file_size) from public.attachments where diary_entry_id is null)), 'fotos de diário de outro autor fora da cota do novo dono');
 select tests.must_fail(format($$select public.update_diary_entry(%L, 'trip', 'x', current_date)$$, :'pub'), 'novo dono não edita entrada do anterior');
 select tests.must_fail(format($$select public.delete_diary_photo(%L)$$, :'att_pub'), 'novo dono não apaga foto do anterior');
+-- Venda simulada deixa B com 2 motos: cortesia temporária para não cair no limite (ADR-062).
+reset role;
+insert into public.premium_grants (id, user_id, plan_id, reason, source)
+select '0c0c0c0c-0000-4000-8000-000000000001', :'B', id, 'Teste: venda simulada', 'admin' from public.subscription_plans where code = 'premium_mensal';
+set role authenticated;
 select public.create_diary_entry(:'moto_a', 'first_ride', 'Primeiro passeio', current_date) as b_entry \gset
+reset role;
+update public.premium_grants set revoked_at = now() where id = '0c0c0c0c-0000-4000-8000-000000000001';
+set role authenticated;
 select tests.ok((select count(*) = 2 from public.motorcycle_diary_feed where motorcycle_id = :'moto_a'), 'novo dono escreve no diário');
 
 select set_config('request.jwt.claim.sub', :'A', false);
