@@ -180,7 +180,7 @@ export function EntryList({ entries, motos, motoId, showMoto }: {
                     )}
                   </p>
                 </div>
-                <span className="font-semibold tabular-nums text-ink">{e.value_cents != null ? formatBRL(e.value_cents) : <span className="font-normal text-muted">sem valor</span>}</span>
+                <span className="font-semibold tabular-nums text-ink">{e.locked ? <span className="font-normal text-muted">no cofre</span> : e.value_cents != null ? formatBRL(e.value_cents) : <span className="font-normal text-muted">sem valor</span>}</span>
               </div>
             )}
           </li>

@@ -80,6 +80,35 @@ export function TimelineEntryCard({ entry: e, successor, original, onVoid, onAtt
     }
   }
 
+  if (e.locked && !e.is_void) {
+    return (
+      <article
+        className={`rounded-sheet border border-rule bg-paper p-4 sm:p-5 ${superseded ? 'border-dashed opacity-70' : ''}`}
+        aria-label={`${CATEGORY_LABEL[e.category]}: ${e.title} (no cofre)`}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-sm text-muted">
+              {formatDate(e.service_date, 'short')}, {CATEGORY_LABEL[e.category]}
+              {e.workshop_name ? ` · ${e.workshop_name}` : ''}
+            </p>
+            <h3 className={`mt-0.5 font-semibold text-ink ${superseded ? 'line-through' : ''}`}>{e.title}</h3>
+          </div>
+          <span className="inline-flex items-center gap-1 rounded-[0.4rem] border border-rule px-2 py-0.5 text-xs font-semibold text-muted">
+            <svg aria-hidden="true" viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <rect x="3" y="7" width="10" height="7" rx="1.5" /><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" />
+            </svg>
+            No cofre
+          </span>
+        </div>
+        <p className="mt-3 text-sm text-graphite">
+          Detalhes e comprovantes deste serviço estão guardados e disponíveis no Premium.{' '}
+          <Link to="/painel/plano" className="font-semibold text-ink underline underline-offset-4">Ver planos</Link>
+        </p>
+      </article>
+    )
+  }
+
   if (e.is_void) {
     return (
       <article className="rounded-doc border border-dashed border-rule px-4 py-3 text-sm text-muted">

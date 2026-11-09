@@ -7,6 +7,7 @@ import { getSupabase } from '@/lib/supabase'
 import { fetchUnreadCount } from '@/modules/notifications/api'
 import { InstallBanner } from '@/core/pwa/PwaBanners'
 import { WorkshopSideNav } from '@/modules/workshop/shared/WorkshopNav'
+import { TermsGate } from '@/modules/account/TermsGate'
 
 // Ícones simples (traço), herdam a cor do texto.
 const I = {
@@ -198,6 +199,7 @@ export function AppLayout() {
         <main id="conteudo" className="flex-1 px-4 pb-28 pt-6 sm:px-6 lg:px-10 lg:pb-12 lg:pt-10 2xl:px-14 print:p-0">
           <div className="mx-auto w-full max-w-[1680px] print:max-w-none">
             <InstallBanner />
+            {user && <TermsGate userId={user.id} />}
             <Suspense fallback={<p className="text-muted" role="status">Carregando…</p>}>
               <Outlet />
             </Suspense>

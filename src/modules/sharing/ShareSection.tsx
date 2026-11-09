@@ -6,6 +6,8 @@ import { Notice } from '@/components/Notice'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { formatDate } from '@/core/shared/format'
 import { downloadQrPng, qrSvg } from './qr'
+import { Link } from 'react-router-dom'
+import { fetchMyVault } from '@/modules/maintenance/api'
 import {
   createShare,
   DEFAULT_OPTIONS,
@@ -27,6 +29,7 @@ const OPTION_ORDER: Array<keyof ShareOptions> = ['show_history', 'show_mileage',
 export function ShareSection({ motorcycleId }: { motorcycleId: string }) {
   const queryClient = useQueryClient()
   const shares = useQuery({ queryKey: ['shares', motorcycleId], queryFn: () => fetchShares(motorcycleId) })
+  const vault = useQuery({ queryKey: ['my-vault'], queryFn: fetchMyVault, retry: false })
   const [open, setOpen] = useState(false)
   const [label, setLabel] = useState('')
   const [expiry, setExpiry] = useState('30')
@@ -76,6 +79,12 @@ export function ShareSection({ motorcycleId }: { motorcycleId: string }) {
         </div>
       ) : (
         <form noValidate onSubmit={onSubmit} className="mt-4 flex max-w-xl flex-col gap-4 rounded-doc border border-rule bg-sheet p-4">
+          {vault.data?.applies && (
+            <Notice tone="info" title="Seu comprador verá só um resumo">
+              No plano gratuito, o link mostra quantos serviços a moto tem, quantos foram feitos por oficina e o último serviço, mas não a lista com detalhes e comprovantes.{' '}
+              <Link to="/painel/plano" className="font-semibold text-ink underline underline-offset-4">Liberar o histórico completo com o Premium</Link>
+            </Notice>
+          )}
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField label="Nome do link (opcional)" maxLength={60} value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Ex.: Anúncio OLX" />
             <SelectField label="Validade" value={expiry} onChange={(e) => setExpiry(e.target.value)} options={Object.keys(EXPIRY)} optionLabel={(v) => EXPIRY[v] ?? v} />

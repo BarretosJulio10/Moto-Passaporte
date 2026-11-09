@@ -10,6 +10,6 @@ export const isSupabaseConfigured = Boolean(env.supabaseUrl && env.supabasePubli
 
 // Versões dos documentos legais aceitos no cadastro (registradas no perfil).
 export const LEGAL_VERSIONS = {
-  terms: '0.1',
-  privacy: '0.1',
+  terms: '0.2',
+  privacy: '0.2',
 } as const

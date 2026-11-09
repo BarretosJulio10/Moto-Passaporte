@@ -39,17 +39,24 @@ export type TimelineEntry = {
   recorded_by_name?: string | null
   /** Visão da oficina: registro feito por ela mesma (ADR-015). */
   is_own?: boolean
+  /** Cofre do plano gratuito (PRD 2.4): sem km, valor, peças, notas e anexos. */
+  locked?: boolean
+}
+
+/** Estado do cofre do plano gratuito para a conta (PRD 2.4, ADR-056). */
+export type VaultState = { enabled: boolean; applies: boolean; open_records: number }
+
+export async function fetchMyVault(): Promise<VaultState> {
+  const { data, error } = await getSupabase().rpc('get_my_vault')
+  if (error) throw error
+  return data as unknown as VaultState
 }
 
 export async function fetchTimeline(motorcycleId: string): Promise<TimelineEntry[]> {
-  const { data, error } = await getSupabase()
-    .from('maintenance_timeline')
-    .select('*')
-    .eq('motorcycle_id', motorcycleId)
-    .order('service_date', { ascending: false })
-    .order('created_at', { ascending: false })
+  // Função do banco: aplica o cofre do plano gratuito (PRD 2.4) e já vem em ordem.
+  const { data, error } = await getSupabase().rpc('get_maintenance_timeline', { p_motorcycle_id: motorcycleId })
   if (error) throw error
-  return data as unknown as TimelineEntry[]
+  return (data ?? []) as unknown as TimelineEntry[]
 }
 
 export async function createMaintenanceRecord(motorcycleId: string, input: MaintenanceInput, items: ItemInput[]) {

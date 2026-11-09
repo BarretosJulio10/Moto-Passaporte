@@ -94,6 +94,10 @@ export function SignUpPage() {
           error={errors.password}
         />
         <TextField label="Confirme a senha" name="confirmPassword" type="password" autoComplete="new-password" required error={errors.confirmPassword} />
+        <p className="rounded-doc border border-rule bg-paper px-3 py-2 text-sm text-graphite">
+          Sua conta começa com Premium grátis por 3 meses, sem cartão. Depois, no plano gratuito, o histórico fica todo guardado e os
+          2 registros mais recentes de cada moto mostram detalhes e comprovantes; os demais ficam no cofre. Você pode baixar seus dados a qualquer momento.
+        </p>
         <CheckboxField
           name="acceptTerms"
           error={errors.acceptTerms}

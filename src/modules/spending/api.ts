@@ -83,6 +83,8 @@ export type SpendingEntry = {
   workshop_name: string | null
   mileage: number | null
   value_cents: number | null
+  /** Serviço no cofre do plano gratuito (PRD 2.4): sem valor e sem km. */
+  locked?: boolean
   has_receipt: boolean
   receipt_path: string | null
   receipt_name: string | null
@@ -182,12 +184,12 @@ export function monthLabel(ym: string, long = false): string {
 }
 
 /** Soma dos valores que contam na linha do tempo (vigentes, não anulados, com valor) — RF-09. */
-export function timelineTotal(entries: { status: string; is_void: boolean; service_value_cents: number | null }[]): { cents: number; withValue: number; missing: number } {
+export function timelineTotal(entries: { status: string; is_void: boolean; service_value_cents: number | null; locked?: boolean }[]): { cents: number; withValue: number; missing: number } {
   let cents = 0
   let withValue = 0
   let missing = 0
   for (const e of entries) {
-    if (e.status !== 'current' || e.is_void) continue
+    if (e.status !== 'current' || e.is_void || e.locked) continue
     if (e.service_value_cents == null) missing++
     else { cents += e.service_value_cents; withValue++ }
   }

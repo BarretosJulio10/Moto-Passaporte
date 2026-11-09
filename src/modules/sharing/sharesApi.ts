@@ -66,6 +66,16 @@ export type SharedPassport = {
     attachments: Array<{ kind: AttachmentKind; id?: string; mime_type?: string }> | null
   }>
   diary?: Array<{ entry_date: string; category: DiaryCategory; title: string; body: string | null; location: string | null; photo_count: number }>
+  /** Dono no plano gratuito com o cofre ligado (PRD 2.4): só o resumo do histórico. */
+  vault?: boolean
+  history_summary?: {
+    services: number
+    workshops: number
+    workshop_records: number
+    first_service_date: string | null
+    last_service_date: string | null
+    last_mileage: number | null
+  }
 }
 
 export function shareUrl(token: string, origin = window.location.origin) {

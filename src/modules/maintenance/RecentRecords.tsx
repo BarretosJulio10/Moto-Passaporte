@@ -34,7 +34,9 @@ export function RecentRecords({ motorcycleId }: { motorcycleId: string }) {
                 <span className="font-semibold text-ink">{e.title}</span>
                 <span className="text-sm text-muted">, {CATEGORY_LABEL[e.category]}</span>
               </span>
-              {e.mileage !== null && <span className="text-sm text-muted">{formatKm(e.mileage)}</span>}
+              {e.locked
+                ? <span className="text-sm text-muted">No cofre</span>
+                : e.mileage !== null && <span className="text-sm text-muted">{formatKm(e.mileage)}</span>}
             </li>
           ))}
         </ul>

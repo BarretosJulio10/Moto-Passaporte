@@ -40,6 +40,22 @@ export async function exportMyData(): Promise<unknown> {
   return data
 }
 
+export type ExportedFile = { bucket: string; path: string; file_name: string; motorcycle: string; date: string | null; title: string; url: string | null }
+
+/** Links temporários (1 hora) de todos os comprovantes do usuário — sempre grátis (PRD 2.4, LGPD). */
+export async function exportMyFiles(): Promise<{ files: ExportedFile[]; expires_in: number }> {
+  const { data, error } = await getSupabase().functions.invoke('export-files', { body: {} })
+  if (error) {
+    const ctx = (error as { context?: Response }).context
+    let message = 'Não foi possível preparar seus comprovantes agora. Tente de novo.'
+    try { const body = ctx ? await ctx.json() : null; if (body?.message) message = body.message } catch { /* mantém a mensagem padrão */ }
+    throw new Error(message)
+  }
+  const body = data as { ok: boolean; files?: ExportedFile[]; expires_in?: number; message?: string }
+  if (!body?.ok) throw new Error(body?.message ?? 'Não foi possível preparar seus comprovantes agora.')
+  return { files: body.files ?? [], expires_in: body.expires_in ?? 3600 }
+}
+
 export async function fetchMyPrivacyRequests(): Promise<PrivacyRequest[]> {
   const { data, error } = await getSupabase().rpc('get_my_privacy_requests')
   if (error) throw error

@@ -134,7 +134,7 @@ export function SharedPassportView({ p, token }: { p: SharedPassport; token?: st
             <Item label="Passaporte criado em" value={formatDate(p.passport_created_at, 'short')} />
             {p.origin_workshop && <Item label="Oficina de Origem" value={p.origin_workshop} />}
           </dl>
-          {p.options.history && (
+          {p.options.history && !p.vault && (
             <p className="mt-5 text-sm text-graphite">
               {history.length} {history.length === 1 ? 'registro' : 'registros'} no histórico
               {counts.workshop > 0 && `, ${counts.workshop} ${counts.workshop === 1 ? 'confirmado' : 'confirmados'} por oficina`}
@@ -165,7 +165,23 @@ export function SharedPassportView({ p, token }: { p: SharedPassport; token?: st
         </section>
       )}
 
-      {p.options.history && (
+      {p.options.history && p.vault && p.history_summary && (
+        <section aria-labelledby="history-title">
+          <h2 id="history-title" className="heading text-2xl text-ink">Histórico de serviços</h2>
+          <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-4 rounded-sheet border border-rule bg-sheet p-5 sm:grid-cols-4">
+            <Item label="Serviços registrados" value={String(p.history_summary.services)} />
+            <Item label="Feitos por oficina" value={String(p.history_summary.workshop_records)} />
+            <Item label="Último serviço" value={p.history_summary.last_service_date ? formatDate(p.history_summary.last_service_date, 'short') : '—'} />
+            <Item label="Km no último serviço" value={p.history_summary.last_mileage !== null ? formatKm(p.history_summary.last_mileage) : '—'} />
+          </dl>
+          <p className="mt-3 text-sm text-muted">
+            O proprietário guarda o histórico completo{p.history_summary.first_service_date ? ` desde ${formatDate(p.history_summary.first_service_date, 'short')}` : ''}, com detalhes e comprovantes.
+            Peça a ele para liberar o histórico completo neste link.
+          </p>
+        </section>
+      )}
+
+      {p.options.history && !p.vault && (
         <section aria-labelledby="history-title">
           <h2 id="history-title" className="heading text-2xl text-ink">Histórico de serviços</h2>
           {history.length === 0 && <p className="mt-2 text-muted">Nenhum serviço registrado.</p>}

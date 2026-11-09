@@ -10,7 +10,9 @@ const TERMS: Array<[string, string]> = [
   ['Histórico da motocicleta', 'Registros confirmados não são apagados nem alterados sem deixar rastro. Correções geram um novo registro, preservando o original.'],
   ['Oficinas participantes', 'Oficinas usam a plataforma gratuitamente e só acessam motocicletas com autorização ativa do proprietário. O selo de participante não é certificação técnica.'],
   ['Transferência', 'Ao concluir a transferência, o novo titular passa a controlar o passaporte, o anterior perde a edição e as autorizações de oficinas são encerradas.'],
-  ['Planos e cobrança', 'Recursos Premium dependem de assinatura. Valores, renovação e cancelamento serão informados antes da contratação.'],
+  ['Planos e cobrança', 'Recursos Premium dependem de assinatura ou de período pago. Valores, renovação e cancelamento são informados antes da contratação. O cancelamento é feito pelo próprio painel, a qualquer momento, e compras online podem ser desistidas em até 7 dias com devolução (CDC, art. 49).'],
+  ['Plano gratuito e cofre do histórico', 'No plano gratuito, todo o histórico fica guardado, sem limite de registros, e nada é apagado por causa do plano. Os 2 registros mais recentes de cada moto mostram todos os detalhes e comprovantes; os demais ficam no cofre, mostrando data, tipo de serviço e oficina. O link para comprador mostra um resumo do histórico (quantidade de serviços, serviços feitos por oficina, data e quilometragem do último). Ao contratar o Premium, tudo abre na hora. Links criados antes desta versão continuam completos até vencer.'],
+  ['Seus dados sempre com você', 'Em qualquer plano, você pode baixar de graça, em Minha conta, todos os seus dados e comprovantes, inclusive os registros guardados no cofre.'],
 ]
 
 const PRIVACY: Array<[string, string]> = [
@@ -18,7 +20,7 @@ const PRIVACY: Array<[string, string]> = [
   ['Para que usamos', 'Para prestar o serviço: manter o histórico, controlar acessos, enviar avisos e cumprir obrigações legais.'],
   ['O que nunca fica público', 'CPF, endereço, telefone e e-mail pessoais, dados de pagamento, chassi completo, documentos pessoais, dados de proprietários anteriores e o diário privado.'],
   ['Compartilhamento', 'Só com quem você autorizar (oficinas e compradores) e com fornecedores necessários à operação, como hospedagem e pagamento.'],
-  ['Seus direitos (LGPD)', 'Você pode pedir acesso, correção, portabilidade e exclusão dos seus dados pessoais, nos limites da lei e da preservação do histórico de terceiros.'],
+  ['Seus direitos (LGPD)', 'Você pode pedir acesso, correção, portabilidade e exclusão dos seus dados pessoais, nos limites da lei e da preservação do histórico de terceiros. A cópia dos seus dados e comprovantes é gratuita em qualquer plano e pode ser baixada a qualquer momento em Minha conta.'],
   ['Segurança', 'Acesso controlado no banco de dados, registros de auditoria e arquivos privados sem links públicos permanentes.'],
 ]
 

@@ -109,6 +109,16 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-056 — Modelo cofre no plano gratuito (PRD 2.4)
+**Data:** 09/11/2026 · **Status:** aceita
+- Gratuito: lista completa da linha do tempo; só os N registros vigentes mais recentes de cada moto (`free_open_records`, 2) com detalhes e comprovantes; a cadeia de correções desses registros abre junto. O resto fica "no cofre" (título, data, categoria, oficina). Nada é apagado.
+- Premium = qualquer plano `kind = premium` vigente (assinatura, período pago ou bônus), via `user_has_full_history`; não usa benefício novo em `entitlements` para não depender de assinaturas antigas.
+- Bloqueio no banco: política de `maintenance_records` e `attachments`, `can_access_attachment_object` (Storage), `get_maintenance_timeline` (o app não lê mais a view direto), `get_spending_entries` (sem valor/km), `get_shared_passport` (resumo) e `shared_attachment_for_download`.
+- Links de comprador criados antes da migração (`passport_shares.full_history = true`) continuam completos até vencer.
+- Exportação sempre grátis (LGPD art. 18 §5): `export_my_data` (registros completos) e `export_my_attachments` + função `export-files` (links de 1 h, até 5 pacotes/24 h).
+- Interruptor `vault_enabled` (admin, Cobrança). Termos 0.2 com novo aceite obrigatório (`accept_current_terms`). Ligado em produção em 09/11/2026 a pedido do responsável, sem o aviso de 30 dias e sem revisão jurídica (KI-044).
+- Passe de venda de R$ 19,90 não criado: o Premium mensal já pode ser pago uma vez no Pix (R$ 9,90, sem renovação). Se quiser, criar em /admin/planos.
+
 ### ADR-055 — Preenchimento automático com serviços públicos gratuitos
 **Data:** 08/11/2026 · **Status:** aceita
 - CEP: BrasilAPI v2 com reserva no ViaCEP; CNPJ: BrasilAPI (dados públicos da Receita); marcas/modelos de moto: Tabela FIPE pela BrasilAPI (marcas guardadas no aparelho por 30 dias). Chamadas direto do navegador, sem chave, com limite de 6 s.

@@ -17,6 +17,7 @@ import {
   createPrivacyRequest,
   downloadJson,
   exportMyData,
+  exportMyFiles,
   fetchMyPrivacyRequests,
   fetchMyProfile,
   updateMyProfile,
@@ -124,6 +125,7 @@ function PrivacySection() {
     onSuccess: (data) => downloadJson(data, `moto-passaporte-meus-dados-${new Date().toISOString().slice(0, 10)}.json`),
     onError: () => setExportError('Não foi possível gerar a cópia agora. Tente de novo.'),
   })
+  const files = useMutation({ mutationFn: exportMyFiles })
   const create = useMutation({
     mutationFn: () => createPrivacyRequest(kind, details),
     onSuccess: () => {
@@ -154,8 +156,40 @@ function PrivacySection() {
         <Button variant="secondary" loading={exporting.isPending} onClick={() => { setExportError(null); exporting.mutate() }}>
           Baixar meus dados
         </Button>
-        <p className="mt-1 text-sm text-muted">Arquivo JSON com sua conta, motos atuais, histórico, diário, assinaturas e avisos. Fotos e notas ficam na página de cada moto.</p>
+        <p className="mt-1 text-sm text-muted">Arquivo JSON com sua conta, motos atuais, histórico, diário, assinaturas e avisos. Os comprovantes saem pelo botão abaixo.</p>
         {exportError && <div className="mt-2"><Notice tone="error">{exportError}</Notice></div>}
+      </div>
+
+      <div className="mt-5">
+        <Button variant="secondary" loading={files.isPending} onClick={() => files.mutate()}>
+          Baixar meus comprovantes
+        </Button>
+        <p className="mt-1 text-sm text-muted">
+          Notas, ordens de serviço, recibos e fotos de todas as suas motos, inclusive os registros guardados no cofre. Grátis em qualquer plano.
+        </p>
+        {files.isError && <div className="mt-2"><Notice tone="error">{(files.error as Error).message}</Notice></div>}
+        {files.data && (
+          files.data.files.length === 0 ? (
+            <p className="mt-2 text-sm text-muted">Você ainda não enviou comprovantes.</p>
+          ) : (
+            <div className="mt-3">
+              <p className="text-sm text-muted">{files.data.files.length} {files.data.files.length === 1 ? 'arquivo' : 'arquivos'}. Os links valem por 1 hora.</p>
+              <ul className="mt-2 max-h-80 divide-y divide-rule overflow-auto border-y border-rule text-sm" aria-label="Meus comprovantes">
+                {files.data.files.map((f) => (
+                  <li key={`${f.bucket}:${f.path}`} className="flex flex-wrap items-baseline justify-between gap-2 py-2">
+                    <span className="min-w-0 text-graphite">
+                      <span className="font-semibold text-ink">{f.title}</span>
+                      <span className="text-muted"> · {f.motorcycle}{f.date ? ` · ${formatDate(f.date)}` : ''}</span>
+                    </span>
+                    {f.url
+                      ? <a href={f.url} target="_blank" rel="noopener noreferrer" download={f.file_name} className="font-semibold text-ink underline underline-offset-4">Baixar</a>
+                      : <span className="text-muted">indisponível</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        )}
       </div>
 
       <form onSubmit={submit} noValidate className="mt-6 grid max-w-lg gap-4" aria-label="Pedido de privacidade">

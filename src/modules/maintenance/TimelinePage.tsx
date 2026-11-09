@@ -7,7 +7,7 @@ import { SelectField, TextField, CheckboxField } from '@/components/Field'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { MotoHeader } from '@/modules/motorcycles/MotoHeader'
 import { CATEGORIES, CATEGORY_LABEL, SOURCE_LABEL, type MaintenanceCategory, type RecordSource } from './labels'
-import { applyFilters, EMPTY_FILTERS, fetchTimeline, voidMaintenanceRecord, type TimelineFilters } from './api'
+import { applyFilters, EMPTY_FILTERS, fetchMyVault, fetchTimeline, voidMaintenanceRecord, type TimelineFilters } from './api'
 import { TimelineEntryCard } from './TimelineEntryCard'
 import { formatBRL } from './schemas'
 import { timelineToSpendingQuery, timelineTotal } from '@/modules/spending/api'
@@ -25,6 +25,7 @@ export function TimelinePage() {
 
   const timeline = useQuery({ queryKey: ['timeline', id], queryFn: () => fetchTimeline(id), enabled: Boolean(id) })
   const usage = useQuery({ queryKey: ['storage-usage'], queryFn: getStorageUsage, retry: false })
+  const vault = useQuery({ queryKey: ['my-vault'], queryFn: fetchMyVault, retry: false })
 
   const all = timeline.data ?? []
   const byId = useMemo(() => new Map(all.map((e) => [e.id, e])), [all])
@@ -38,6 +39,7 @@ export function TimelinePage() {
     [all],
   )
   const visible = applyFilters(all, filters)
+  const lockedCount = all.filter((e) => e.locked && e.status === 'current' && !e.is_void).length
   const filtered = JSON.stringify(filters) !== JSON.stringify(EMPTY_FILTERS)
   const total = timelineTotal(visible)
   const spendingLink = `/painel/motos/${id}/gastos${timelineToSpendingQuery(filters)}`
@@ -93,6 +95,16 @@ export function TimelinePage() {
               </Notice>
             </div>
           )}
+        </div>
+      )}
+
+      {timeline.isSuccess && lockedCount > 0 && (
+        <div className="mt-6">
+          <Notice tone="info" title={`${lockedCount} ${lockedCount === 1 ? 'registro está' : 'registros estão'} no cofre`}>
+            No plano gratuito, só os {vault.data?.open_records ?? 2} registros mais recentes de cada moto mostram detalhes e comprovantes.
+            Os demais estão guardados e seguros, e você pode exportar tudo em Minha conta.{' '}
+            <Link to="/painel/plano" className="font-semibold text-ink underline underline-offset-4">Abrir o histórico completo com o Premium</Link>
+          </Notice>
         </div>
       )}
 

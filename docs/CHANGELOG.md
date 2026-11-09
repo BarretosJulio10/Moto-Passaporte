@@ -9,6 +9,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.56.0] — 09/11/2026 — Planos: modelo cofre (PRD 2.4)
+
+### Adicionado
+- **Cofre do plano gratuito**: o histórico continua inteiro na lista, mas só os 2 registros mais recentes de cada moto mostram km, valor, peças, observações e comprovantes. Os demais aparecem com cadeado ("No cofre") e convite ao Premium. No Premium, tudo abre na hora; ao voltar ao gratuito, fecha de novo sem apagar nada.
+- Linha do tempo mostra quantos registros estão no cofre; gastos mostram "no cofre" no lugar do valor.
+- **Link para comprador em resumo** no gratuito: serviços, feitos por oficina, último serviço e km. Links criados antes continuam completos até vencer. Aviso ao criar link.
+- **Baixar meus comprovantes** (Minha conta): links de 1 hora para todos os comprovantes, inclusive os do cofre. Grátis em qualquer plano.
+- **Termos 0.2**: novo aceite obrigatório no próximo acesso; regra explicada no cadastro.
+- Admin → Configurações → Cobrança: ligar/desligar o cofre e quantos registros ficam abertos.
+
+### Mudado
+- Card de preços com textos novos do Gratuito e do Premium.
+- Avisos de fim do bônus e de serviço registrado por oficina citam o cofre.
+
 ## [0.55.0] — 08/11/2026 — Preenchimento automático e telas na largura toda
 
 ### Adicionado

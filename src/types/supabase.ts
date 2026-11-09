@@ -871,6 +871,10 @@ export type Database = {
       get_my_chassis: { Args: { p_motorcycle_id: string }; Returns: string | null }
       set_my_chassis: { Args: { p_motorcycle_id: string; p_chassis: string }; Returns: undefined }
       export_my_data: { Args: Record<PropertyKey, never>; Returns: Json }
+      export_my_attachments: { Args: Record<PropertyKey, never>; Returns: Json }
+      get_maintenance_timeline: { Args: { p_motorcycle_id: string }; Returns: Json }
+      get_my_vault: { Args: Record<PropertyKey, never>; Returns: Json }
+      accept_current_terms: { Args: { p_terms_version: string; p_privacy_version: string }; Returns: undefined }
       create_privacy_request: { Args: { p_kind: string; p_details?: string | null }; Returns: string }
       cancel_my_privacy_request: { Args: { p_id: string }; Returns: undefined }
       get_my_privacy_requests: {
