@@ -6,10 +6,14 @@ import { CORS, reply, serverClient, userClient } from '../_shared/mercadopago.ts
 // Também confere as fotos das ordens de serviço (bucket "workshop-files", PRD 2.1 §20.3).
 const BUCKETS = {
   attachments: { info: 'attachment_object_info', pattern: /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp|pdf)$/ },
-  'workshop-files': { info: 'workshop_file_object_info', pattern: /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/ },
+  'workshop-files': { info: 'workshop_file_object_info', pattern: /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp|m4a|webm|ogg)$/ },
 } as const
 type BucketName = keyof typeof BUCKETS
-const EXT: Record<string, string> = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', pdf: 'application/pdf' }
+const EXT: Record<string, string> = {
+  jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', pdf: 'application/pdf',
+  // Áudio do App da Pista (ADR-057): só no bucket da oficina.
+  m4a: 'audio/mp4', webm: 'audio/webm', ogg: 'audio/ogg',
+}
 
 function matches(mime: string, b: Uint8Array): boolean {
   const at = (i: number, ...v: number[]) => v.every((x, k) => b[i + k] === x)
@@ -22,6 +26,13 @@ function matches(mime: string, b: Uint8Array): boolean {
       return at(0, 0x52, 0x49, 0x46, 0x46) && at(8, 0x57, 0x45, 0x42, 0x50)
     case 'application/pdf':
       return at(0, 0x25, 0x50, 0x44, 0x46, 0x2d)
+    case 'audio/mp4':
+      return at(4, 0x66, 0x74, 0x79, 0x70) // "ftyp"
+    case 'audio/webm':
+      return at(0, 0x1a, 0x45, 0xdf, 0xa3) // EBML
+    case 'audio/ogg':
+      return at(0, 0x4f, 0x67, 0x67, 0x53) // "OggS"
+
     default:
       return false
   }
@@ -64,7 +75,7 @@ Deno.serve(async (req) => {
   await server.rpc('record_attachment_check', { p_path: path, p_user: user.id, p_mime: declared, p_ok: ok })
   if (!ok) {
     await server.storage.from(BUCKET).remove([path])
-    return reply(422, { ok: false, message: 'O conteúdo do arquivo não corresponde ao tipo informado. Envie uma foto (JPG, PNG, WebP) ou um PDF.' })
+    return reply(422, { ok: false, message: 'O conteúdo do arquivo não corresponde ao tipo informado. Envie uma foto (JPG, PNG, WebP), um PDF ou um áudio gravado pelo app.' })
   }
   return reply(200, { ok: true })
 })

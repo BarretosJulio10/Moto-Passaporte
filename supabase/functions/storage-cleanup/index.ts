@@ -13,6 +13,8 @@ const BUCKET = 'attachments'
 
 // Caminhos com prefixo "expense-receipts:" são comprovantes de despesa (ADR-052); o resto é do bucket de anexos.
 const RECEIPTS_PREFIX = 'expense-receipts:'
+// "workshop-files:": arquivos da oficina sem registro (envio que falhou ou áudio da pista vencido, ADR-057).
+const WORKSHOP_PREFIX = 'workshop-files:'
 async function removePlanned(
   // deno-lint-ignore no-explicit-any
   server: any,
@@ -20,12 +22,12 @@ async function removePlanned(
 ): Promise<{ deleted: string[]; failed: number }> {
   const deleted: string[] = []
   let failed = 0
-  const groups: Array<[string, string[]]> = [
-    [BUCKET, paths.filter((p) => !p.startsWith(RECEIPTS_PREFIX))],
-    ['expense-receipts', paths.filter((p) => p.startsWith(RECEIPTS_PREFIX))],
+  const groups: Array<[string, string, string[]]> = [
+    [BUCKET, '', paths.filter((p) => !p.startsWith(RECEIPTS_PREFIX) && !p.startsWith(WORKSHOP_PREFIX))],
+    ['expense-receipts', RECEIPTS_PREFIX, paths.filter((p) => p.startsWith(RECEIPTS_PREFIX))],
+    ['workshop-files', WORKSHOP_PREFIX, paths.filter((p) => p.startsWith(WORKSHOP_PREFIX))],
   ]
-  for (const [bucket, list] of groups) {
-    const prefix = bucket === BUCKET ? '' : RECEIPTS_PREFIX
+  for (const [bucket, prefix, list] of groups) {
     for (let i = 0; i < list.length; i += 100) {
       const chunk = list.slice(i, i + 100)
       const names = chunk.map((p) => p.slice(prefix.length))

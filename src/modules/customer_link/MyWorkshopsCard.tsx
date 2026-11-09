@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { fetchMyRecords } from './api'
 
-const OPEN = ['open', 'awaiting_diagnosis', 'awaiting_approval', 'awaiting_parts', 'awaiting_execution', 'in_progress', 'paused', 'awaiting_complement', 'completed', 'awaiting_pickup']
+const OPEN = ['open', 'awaiting_diagnosis', 'awaiting_approval', 'awaiting_parts', 'awaiting_execution', 'in_progress', 'paused', 'awaiting_complement', 'ready', 'completed', 'awaiting_pickup']
 
 /** No painel do dono: atalho para Meus atendimentos quando há oficina ligada. Some quando não há. */
 export function MyWorkshopsCard() {

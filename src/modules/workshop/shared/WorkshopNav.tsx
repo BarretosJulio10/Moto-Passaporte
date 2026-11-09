@@ -17,6 +17,7 @@ export const WORKSHOP_NAV: NavGroup[] = [
     label: 'Dia a dia',
     items: [
       { to: '', label: 'Visão geral', end: true },
+      { to: 'pista', label: 'App da Pista' },
       { to: 'agenda', label: 'Agenda' },
       { to: 'orcamentos', label: 'Orçamentos' },
       { to: 'os', label: 'Ordens de serviço' },

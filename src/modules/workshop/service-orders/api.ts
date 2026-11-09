@@ -9,17 +9,17 @@ import type { Vehicle } from '../customers/api'
 
 export type OrderStatus =
   | 'open' | 'awaiting_diagnosis' | 'awaiting_approval' | 'awaiting_parts' | 'awaiting_execution' | 'in_progress'
-  | 'paused' | 'awaiting_complement' | 'completed' | 'awaiting_pickup' | 'delivered' | 'canceled'
+  | 'paused' | 'awaiting_complement' | 'ready' | 'completed' | 'awaiting_pickup' | 'delivered' | 'canceled'
 
 export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   open: 'Aberta', awaiting_diagnosis: 'Aguardando diagnóstico', awaiting_approval: 'Aguardando aprovação',
   awaiting_parts: 'Aguardando peças', awaiting_execution: 'Aguardando execução', in_progress: 'Em execução', paused: 'Pausada',
-  awaiting_complement: 'Aguardando serviço complementar', completed: 'Concluída', awaiting_pickup: 'Aguardando retirada',
+  awaiting_complement: 'Aguardando serviço complementar', ready: 'Pronto (mecânico)', completed: 'Concluída', awaiting_pickup: 'Aguardando retirada',
   delivered: 'Entregue', canceled: 'Cancelada',
 }
 /** Situações que a equipe escolhe à mão; conclusão, retirada, entrega e cancelamento têm botões próprios. */
 export const MANUAL_STATUSES: OrderStatus[] = [
-  'open', 'awaiting_diagnosis', 'awaiting_approval', 'awaiting_parts', 'awaiting_execution', 'in_progress', 'paused', 'awaiting_complement',
+  'open', 'awaiting_diagnosis', 'awaiting_approval', 'awaiting_parts', 'awaiting_execution', 'in_progress', 'paused', 'awaiting_complement', 'ready',
 ]
 export const CLOSED: OrderStatus[] = ['completed', 'awaiting_pickup', 'delivered', 'canceled']
 
@@ -28,6 +28,7 @@ export const ORDER_STATUS_TONE: Record<OrderStatus, string> = {
   awaiting_approval: 'border-brass/50 bg-brass/10 text-graphite', awaiting_parts: 'border-brass/50 bg-brass/10 text-graphite',
   awaiting_execution: 'border-ink/30 bg-sheet text-ink', in_progress: 'border-ink bg-ink text-sheet',
   paused: 'border-rule bg-paper text-muted', awaiting_complement: 'border-stamp/40 bg-stamp/10 text-stamp',
+  ready: 'border-ok/50 bg-ok/10 text-ok',
   completed: 'border-ok/40 bg-ok/10 text-ok', awaiting_pickup: 'border-ok/40 bg-ok/10 text-ok',
   delivered: 'border-ok bg-ok text-sheet', canceled: 'border-rule bg-paper text-muted line-through',
 }

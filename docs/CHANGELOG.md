@@ -9,6 +9,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.57.0] — 09/11/2026 — App da Pista (PWA do mecânico)
+
+### Adicionado
+- **App da Pista** em `/pista`: app instalável próprio (ícone laranja "Pista") para os mecânicos da equipe com "Executar OS". Minhas OS, Sem mecânico e (responsável) Todas; busca por placa.
+- Na OS: pegar a OS, Iniciar, Pausar, Aguardando peça e **Pronto** (com km de saída); marcar itens feitos com um toque; fotos em sequência por etapa (entrada, execução, saída); notas com ditado do teclado; **áudio** de até 2 min (arquivado, sem transcrição); checklist de entrada e saída.
+- **Funciona sem internet**: tudo vai para uma fila no celular e é enviado sozinho quando o sinal volta, sem duplicar.
+- Menu da oficina → **App da Pista**: link para instalar, enviar pelo WhatsApp, compartilhar, copiar e baixar QR code; regras (pegar OS sem mecânico, marcar Pronto).
+- OS no painel mostra as notas e os áudios da pista; nova situação "Pronto (mecânico)".
+- Áudios apagados automaticamente 90 dias depois da entrega da OS.
+
+### Segurança
+- A pista nunca recebe preços nem contato do cliente. Fotos sem localização. Arquivos da oficina sem registro entram na limpeza automática.
+
 ## [0.56.0] — 09/11/2026 — Planos: modelo cofre (PRD 2.4)
 
 ### Adicionado

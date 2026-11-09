@@ -109,6 +109,15 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-057 — App da Pista (PWA do mecânico)
+**Data:** 09/11/2026 · **Status:** aceita
+- Segundo PWA no mesmo domínio, em `/pista`, com manifesto (`/pista.webmanifest`, escopo `/pista`) e ícone próprios; o app troca o manifesto ao abrir a rota. Mesmas contas; entra quem é membro ativo com "Executar OS" ou o responsável (`pista_context`).
+- Tudo por funções `pista_*` (sem preços nem contato do cliente). `pista_lock` impede mexer em OS de outro mecânico; OS sem mecânico só se a oficina permitir (`workshops.pista_allow_unassigned`). Situação nova `ready` ("Pronto", com km de saída), liberada por `pista_allow_ready`; concluir e entregar seguem no painel.
+- Fila no aparelho (IndexedDB) com código único por envio: caminho do arquivo (fotos/áudios) ou `client_id` (notas); as funções aceitam repetição. No iPhone não há envio em segundo plano: a fila roda ao abrir, ao voltar, quando a internet volta e a cada 30 s. O service worker guarda a casca de `/pista` para abrir sem internet.
+- Áudio: gravado no aparelho (até 2 min, 30 por OS), conferido pelo `attachment-check` (assinatura m4a/webm/ogg), **sem transcrição** (decisão do responsável). Só a equipe ouve. `system_expire_workshop_audios` (cron diário) vence o áudio 90 dias após a entrega/cancelamento (`workshop_audio_retention_days`); o arquivo vira órfão em `storage_unlinked_objects` (prefixo `workshop-files:`) e a limpeza automática apaga.
+- Fotos da pista: sempre redesenhadas no aparelho (até 1600 px, JPEG 0,8), o que remove a localização (EXIF/GPS).
+- Painel: menu da oficina → "App da Pista" (link, WhatsApp, compartilhar, copiar, QR e regras); OS do painel mostra notas e áudios.
+
 ### ADR-056 — Modelo cofre no plano gratuito (PRD 2.4)
 **Data:** 09/11/2026 · **Status:** aceita
 - Gratuito: lista completa da linha do tempo; só os N registros vigentes mais recentes de cada moto (`free_open_records`, 2) com detalhes e comprovantes; a cadeia de correções desses registros abre junto. O resto fica "no cofre" (título, data, categoria, oficina). Nada é apagado.

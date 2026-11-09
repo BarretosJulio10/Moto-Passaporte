@@ -3,9 +3,9 @@
 //   tudo que vem do Supabase é buscado ao vivo, com login.
 // - Sem internet: mostra /offline.html.
 // - Recebe as notificações no celular (Web Push) e abre a tela certa ao tocar.
-const VERSION = 'mp-v1'
+const VERSION = 'mp-v2'
 const SHELL = `shell-${VERSION}`
-const PRECACHE = ['/offline.html', '/icons/icon-192.png', '/icons/badge-96.png', '/manifest.webmanifest']
+const PRECACHE = ['/offline.html', '/icons/icon-192.png', '/icons/badge-96.png', '/manifest.webmanifest', '/pista.webmanifest', '/icons/pista-192.png']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(SHELL).then((c) => c.addAll(PRECACHE)))
@@ -32,6 +32,19 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return // Supabase, Mercado Pago etc.: sempre direto, sem cache
 
   // Páginas: sempre da rede (versão mais nova); sem internet, a página de aviso.
+  // App da Pista (ADR-057): guarda a "casca" para abrir sem internet; os dados das OS ficam no
+  // próprio app (sem preços) e as ações vão para a fila do aparelho.
+  if (req.mode === 'navigate' && url.pathname.startsWith('/pista')) {
+    event.respondWith(
+      fetch(req)
+        .then(async (res) => {
+          if (res.ok) await (await caches.open(SHELL)).put('/pista-shell', res.clone())
+          return res
+        })
+        .catch(async () => (await caches.match('/pista-shell')) || caches.match('/offline.html')),
+    )
+    return
+  }
   if (req.mode === 'navigate') {
     event.respondWith(fetch(req).catch(() => caches.match('/offline.html')))
     return

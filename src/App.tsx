@@ -1,4 +1,4 @@
-import { lazy, useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { createBrowserRouter, Link, RouterProvider, ScrollRestoration, Outlet, useRouteError } from 'react-router-dom'
 import { isStaleChunkError, reloadForNewVersion } from '@/core/shared/staleChunk'
 import { PublicLayout } from '@/modules/public_site/PublicLayout'
@@ -56,6 +56,10 @@ const ReportsPage = lazy(() => import('@/modules/workshop/management/ReportsPage
 const RelationshipPage = lazy(() => import('@/modules/workshop/management/RelationshipPage').then((m) => ({ default: m.RelationshipPage })))
 const ReviewsPage = lazy(() => import('@/modules/workshop/growth/ReviewsPage').then((m) => ({ default: m.ReviewsPage })))
 const CampaignsPage = lazy(() => import('@/modules/workshop/growth/CampaignsPage').then((m) => ({ default: m.CampaignsPage })))
+const PistaLayout = lazy(() => import('@/modules/pista/PistaApp').then((m) => ({ default: m.PistaLayout })))
+const PistaHomePage = lazy(() => import('@/modules/pista/PistaApp').then((m) => ({ default: m.PistaHomePage })))
+const PistaOrderPage = lazy(() => import('@/modules/pista/PistaOrderPage').then((m) => ({ default: m.PistaOrderPage })))
+const PistaInstallPage = lazy(() => import('@/modules/pista/PistaInstallPage').then((m) => ({ default: m.PistaInstallPage })))
 const SpendingPage = lazy(() => import('@/modules/spending/SpendingPage').then((m) => ({ default: m.SpendingPage })))
 const AllSpendingPage = lazy(() => import('@/modules/spending/SpendingPage').then((m) => ({ default: m.AllSpendingPage })))
 const AdminReviewsPage = lazy(() => import('@/modules/admin/AdminReviewsPage').then((m) => ({ default: m.AdminReviewsPage })))
@@ -130,6 +134,15 @@ export const routes = [
     errorElement: <RouteErrorPage />,
     children: [
       {
+        // App da Pista (ADR-057): PWA do mecânico, com manifesto e login próprios.
+        path: '/pista',
+        element: <Suspense fallback={<p className="p-6 text-muted" role="status">Carregando…</p>}><PistaLayout /></Suspense>,
+        children: [
+          { index: true, element: <Suspense fallback={null}><PistaHomePage /></Suspense> },
+          { path: 'os/:orderId', element: <Suspense fallback={null}><PistaOrderPage /></Suspense> },
+        ],
+      },
+      {
         element: <PublicLayout />,
         children: [
           { path: '/', element: <HomePage /> },
@@ -181,6 +194,7 @@ export const routes = [
           { path: '/oficina/:orgId', element: <WorkshopDashboardPage /> },
           { path: '/oficina/:orgId/perfil', element: <WorkshopShellRoute><WorkshopProfilePage /></WorkshopShellRoute> },
           { path: '/oficina/:orgId/equipe', element: <WorkshopShellRoute><TeamPage /></WorkshopShellRoute> },
+          { path: '/oficina/:orgId/pista', element: <WorkshopShellRoute><PistaInstallPage /></WorkshopShellRoute> },
           { path: '/oficina/:orgId/orcamentos', element: <QuotesPage /> },
           { path: '/oficina/:orgId/orcamentos/novo', element: <NewQuotePage /> },
           { path: '/oficina/:orgId/orcamentos/:quoteId', element: <QuotePage /> },

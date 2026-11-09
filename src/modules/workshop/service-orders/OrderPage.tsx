@@ -13,6 +13,7 @@ import { formatCents, formatDateTime, onlyDigits, parseMoney } from '../shared/r
 import { ITEM_KIND_LABEL, ITEM_KINDS, STATUS_LABEL as QUOTE_STATUS_LABEL, whatsappUrl, type ItemKind } from '../quotes/api'
 import type { WorkshopPermissions } from '../customers/api'
 import { InspectionCard, PhotosCard } from './InspectionAndPhotos'
+import { PistaMediaCard } from '@/modules/pista/PistaMediaCard'
 import { OrderReceipt, type ReceiptDoc } from './OrderReceipt'
 import { HistoryCard, HistoryOptionsFields } from './HistoryCard'
 import { PaymentsCard, ReminderForm } from '../management/widgets'
@@ -51,6 +52,7 @@ const EVENT_LABEL: Record<string, string> = {
   photo_added: 'Foto incluída', photo_removed: 'Foto removida', link_created: 'Link criado para o cliente', customer_ack: 'Cliente deu ciência da entrada',
   completed: 'OS concluída', pickup_notified: 'Cliente avisado da retirada', delivered: 'Moto entregue', canceled: 'OS cancelada', notes_updated: 'Observações atualizadas',
   history_published: 'Registrado no histórico da moto', history_photo_added: 'Foto enviada ao histórico da moto',
+  note_added: 'Nota da pista', note_voided: 'Nota anulada', audio_added: 'Áudio da pista', mechanic_ready: 'Mecânico marcou Pronto', taken: 'Mecânico pegou a OS',
 }
 
 function OrderView({ orgId, perms }: { orgId: string; perms: WorkshopPermissions & { user_id?: string } }) {
@@ -139,6 +141,7 @@ function OrderView({ orgId, perms }: { orgId: string; perms: WorkshopPermissions
             <InspectionCard key={`exit-${o.inspections.exit?.recorded_at ?? ''}`} orgId={orgId} order={o} phase="exit" canEdit={execute} onSaved={refresh} />
           </div>
           <PhotosCard orgId={orgId} order={o} canEdit={execute} onChanged={refresh} />
+          <PistaMediaCard orgId={orgId} orderId={o.id} />
           <TechnicalNotes key={o.technical_notes ?? ''} orgId={orgId} order={o} canEdit={execute && !closed} onSaved={refresh} />
         </div>
 
