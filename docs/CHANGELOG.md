@@ -9,6 +9,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.58.2] — 09/11/2026 — Checklist e links públicos com conta da pista
+
+### Corrigido
+- **Salvar checklist:** o campo de chaves agora é "Quantidade de chaves" (só número). Texto como "sim" fazia o salvamento falhar com "Não foi possível concluir a operação"; o banco também passou a ignorar texto nesse campo.
+- Celular logado com conta da pista volta a abrir links públicos (orçamento, OS, passaporte): a trava libera as funções que qualquer visitante já pode usar.
+
 ## [0.58.1] — 09/11/2026 — Links de orçamento e instalação da pista
 
 ### Corrigido

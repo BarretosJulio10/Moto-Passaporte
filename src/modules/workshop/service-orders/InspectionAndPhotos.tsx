@@ -43,7 +43,7 @@ export function InspectionCard({ orgId, order, phase, canEdit, onSaved }: {
     setSaving(true)
     setError(null)
     try {
-      await saveInspection(orgId, order.id, phase, { items, fuel_level: fuel, keys_count: keys, km: onlyDigits(km), notes })
+      await saveInspection(orgId, order.id, phase, { items, fuel_level: fuel, keys_count: onlyDigits(keys), km: onlyDigits(km), notes })
       await onSaved()
       setEditing(false)
     } catch (err) {
@@ -116,7 +116,7 @@ export function InspectionCard({ orgId, order, phase, canEdit, onSaved }: {
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <TextField label="Quilometragem" value={km} onChange={(e) => setKm(e.target.value)} inputMode="numeric" />
             {phase === 'entry' && <SelectField label="Combustível" value={fuel} options={FUEL_LEVELS} placeholder="Não informado" onChange={(e) => setFuel(e.target.value)} />}
-            {phase === 'entry' && <TextField label="Chaves entregues" value={keys} onChange={(e) => setKeys(e.target.value)} inputMode="numeric" />}
+            {phase === 'entry' && <TextField label="Quantidade de chaves" value={keys} onChange={(e) => setKeys(onlyDigits(e.target.value).slice(0, 1))} inputMode="numeric" placeholder="Ex.: 1" />}
             <TextAreaField label={phase === 'entry' ? 'Observações da entrada' : 'Testes, pendências e observações'} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="sm:col-span-3" />
           </div>
           {error && <div className="mt-3"><Notice tone="error">{error}</Notice></div>}

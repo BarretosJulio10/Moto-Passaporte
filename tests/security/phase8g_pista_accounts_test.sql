@@ -108,3 +108,16 @@ select tests.ok(pg_get_constraintdef(oid) ~ 'quote_link' and pg_get_constraintde
                 'categorias dos links da oficina aceitas no controle de acessos')
   from pg_constraint where conname = 'anon_rate_limits_bucket_check';
 \o
+
+-- Conta da pista abre páginas públicas; checklist aceita "chaves" com texto
+\o /dev/null
+select set_config('request.jwt.claim.sub', :'Q', false);
+set role authenticated;
+select set_config('request.path', '/rpc/get_quote_by_token', false);
+select public.pista_request_guard();
+select set_config('request.path', '/rpc/get_my_plan', false);
+select tests.must_fail('select public.pista_request_guard()', 'função não pública continua bloqueada para a pista');
+reset role;
+select tests.ok(position('regexp_replace' in pg_get_functiondef('public.workshop_save_inspection(uuid, uuid, text, jsonb)'::regprocedure)) > 0,
+                'checklist ignora texto no campo de chaves');
+\o
