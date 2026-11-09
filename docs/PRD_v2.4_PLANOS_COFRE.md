@@ -2,7 +2,7 @@
 
 **Decisões de 09/11/2026: 2 registros abertos, passe R$ 19,90, teste 3 meses, cofre por moto.**
 
-**Status: rascunho de 09/11/2026 — aguardando validação do responsável e revisão jurídica. Não implementar sem pedido.**
+**Status: implementado e ligado em produção em 09/11/2026 (v0.56.0, ADR-056). Pendente: revisão jurídica dos Termos 0.2 (KI-044). Passe de venda não criado (Premium mensal já é pago uma vez no Pix por R$ 9,90).**
 
 Documento completo (fonte oficial): https://claude.ai/artifact/Y92XDzi8QNn62XbsNon1RU
 Estudo que originou: https://claude.ai/artifact/CGRPGhxxsVo4V5thCHCPSN
