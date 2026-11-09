@@ -24,6 +24,7 @@ vi.mock('./messagingApi', () => ({
     if (action === 'wa_status') return status
     if (action === 'wa_connect') { status = { connected: true, loggedIn: false, number: null }; return status }
     if (action === 'wa_qr') return { qr: 'data:image/png;base64,AAAA' }
+    if (action === 'wa_pair') return { code: '9H3J-H3J8', phone: '5521****1728' }
     if (action === 'test_email') return { ok: true, detail: 'Enviado para admin@teste.com.' }
     if (action === 'wa_create_instance') return { ok: true, name: 'motopassaporte-avisos-ab12', connected: true, loggedIn: false }
     return { ok: true }
@@ -69,6 +70,17 @@ describe('admin: e-mail e WhatsApp (ADR-064)', () => {
     expect(await screen.findByText('Desconectado.')).toBeVisible()
     await user.click(screen.getByRole('button', { name: 'Conectar (QR Code)' }))
     expect(await screen.findByAltText('QR Code para conectar o WhatsApp')).toHaveAttribute('src', 'data:image/png;base64,AAAA')
+  })
+
+  it('conecta pelo número: mostra o código para digitar no celular, sem QR', async () => {
+    const user = userEvent.setup()
+    wrap(<AdminMessagingPage />)
+    await user.type(await screen.findByLabelText('Ou conecte pelo número (com DDD)'), '21 97363-1728')
+    await user.click(screen.getByRole('button', { name: 'Receber código' }))
+    await waitFor(() => expect(calls.find((c) => c.fn === 'wa_pair')?.args[0]).toEqual({ phone: '21 97363-1728' }))
+    expect(await screen.findByText('9H3J-H3J8')).toBeVisible()
+    expect(screen.getByText(/Conectar com número de telefone/)).toBeVisible()
+    expect(screen.queryByAltText('QR Code para conectar o WhatsApp')).toBeNull()
   })
 })
 

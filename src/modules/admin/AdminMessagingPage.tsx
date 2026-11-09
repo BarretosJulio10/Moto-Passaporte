@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/Button'
@@ -24,6 +24,11 @@ function WhatsappConnection({ hasUrl, hasToken, instance, onCreated }: { hasUrl:
   const [phone, setPhone] = useState('')
   const [busy, setBusy] = useState<string | null>(null)
   const [adminToken, setAdminToken] = useState('')
+  const [pairPhone, setPairPhone] = useState('')
+  const [pairCode, setPairCode] = useState('')
+
+  const pairCodeRef = useRef('')
+  pairCodeRef.current = pairCode
 
   async function run<T>(name: string, fn: () => Promise<T>): Promise<T | null> {
     setBusy(name)
@@ -53,9 +58,11 @@ function WhatsappConnection({ hasUrl, hasToken, instance, onCreated }: { hasUrl:
         if (s.loggedIn) {
           setWaiting(false)
           setQr('')
+          setPairCode('')
           setMsg({ tone: 'success', text: 'WhatsApp conectado.' })
           return
         }
+        if (pairCodeRef.current) return
         const q = await messagingAction<{ qr: string }>('wa_qr')
         if (!stop && q.qr) setQr(q.qr)
       } catch (e) {
@@ -64,7 +71,7 @@ function WhatsappConnection({ hasUrl, hasToken, instance, onCreated }: { hasUrl:
     }
     void tick()
     const t = window.setInterval(() => void tick(), 4000)
-    const end = window.setTimeout(() => { setWaiting(false); setQr(''); setMsg({ tone: 'info', text: 'O QR Code expirou. Toque em Conectar de novo.' }) }, 120_000)
+    const end = window.setTimeout(() => { setWaiting(false); setQr(''); setPairCode(''); setMsg({ tone: 'info', text: 'O código expirou. Gere um novo.' }) }, 120_000)
     return () => { stop = true; window.clearInterval(t); window.clearTimeout(end) }
   }, [waiting])
 
@@ -111,7 +118,7 @@ function WhatsappConnection({ hasUrl, hasToken, instance, onCreated }: { hasUrl:
       <div className="flex flex-wrap gap-2">
         {!status?.loggedIn && (
           <Button size="sm" loading={busy === 'connect'} disabled={waiting}
-            onClick={() => void run('connect', () => messagingAction<WaStatus>('wa_connect')).then((s) => { if (s) { setStatus(s); if (!s.loggedIn) setWaiting(true) } })}>
+            onClick={() => { setPairCode(''); void run('connect', () => messagingAction<WaStatus>('wa_connect')).then((s) => { if (s) { setStatus(s); if (!s.loggedIn) setWaiting(true) } }) }}>
             Conectar (QR Code)
           </Button>
         )}
@@ -123,11 +130,34 @@ function WhatsappConnection({ hasUrl, hasToken, instance, onCreated }: { hasUrl:
           </Button>
         )}
       </div>
-      {waiting && (
+      {waiting && pairCode && (
+        <div className="rounded-doc border border-rule bg-paper p-4">
+          <p className="text-sm text-graphite">No celular do número dos avisos: WhatsApp → <strong>Aparelhos conectados</strong> → <strong>Conectar um aparelho</strong> → <strong>Conectar com número de telefone</strong>, e digite:</p>
+          <p className="mt-3 font-mono text-3xl font-bold tracking-widest text-ink" aria-label="Código para conectar o WhatsApp">{pairCode}</p>
+          <p className="mt-2 text-sm text-muted" role="status">Aguardando você digitar o código…</p>
+        </div>
+      )}
+      {waiting && !pairCode && (
         <div className="rounded-doc border border-rule bg-paper p-4">
           <p className="text-sm text-graphite">No celular do número que vai mandar os avisos: WhatsApp → <strong>Aparelhos conectados</strong> → <strong>Conectar um aparelho</strong> e aponte para o código.</p>
           {qr ? <img src={qr} alt="QR Code para conectar o WhatsApp" className="mt-3 h-64 w-64 bg-white p-2" /> : <p className="mt-3 text-sm text-muted" role="status">Gerando o QR Code…</p>}
         </div>
+      )}
+      {!status?.loggedIn && (
+        <form className="flex flex-wrap items-end gap-2" onSubmit={(e) => {
+          e.preventDefault()
+          void run('pair', () => messagingAction<{ code: string }>('wa_pair', { phone: pairPhone })).then((r) => {
+            if (!r) return
+            setQr('')
+            setPairCode(r.code)
+            setWaiting(false)
+            window.setTimeout(() => setWaiting(true), 0)
+          })
+        }}>
+          <TextField label="Ou conecte pelo número (com DDD)" value={pairPhone} onChange={(e) => setPairPhone(e.target.value)} inputMode="tel"
+            placeholder="21 99999-9999" className="w-60" />
+          <Button size="sm" type="submit" variant="secondary" loading={busy === 'pair'} disabled={pairPhone.replace(/\D/g, '').length < 10}>Receber código</Button>
+        </form>
       )}
       {status?.loggedIn && (
         <form className="flex flex-wrap items-end gap-2" onSubmit={(e) => { e.preventDefault(); void run('test', () => messagingAction('test_whatsapp', { phone })).then((r) => r && setMsg({ tone: 'success', text: r.detail ?? 'Enviado.' })) }}>

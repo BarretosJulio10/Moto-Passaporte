@@ -103,6 +103,27 @@ Deno.serve(async (req) => {
       const qr = r.data?.qrCode ?? r.data?.QRCode ?? ''
       return reply(200, { qr: qr.startsWith('data:image/') ? qr : '' })
     }
+    // Alternativa ao QR: a FZAP devolve um código de 8 caracteres para digitar no celular
+    // (WhatsApp → Aparelhos conectados → Conectar com número de telefone).
+    case 'wa_pair': {
+      const digits = String(body.phone ?? '').replace(/\D/g, '')
+      if (!/^[0-9]{10,13}$/.test(digits)) return reply(400, { message: 'Informe o número do WhatsApp com DDD.' })
+      const phone = digits.length <= 11 ? `55${digits}` : digits
+      await fzap(cfg, '/session/connect', { method: 'POST', body: { immediate: true } })
+      let r = await fzap<{ LinkingCode?: string; linkingCode?: string }>(cfg, '/session/pairphone', { method: 'POST', body: { phone } })
+      if (!r.ok && /no session/i.test(r.error ?? '')) {
+        // A sessão leva um instante para subir depois do connect.
+        await new Promise((ok) => setTimeout(ok, 2500))
+        r = await fzap<{ LinkingCode?: string; linkingCode?: string }>(cfg, '/session/pairphone', { method: 'POST', body: { phone } })
+      }
+      if (!r.ok) {
+        if (/already paired/i.test(r.error ?? '')) return reply(400, { message: 'Este número já está conectado. Toque em Atualizar.' })
+        return reply(502, { message: r.error ?? 'A FZAP não gerou o código. Tente de novo.' })
+      }
+      const code = r.data?.LinkingCode ?? r.data?.linkingCode ?? ''
+      if (!code) return reply(502, { message: 'A FZAP não devolveu o código. Tente de novo.' })
+      return reply(200, { code, phone: maskPhone(phone) })
+    }
     case 'wa_logout': {
       const r = await fzap(cfg, '/session/logout', { method: 'POST' })
       return r.ok ? reply(200, { ok: true }) : reply(502, { message: r.error ?? 'FZAP não respondeu.' })

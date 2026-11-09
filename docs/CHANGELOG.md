@@ -9,6 +9,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.66.4] — 09/11/2026 — Conectar o WhatsApp pelo número
+
+### Adicionado
+- `/admin/mensagens`: "Ou conecte pelo número" — o admin informa o celular e recebe um código de 8 caracteres para digitar em WhatsApp → Aparelhos conectados → Conectar com número de telefone (alternativa ao QR Code).
+- `messages-admin` (v4): ação `wa_pair` → FZAP `POST /session/pairphone {phone}`, resposta `data.LinkingCode`.
+
 ## [0.66.3] — 09/11/2026 — QR Code do WhatsApp aparece
 
 ### Corrigido
