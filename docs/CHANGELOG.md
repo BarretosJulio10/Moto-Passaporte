@@ -9,6 +9,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.62.0] — 09/11/2026 — Checklist de entrada na chegada, de saída na entrega
+
+### Mudado
+- **Nova entrada** agora tem o **checklist de entrada** na própria tela (com "Tudo OK" e combustível, chaves e observações): é feito na hora em que o cliente deixa a moto, junto com km e problema. Depois, na OS, ficam as fotos e o link para o cliente confirmar.
+- **Orçamento nascido de uma entrada** mostra o card "Entrada da moto" com o resumo do checklist (itens com atenção/avaria, fotos, confirmação do cliente) e o checklist completo ao tocar.
+- **Checklist de saída** só aparece na OS quando a moto está pronta (Pronto, Concluída, Aguardando retirada ou Entregue) e já abre para preencher nessa hora.
+
 ## [0.61.1] — 09/11/2026 — Esteira cabe na tela
 
 ### Mudado

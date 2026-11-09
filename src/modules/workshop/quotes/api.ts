@@ -264,3 +264,10 @@ export function whatsappUrl(phoneDigits: string | null | undefined, text: string
   const n = waNumber(phoneDigits)
   return `https://wa.me/${n}?text=${encodeURIComponent(text)}`
 }
+
+// Orçamento nascido de uma entrada (ADR-060): checklist de entrada e fotos da OS.
+export type QuoteEntry = {
+  order_id: string; order_number: number; km_in: number | null; problem: string | null; photos: number
+  entry: { items: Record<string, { state: 'ok' | 'atencao' | 'avaria' | 'na'; note?: string }>; fuel_level: string | null; keys_count: number | null; km: number | null; notes: string | null; recorded_at: string; customer_ack_at: string | null; customer_ack_name: string | null } | null
+}
+export const fetchQuoteEntry = (org: string, quoteId: string) => rpc<QuoteEntry | null>('workshop_quote_entry', { p_org: org, p_quote: quoteId })

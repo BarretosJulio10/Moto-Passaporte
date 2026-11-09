@@ -27,16 +27,14 @@ export function InspectionCard({ orgId, order, phase, canEdit, onSaved }: {
   const locked = phase === 'entry'
     ? Boolean(current?.customer_ack_at) || ['completed', 'awaiting_pickup', 'delivered', 'canceled'].includes(order.status)
     : ['delivered', 'canceled'].includes(order.status)
-  const [editing, setEditing] = useState(phase === 'entry' && !current && canEdit && !locked)
+  const [editing, setEditing] = useState(!current && canEdit && !locked && (phase === 'entry' || ['ready', 'completed', 'awaiting_pickup'].includes(order.status)))
   const [items, setItems] = useState<InspectionItems>(() => current?.items ?? {})
-  const [extra, setExtra] = useState('')
   const [fuel, setFuel] = useState(current?.fuel_level ?? '')
   const [keys, setKeys] = useState(current?.keys_count?.toString() ?? '')
   const [km, setKm] = useState(current?.km?.toString() ?? (phase === 'entry' ? order.km_in?.toString() ?? '' : ''))
   const [notes, setNotes] = useState(current?.notes ?? '')
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const keysAll = [...base.map((b) => b.key), ...Object.keys(items).filter((k) => !base.some((b) => b.key === k))]
   const label = (k: string) => base.find((b) => b.key === k)?.label ?? k
 
   async function save() {
@@ -82,37 +80,7 @@ export function InspectionCard({ orgId, order, phase, canEdit, onSaved }: {
       )}
       {editing && (
         <div>
-          <ul className="flex flex-col gap-2">
-            {keysAll.map((k) => {
-              const v = items[k]
-              return (
-                <li key={k} className="rounded-doc border border-rule p-2">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-sm font-semibold text-graphite">{label(k)}</span>
-                    <span className="flex flex-wrap gap-1" role="radiogroup" aria-label={label(k)}>
-                      {STATES.map((s) => (
-                        <button key={s} type="button" role="radio" aria-checked={v?.state === s}
-                          onClick={() => setItems({ ...items, [k]: { ...v, state: s } })}
-                          className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${v?.state === s ? STATE_TONE[s] : 'border-rule text-ink hover:border-ink'}`}>
-                          {STATE_LABEL[s]}
-                        </button>
-                      ))}
-                    </span>
-                  </div>
-                  {v && v.state !== 'ok' && v.state !== 'na' && (
-                    <input value={v.note ?? ''} onChange={(e) => setItems({ ...items, [k]: { ...v, note: e.target.value.slice(0, 300) } })}
-                      placeholder="Descreva (onde, tamanho…)" aria-label={`Observação: ${label(k)}`}
-                      className="mt-2 w-full rounded-doc border border-rule bg-sheet px-3 py-1.5 text-sm focus:border-ink focus:outline-none" />
-                  )}
-                </li>
-              )
-            })}
-          </ul>
-          <div className="mt-2 flex gap-2">
-            <input value={extra} onChange={(e) => setExtra(e.target.value)} placeholder="Outro item (ex.: baú, protetor de motor)" aria-label="Outro item"
-              className="flex-1 rounded-doc border border-rule bg-sheet px-3 py-2 text-sm focus:border-ink focus:outline-none" />
-            <Button size="sm" variant="secondary" onClick={() => { const k = extra.trim().slice(0, 60); if (k && !items[k]) setItems({ ...items, [k]: { state: 'ok' } }); setExtra('') }}>Incluir</Button>
-          </div>
+          <ChecklistItemsEditor base={base} items={items} onChange={setItems} />
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <TextField label="Quilometragem" value={km} onChange={(e) => setKm(e.target.value)} inputMode="numeric" />
             {phase === 'entry' && <SelectField label="Combustível" value={fuel} options={FUEL_LEVELS} placeholder="Não informado" onChange={(e) => setFuel(e.target.value)} />}
@@ -127,6 +95,70 @@ export function InspectionCard({ orgId, order, phase, canEdit, onSaved }: {
         </div>
       )}
     </Card>
+  )
+}
+
+/** Itens do checklist com OK / Atenção / Avaria / Não se aplica, observação e itens extras. Também usado na Nova entrada. */
+export function ChecklistItemsEditor({ base, items, onChange }: { base: { key: string; label: string }[]; items: InspectionItems; onChange: (v: InspectionItems) => void }) {
+  const [extra, setExtra] = useState('')
+  const keysAll = [...base.map((b) => b.key), ...Object.keys(items).filter((k) => !base.some((b) => b.key === k))]
+  const label = (k: string) => base.find((b) => b.key === k)?.label ?? k
+  return (
+    <div>
+      <ul className="flex flex-col gap-2">
+        {keysAll.map((k) => {
+          const v = items[k]
+          return (
+            <li key={k} className="rounded-doc border border-rule p-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-sm font-semibold text-graphite">{label(k)}</span>
+                <span className="flex flex-wrap gap-1" role="radiogroup" aria-label={label(k)}>
+                  {STATES.map((st) => (
+                    <button key={st} type="button" role="radio" aria-checked={v?.state === st}
+                      onClick={() => onChange({ ...items, [k]: { ...v, state: st } })}
+                      className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${v?.state === st ? STATE_TONE[st] : 'border-rule text-ink hover:border-ink'}`}>
+                      {STATE_LABEL[st]}
+                    </button>
+                  ))}
+                </span>
+              </div>
+              {v && v.state !== 'ok' && v.state !== 'na' && (
+                <input value={v.note ?? ''} onChange={(e) => onChange({ ...items, [k]: { ...v, note: e.target.value.slice(0, 300) } })}
+                  placeholder="Descreva (onde, tamanho…)" aria-label={`Observação: ${label(k)}`}
+                  className="mt-2 w-full rounded-doc border border-rule bg-sheet px-3 py-1.5 text-sm focus:border-ink focus:outline-none" />
+              )}
+            </li>
+          )
+        })}
+      </ul>
+      <div className="mt-2 flex gap-2">
+        <input value={extra} onChange={(e) => setExtra(e.target.value)} placeholder="Outro item (ex.: baú, protetor de motor)" aria-label="Outro item"
+          className="flex-1 rounded-doc border border-rule bg-sheet px-3 py-2 text-sm focus:border-ink focus:outline-none" />
+        <Button size="sm" variant="secondary" onClick={() => { const k = extra.trim().slice(0, 60); if (k && !items[k]) onChange({ ...items, [k]: { state: 'ok' } }); setExtra('') }}>Incluir</Button>
+      </div>
+    </div>
+  )
+}
+
+/** Checklist só para leitura (orçamento nascido de uma entrada). */
+export function ChecklistSummary({ data }: { data: { items: InspectionItems; fuel_level: string | null; keys_count: number | null; km: number | null; notes: string | null } }) {
+  const label = (k: string) => ENTRY_ITEMS.find((b) => b.key === k)?.label ?? k
+  return (
+    <div className="text-sm">
+      <ul className="grid gap-x-4 gap-y-1 sm:grid-cols-2">
+        {Object.entries(data.items).map(([k, v]) => (
+          <li key={k} className="flex items-start justify-between gap-2 border-b border-rule/60 py-1">
+            <span className="text-graphite">{label(k)}{v.note ? <span className="block text-xs text-muted">{v.note}</span> : null}</span>
+            <span className={`shrink-0 rounded-full border px-2 py-0.5 text-xs font-semibold ${STATE_TONE[v.state]}`}>{STATE_LABEL[v.state]}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2 text-muted">
+        {[data.km !== null ? formatKm(data.km) : null, data.fuel_level ? `combustível ${data.fuel_level}` : null,
+          data.keys_count !== null ? `${data.keys_count} chave${data.keys_count === 1 ? '' : 's'}` : null].filter(Boolean).join(' · ')}
+      </p>
+      {data.notes && <p className="mt-1 whitespace-pre-line text-graphite">{data.notes}</p>}
+    </div>
   )
 }
 

@@ -11,10 +11,11 @@ import { Card, StatusChip, WorkshopShell } from '../shared/WorkshopShell'
 import { formatCents, formatDateTime } from '../shared/rpc'
 import { QuoteDocument, type QuoteDoc } from './QuoteDocument'
 import { QuoteEditor } from './QuoteEditor'
+import { ChecklistSummary } from '../service-orders/InspectionAndPhotos'
 import { createOrderFromQuote } from '../service-orders/api'
 import {
   approvalLink, AWAITING, cancelQuote, createQuote, EVENT_LABEL, fetchQuote, logQuoteEvent, quoteWhatsappText, reviseQuote,
-  revokeQuoteLink, sendQuote, STATUS_LABEL, STATUS_TONE, VERSION_STATUS_LABEL, whatsappUrl,
+  fetchQuoteEntry, revokeQuoteLink, sendQuote, STATUS_LABEL, STATUS_TONE, VERSION_STATUS_LABEL, whatsappUrl,
   type LinkResult, type Quote, type QuoteVersion,
 } from './api'
 
@@ -112,6 +113,8 @@ function QuoteView({ orgId, canEdit }: { orgId: string; canEdit: boolean }) {
       </div>
 
       {error && <div className="mt-4 max-w-2xl print:hidden"><Notice tone="error">{error}</Notice></div>}
+
+      <QuoteEntryCard orgId={orgId} quoteId={quote.id} />
 
       {current.status === 'draft' && quote.status === 'draft' && canEdit ? (
         <div className="mt-6">
@@ -256,6 +259,36 @@ function QuoteView({ orgId, canEdit }: { orgId: string; canEdit: boolean }) {
           </aside>
         </div>
       )}
+    </div>
+  )
+}
+
+/** Orçamento nascido de uma entrada: o checklist feito quando o cliente deixou a moto (ADR-060). */
+function QuoteEntryCard({ orgId, quoteId }: { orgId: string; quoteId: string }) {
+  const [open, setOpen] = useState(false)
+  const e = useQuery({ queryKey: ['ws-quote-entry', orgId, quoteId], queryFn: () => fetchQuoteEntry(orgId, quoteId) })
+  const d = e.data
+  if (!d) return null
+  const problems = d.entry ? Object.values(d.entry.items).filter((v) => v.state === 'atencao' || v.state === 'avaria').length : 0
+  return (
+    <div className="mt-6 print:hidden">
+      <Card title={`Entrada da moto · OS nº ${d.order_number}`}
+        actions={<Link to={`/oficina/${orgId}/os/${d.order_id}`} className="text-sm font-semibold underline underline-offset-4">Abrir a OS</Link>}>
+        {d.entry ? (
+          <>
+            <p className="text-sm text-graphite">
+              Checklist de entrada feito em {formatDateTime(d.entry.recorded_at)}
+              {problems > 0 ? ` · ${problems} item${problems === 1 ? '' : 's'} com atenção ou avaria` : ' · tudo OK'}
+              {` · ${d.photos} foto${d.photos === 1 ? '' : 's'} de entrada`}
+              {d.entry.customer_ack_at ? ` · cliente confirmou (${d.entry.customer_ack_name})` : ''}
+            </p>
+            <button type="button" onClick={() => setOpen(!open)} className="mt-2 text-sm font-semibold underline underline-offset-4">{open ? 'Esconder checklist' : 'Ver checklist'}</button>
+            {open && <div className="mt-3"><ChecklistSummary data={d.entry} /></div>}
+          </>
+        ) : (
+          <p className="text-sm text-muted">O checklist de entrada ainda não foi feito. Faça na OS antes de enviar o orçamento.</p>
+        )}
+      </Card>
     </div>
   )
 }

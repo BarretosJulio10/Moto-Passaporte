@@ -2,13 +2,14 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/Button'
-import { CheckboxField, TextAreaField, TextField } from '@/components/Field'
+import { CheckboxField, SelectField, TextAreaField, TextField } from '@/components/Field'
 import { Notice } from '@/components/Notice'
 import { PageHeader } from '@/components/AppLayout'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { formatPlate, normalizePlate } from '@/core/shared/format'
 import { listCustomers, listVehicles, saveCustomer, saveVehicle, type CustomerRow, type VehicleRow } from '../customers/api'
-import { createEntry } from '../service-orders/api'
+import { createEntry, ENTRY_ITEMS, FUEL_LEVELS, saveInspection, type InspectionItems } from '../service-orders/api'
+import { ChecklistItemsEditor } from '../service-orders/InspectionAndPhotos'
 import { onlyDigits } from '../shared/rpc'
 import { WorkshopShell, type WorkshopContext } from '../shared/WorkshopShell'
 
@@ -33,12 +34,12 @@ function NewEntry({ orgId, perms }: WorkshopContext) {
     <div className="max-w-3xl">
       <Link to={base} className="text-sm text-muted underline underline-offset-4">Esteira</Link>
       <div className="mt-2">
-        <PageHeader title="Nova entrada" intro="A moto chegou: ache pela placa (ou cadastre na hora), anote km e o problema. Checklist e fotos vêm em seguida, na própria OS." />
+        <PageHeader title="Nova entrada" intro="O cliente está deixando a moto: ache pela placa (ou cadastre na hora), anote km, o problema e faça o checklist de entrada na frente dele." />
       </div>
       <ol className="mt-4 flex flex-wrap gap-2 text-sm font-semibold" aria-label="Passos">
         <li className={`rounded-full border px-3 py-1 ${picked ? 'border-ok bg-ok/10 text-ok' : 'border-ink bg-ink text-sheet'}`}>1. Moto e cliente{picked ? ' ✓' : ''}</li>
-        <li className={`rounded-full border px-3 py-1 ${picked ? 'border-ink bg-ink text-sheet' : 'border-rule text-muted'}`}>2. Km e problema</li>
-        <li className="rounded-full border border-rule px-3 py-1 text-muted">3. Checklist e fotos</li>
+        <li className={`rounded-full border px-3 py-1 ${picked ? 'border-ink bg-ink text-sheet' : 'border-rule text-muted'}`}>2. Km, problema e checklist de entrada</li>
+        <li className="rounded-full border border-rule px-3 py-1 text-muted">3. Fotos e ciência do cliente</li>
       </ol>
       <div className="mt-6">
         {picked
@@ -170,6 +171,10 @@ function EntryDetails({ orgId, picked, onBack, onDone }: { orgId: string; picked
   const [problem, setProblem] = useState('')
   const [due, setDue] = useState('')
   const [toDiagnosis, setToDiagnosis] = useState(true)
+  const [items, setItems] = useState<InspectionItems>({})
+  const [fuel, setFuel] = useState('')
+  const [keys, setKeys] = useState('')
+  const [checkNotes, setCheckNotes] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -179,9 +184,16 @@ function EntryDetails({ orgId, picked, onBack, onDone }: { orgId: string; picked
     const kmNum = km ? Number(onlyDigits(km)) : null
     if (kmNum !== null && picked.km !== null && kmNum < picked.km) return setError(`A km informada é menor que a última registrada (${picked.km.toLocaleString('pt-BR')}).`)
     if (problem.trim().length < 3) return setError('Escreva o problema que o cliente relatou.')
+    const missing = ENTRY_ITEMS.filter((it) => !items[it.key]).length
+    if (missing > 0) return setError(`Faltam ${missing} item${missing === 1 ? '' : 's'} do checklist de entrada. Use "Tudo OK" e marque só o que tiver problema.`)
     setBusy(true)
     try {
       const id = await createEntry(orgId, { customer: picked.customerId, vehicle: picked.vehicleId, km: kmNum, problem: problem.trim(), due: due || null, toDiagnosis })
+      try {
+        await saveInspection(orgId, id, 'entry', { items, fuel_level: fuel, keys_count: keys, km: kmNum !== null ? String(kmNum) : '', notes: checkNotes })
+      } catch {
+        // A entrada já existe: o checklist pode ser refeito na OS.
+      }
       onDone(id)
     } catch (err) {
       setError(errText(err))
@@ -205,13 +217,27 @@ function EntryDetails({ orgId, picked, onBack, onDone }: { orgId: string; picked
       </div>
       <TextAreaField label="Problema relatado pelo cliente" value={problem} onChange={(e) => setProblem(e.target.value.slice(0, 2000))} rows={4}
         placeholder="Ex.: barulho na suspensão dianteira, freio puxando para o lado" />
+      <section aria-labelledby="checklist-title" className="rounded-doc border border-rule bg-sheet p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="checklist-title" className="heading text-lg text-ink">Checklist de entrada</h2>
+          <Button type="button" size="sm" variant="secondary"
+            onClick={() => setItems(Object.fromEntries(ENTRY_ITEMS.map((it) => [it.key, items[it.key] ?? { state: 'ok' as const }])))}>Tudo OK</Button>
+        </div>
+        <p className="mt-1 text-sm text-muted">Confira a moto com o cliente: o estado em que ela chegou fica registrado e vai junto no orçamento.</p>
+        <div className="mt-3"><ChecklistItemsEditor base={ENTRY_ITEMS} items={items} onChange={setItems} /></div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <SelectField label="Combustível" value={fuel} options={FUEL_LEVELS} placeholder="Não informado" onChange={(e) => setFuel(e.target.value)} />
+          <TextField label="Quantidade de chaves" value={keys} onChange={(e) => setKeys(onlyDigits(e.target.value).slice(0, 1))} inputMode="numeric" placeholder="Ex.: 1" />
+          <TextAreaField label="Observações da entrada (objetos deixados, avarias…)" value={checkNotes} onChange={(e) => setCheckNotes(e.target.value.slice(0, 1000))} rows={2} className="sm:col-span-2" />
+        </div>
+      </section>
       <CheckboxField label="Mandar agora para o mecânico fazer o diagnóstico (aparece no App da Pista)" checked={toDiagnosis} onChange={(e) => setToDiagnosis(e.target.checked)} />
       {error && <Notice tone="error">{error}</Notice>}
       <div className="flex flex-wrap gap-2">
         <Button type="submit" loading={busy}>Dar entrada</Button>
         <Button type="button" variant="secondary" disabled={busy} onClick={onBack}>Voltar</Button>
       </div>
-      <p className="text-sm text-muted">Depois de dar entrada você vai para a OS: faça o checklist de entrada, tire as fotos e, se quiser, mande o link de ciência para o cliente.</p>
+      <p className="text-sm text-muted">Depois de dar entrada você vai para a OS: tire as fotos de entrada e, se quiser, mande o link para o cliente confirmar o checklist.</p>
     </form>
   )
 }

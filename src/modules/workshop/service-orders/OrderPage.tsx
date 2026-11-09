@@ -47,6 +47,8 @@ export function toReceipt(o: Order): ReceiptDoc {
   }
 }
 
+const EXIT_PHASE = ['ready', 'completed', 'awaiting_pickup', 'delivered']
+
 const EVENT_LABEL: Record<string, string> = {
   created: 'OS aberta', status_changed: 'Situação alterada', assigned: 'Mecânico designado', item_added: 'Item incluído com autorização',
   item_updated: 'Item atualizado', complement_added: 'Itens do complementar incluídos', checklist_saved: 'Checklist salvo',
@@ -138,9 +140,12 @@ function OrderView({ orgId, perms }: { orgId: string; perms: WorkshopPermissions
               </ul>
             </Card>
           )}
+          {/* Entrada: quando a moto fica com a oficina. Saída: só quando a moto está pronta para entregar. */}
           <div className="grid gap-6 xl:grid-cols-2">
             <InspectionCard key={`entry-${o.inspections.entry?.recorded_at ?? ''}`} orgId={orgId} order={o} phase="entry" canEdit={execute} onSaved={refresh} />
-            <InspectionCard key={`exit-${o.inspections.exit?.recorded_at ?? ''}`} orgId={orgId} order={o} phase="exit" canEdit={execute} onSaved={refresh} />
+            {(EXIT_PHASE.includes(o.status) || o.inspections.exit)
+              ? <InspectionCard key={`exit-${o.inspections.exit?.recorded_at ?? ''}`} orgId={orgId} order={o} phase="exit" canEdit={execute} onSaved={refresh} />
+              : <Card title="Checklist de saída"><p className="text-sm text-muted">Fica disponível quando a moto estiver pronta, na hora de entregar ao cliente.</p></Card>}
           </div>
           <PhotosCard orgId={orgId} order={o} canEdit={execute} onChanged={refresh} />
           <PistaMediaCard orgId={orgId} orderId={o.id} />

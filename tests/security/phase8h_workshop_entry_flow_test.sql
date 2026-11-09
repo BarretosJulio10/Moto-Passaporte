@@ -80,6 +80,14 @@ select tests.must_fail(format($$insert into public.workshop_service_orders (orga
 select tests.ok(not has_function_privilege('authenticated', 'public.wo_has_work(uuid)', 'execute'), 'funções internas fechadas');
 
 
+-- Orçamento mostra o checklist de entrada
+select set_config('request.jwt.claim.sub', :'C', false);
+set role authenticated;
+select public.workshop_save_inspection(:'org_c', :'os', 'entry', '{"items":{"pneus":{"state":"avaria","note":"careca"}},"km":"21000","keys_count":"sim"}');
+select tests.ok((public.workshop_quote_entry(:'org_c', :'q') -> 'entry' -> 'items' -> 'pneus' ->> 'state') = 'avaria'
+                and (public.workshop_quote_entry(:'org_c', :'q') ->> 'order_id') = :'os', 'orçamento da entrada traz o checklist de entrada');
+reset role;
+
 -- Fase D: hora em que entrou na etapa, WhatsApp na lista e tempo médio por etapa
 select tests.ok((select status_changed_at >= created_at from public.workshop_service_orders where id = :'os'), 'OS guarda quando entrou na etapa atual');
 select set_config('request.jwt.claim.sub', :'C', false);
