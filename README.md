@@ -8,7 +8,7 @@ SaaS brasileiro que cria um passaporte digital permanente para cada moto — man
 
 ## Situação
 
-Versão **0.7.0** — no ar em https://moto-passaporte.vercel.app: site público, contas, motos com QR Code e passaporte público, linha do tempo de manutenção, oficinas (base) e painel administrativo base.
+Versão **0.7.0** — no ar em https://www.motopassaporte.com.br: site público, contas, motos com QR Code e passaporte público, linha do tempo de manutenção, oficinas (base) e painel administrativo base.
 
 ## Documentação
 

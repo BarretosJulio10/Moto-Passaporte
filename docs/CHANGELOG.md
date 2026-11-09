@@ -9,6 +9,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.64.1] — 09/11/2026 — Domínio próprio
+
+### Mudado
+- **Site no endereço próprio: https://www.motopassaporte.com.br.** `motopassaporte.com.br` leva para o `www`. DNS no Registro.br (A `216.198.79.1`; CNAME `www` → Vercel), certificado HTTPS emitido pela Vercel.
+- `moto-passaporte.vercel.app` redireciona (308) para o mesmo caminho no domínio novo, para QR Codes impressos e links já enviados continuarem funcionando. **Não remover esse endereço da Vercel.**
+- Supabase Auth: Site URL `https://www.motopassaporte.com.br`; Redirect URLs com o domínio novo (com e sem `www`), o vercel.app e o localhost.
+- Monitor do GitHub vigia o domínio novo.
+- Nenhum link do sistema precisou mudar: todos usam o endereço aberto no navegador; o banco não guarda o endereço antigo.
+
+### Efeito para quem já usa
+- Entrar de novo uma vez; reinstalar o app (cliente e pista) pelo endereço novo; reativar notificações; mecânicos enviam pendências da pista antes da troca.
+
 ## [0.64.0] — 09/11/2026 — Correções da rodada de testes (QA)
 
 ### Corrigido

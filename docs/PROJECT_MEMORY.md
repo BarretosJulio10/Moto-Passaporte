@@ -6,7 +6,7 @@
 
 **Última atualização:** 09/11/2026
 **Versão do projeto:** 0.58.0
-**Situação geral:** PRD 2.0 em 97,5% (falta homologação com contas reais); complementos 2.1, 2.2, 2.4 e 2.5 no ar; 2.3 guardado. Publicado em https://moto-passaporte.vercel.app. Estado detalhado em `PROJECT_STATUS.md`.
+**Situação geral:** PRD 2.0 em 97,5% (falta homologação com contas reais); complementos 2.1, 2.2, 2.4 e 2.5 no ar; 2.3 guardado. Publicado em https://www.motopassaporte.com.br. Estado detalhado em `PROJECT_STATUS.md`.
 
 Legenda de estados (seção 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 
@@ -104,7 +104,7 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 
 | Ambiente | Situação |
 |---|---|
-| Desenvolvimento | Supabase `ripgenhykaajcnzdxoid`; frontend na Vercel (https://moto-passaporte.vercel.app) |
+| Desenvolvimento | Supabase `ripgenhykaajcnzdxoid`; frontend na Vercel (https://www.motopassaporte.com.br) |
 | Homologação | não configurado |
 | Produção | não configurado |
 

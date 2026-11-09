@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  SITE_URL: https://moto-passaporte.vercel.app
+  SITE_URL: https://www.motopassaporte.com.br
   SUPABASE_URL: https://ripgenhykaajcnzdxoid.supabase.co
   # Chave pública (a mesma que vai no site). Nunca colocar a chave secreta aqui.
   SUPABASE_PUBLISHABLE_KEY: sb_publishable_lfnqyVtIUo7fs91Sft-NIg_BlJhGMwt
