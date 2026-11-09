@@ -9,6 +9,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.57.1] — 09/11/2026 — Pedido de acesso de oficina em destaque
+
+### Mudado
+- Quando uma oficina pede acesso a uma moto, abre uma janela ao entrar no app e a cada troca de tela até o dono responder: Autorizar, Recusar ou Ver detalhes. "Decidir depois" fecha até a próxima tela. Autorizar pela janela dá acesso comum; o título de Oficina de Origem continua na página da moto.
+
 ## [0.57.0] — 09/11/2026 — App da Pista (PWA do mecânico)
 
 ### Adicionado
