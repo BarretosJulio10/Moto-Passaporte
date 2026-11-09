@@ -10,6 +10,7 @@ import { fetchPendingRequests } from '@/modules/workshop_access/api'
 import { PendingRequestsNotice } from '@/modules/workshop_access/OwnerAccessSection'
 import { IncomingTransfers, PreviousMotorcycles } from '@/modules/transfers/IncomingTransfers'
 import { PlanSummary } from '@/modules/plans/MyPlanPage'
+import { PremiumEndingNotice } from '@/modules/plans/ExtraMotorcycles'
 import { PushPrompt } from '@/modules/notifications/PushPrompt'
 import { DueReminders } from '@/modules/reminders/DueReminders'
 import { MyClaims, OwnershipNotices } from '@/modules/claims/MyClaims'
@@ -53,6 +54,7 @@ export function DashboardPage() {
             </div>
           )}
           <IncomingTransfers />
+          {hasMotos && <PremiumEndingNotice />}
           {hasMotos && <PushPrompt />}
           <div className="mt-6">
             {motorcycles.isLoading && <p className="text-muted" role="status">Carregando suas motos…</p>}

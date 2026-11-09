@@ -56,6 +56,31 @@ Problemas conhecidos e sua situação.
 - Na `pista-accounts`, `getUser(jwt)` devolveu "Auth session missing!" com sessão válida (token ES256, chaves novas do Supabase). Corrigido lá: a assinatura é conferida pelo gateway (`verify_jwt`) e a função lê o `sub` do token e confirma a conta com `auth.admin.getUserById`.
 - `mercadopago-billing` corrigida na v0.63.0. `export-files` ainda usa `getUser(jwt)`: conferir com um teste real (baixar comprovantes) e aplicar a mesma correção se falhar.
 
+### KI-048 — Conciliação do cartão falhava ("Invalid value for limit")
+**Status:** resolvido (09/11/2026, v0.64.0)
+- `authorized_payments/search` do Mercado Pago aceita `limit` de no máximo 12 (o padrão devolvido é 12; 20 e 50 dão 400). `syncPreapproval` usava 50, então a conciliação e o webhook de assinatura falhavam. Agora 10 por página com `offset`. O Monitor do GitHub acusava `reconcile_recent` falso.
+
+### KI-049 — Login da pista derrubava o painel no mesmo aparelho
+**Status:** resolvido (09/11/2026, v0.64.0)
+- Painel e pista usavam a mesma chave de sessão do supabase-js. Agora `/pista` usa `mp-pista-auth` (`src/lib/supabase.ts`). Navegar do painel para a pista dentro da mesma aba continua com a sessão do painel até recarregar.
+
+### KI-050 — "Hoje" em UTC no banco
+**Status:** resolvido (09/11/2026, v0.64.0)
+- Funções com `current_date` agora têm `SET timezone = America/Sao_Paulo`. Teste `phase8j` falha se uma função nova usar `current_date` sem o fuso.
+
+### KI-051 — Esteira podia esconder OS abertas
+**Status:** resolvido (09/11/2026, v0.64.0)
+- `workshop_list_orders` tinha `limit 500` sem `order by` no subselect. Agora abertas primeiro, depois por data.
+
+### KI-052 — Moto virava só leitura sem aviso
+**Status:** resolvido (09/11/2026, v0.64.0)
+- Aviso no painel 15 dias antes do fim do Premium com prazo. Continua possível ficar acima do limite quando o admin aprova uma disputa de placa: a moto entra como só leitura (regra de segurança, sem perda de dados).
+
+### Pendências conhecidas (rodada de QA, 09/11/2026)
+- Proteção contra senhas vazadas do Supabase Auth desligada (liga no painel do Supabase: Authentication → senha; exige plano pago).
+- MFA do admin (KI-043) e revisão jurídica dos Termos 0.3 (KI-044).
+- iPhone: o código da oficina digitado no Safari não passa para o app instalado (a Apple separa o armazenamento); o mecânico digita de novo no primeiro acesso.
+
 ### KI-047 — Links públicos da oficina falhavam (controle de acessos)
 **Status:** resolvido (09/11/2026, v0.58.1)
 - `anon_rate_limits` só aceitava `public_passport` e `shared_passport`; orçamento, OS, vínculo do cliente (`quote_link`), página pública (`public_workshop`) e agendamento (`public_booking`) davam erro 23514 no site real. Os testes locais não pegaram porque o limite só age com cabeçalho de requisição. Ao criar categoria nova em `anon_rate_limit_ok`, incluir na restrição.

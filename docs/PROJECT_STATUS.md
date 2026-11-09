@@ -1,6 +1,6 @@
 # PROJECT_STATUS — Moto Passaporte
 
-**Versão atual:** 0.63.0
+**Versão atual:** 0.64.0
 **Data:** 09/11/2026
 **Fase:** Fases 1 a 4 concluídas. Fases 1 a 5 concluídas (Mercado Pago aguardando teste ponta a ponta). Fase 6 em andamento: painel administrativo
 **Progresso geral:** PRD 2.0: 97,5% (39 de 40 itens — `PRD_CHECKLIST.md`). PRD 2.1 (módulo Oficina): Fases 1 a 5 e acabamento 5.1 concluídos (100%). PRD 2.2 (Gastos): Fases A, B e C concluídas (100%). PRD 2.3 (todos os veículos): guardado, não iniciado (0%). PRD 2.4 (modelo cofre): Fases A a C no ar (100%; falta revisão jurídica, KI-044). PRD 2.5 (App da Pista): no ar (100%, com conta da pista v0.58.0)

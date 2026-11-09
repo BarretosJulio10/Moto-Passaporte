@@ -50,11 +50,17 @@ export function PistaInstallPrompt() {
             {busy ? 'Abrindo…' : 'Instalar agora'}
           </button>
         ) : ios ? (
-          <ol className="mt-4 list-decimal space-y-2 pl-5 text-graphite">
-            <li>Abra este link no <strong>Safari</strong>.</li>
-            <li>Toque em <strong>Compartilhar</strong> (o quadrado com a seta para cima).</li>
-            <li>Escolha <strong>“Adicionar à Tela de Início”</strong> e toque em <strong>Adicionar</strong>.</li>
-          </ol>
+          <>
+            <ol className="mt-4 list-decimal space-y-2 pl-5 text-graphite">
+              <li>Abra este link no <strong>Safari</strong>.</li>
+              <li>Toque em <strong>Compartilhar</strong> (o quadrado com a seta para cima).</li>
+              <li>Escolha <strong>“Adicionar à Tela de Início”</strong> e toque em <strong>Adicionar</strong>.</li>
+              <li>Abra pelo ícone e entre de novo com <strong>código da oficina, apelido e senha</strong>.</li>
+            </ol>
+            <p className="mt-3 rounded-lg bg-brass/15 p-3 text-sm text-ink">
+              Importante no iPhone: sem instalar, fotos e áudios guardados sem internet podem ser apagados pelo Safari depois de alguns dias.
+            </p>
+          </>
         ) : (
           <ol className="mt-4 list-decimal space-y-2 pl-5 text-graphite">
             <li>Toque no menu <strong>⋮</strong> do Chrome (canto de cima).</li>

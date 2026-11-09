@@ -11,6 +11,7 @@ import { listCustomers, listVehicles, saveCustomer, saveVehicle, type CustomerRo
 import { createEntry, ENTRY_ITEMS, FUEL_LEVELS, saveInspection, type InspectionItems } from '../service-orders/api'
 import { ChecklistItemsEditor } from '../service-orders/InspectionAndPhotos'
 import { onlyDigits } from '../shared/rpc'
+import { entryPhoneProblem, entryPlateProblem } from './entryValidation'
 import { WorkshopShell, type WorkshopContext } from '../shared/WorkshopShell'
 
 const errText = (e: unknown) => (e instanceof Error && !(e as { code?: string }).code ? e.message : translateDbError(e as { code?: string; message?: string }))
@@ -101,16 +102,28 @@ function QuickCreate({ orgId, initialPlate, onCancel, onCreated }: { orgId: stri
   const [year, setYear] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  // Cliente já criado numa tentativa anterior (a moto falhou): não cadastra de novo.
+  const [createdCustomerId, setCreatedCustomerId] = useState<string | null>(null)
   const custs = useQuery({ queryKey: ['entry-customers', orgId, custTerm], queryFn: () => listCustomers(orgId, custTerm), enabled: !customer && custTerm.trim().length >= 2 })
 
   async function submit(e: FormEvent) {
     e.preventDefault()
     setError('')
     if (!customer && name.trim().length < 3) return setError('Informe o nome do cliente.')
+    const phoneProblem = customer ? null : entryPhoneProblem(whatsapp)
+    if (phoneProblem) return setError(phoneProblem)
     if (!brand.trim() || !model.trim()) return setError('Informe marca e modelo da moto.')
+    const plateProblem = entryPlateProblem(plate)
+    if (plateProblem) return setError(plateProblem)
+    const y = onlyDigits(year)
+    if (y && (Number(y) < 1900 || Number(y) > new Date().getFullYear() + 1)) return setError('Confira o ano da moto.')
     setBusy(true)
     try {
-      const customerId = customer?.id ?? await saveCustomer(orgId, null, { full_name: name.trim(), whatsapp: onlyDigits(whatsapp), source: 'balcao' })
+      let customerId = customer?.id ?? createdCustomerId
+      if (!customerId) {
+        customerId = await saveCustomer(orgId, null, { full_name: name.trim(), whatsapp: onlyDigits(whatsapp), source: 'balcao' })
+        setCreatedCustomerId(customerId)
+      }
       const vehicleId = await saveVehicle(orgId, null, customerId, { brand: brand.trim(), model: model.trim(), year: onlyDigits(year), plate: normalizePlate(plate) })
       onCreated({ customerId, customerName: customer?.full_name ?? name.trim(), vehicleId, label: [brand, model, year].filter(Boolean).join(' '), plate: normalizePlate(plate) || null, km: null })
     } catch (err) {

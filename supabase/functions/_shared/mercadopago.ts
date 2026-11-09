@@ -98,14 +98,21 @@ export async function syncPreapproval(server: SupabaseClient, token: string, pre
   if (error) throw new Error(`apply_state: ${error.message}`)
   if ((st as { result: string }).result === 'ignored') return { result: 'ignored', detail: 'Assinatura sem vínculo local' }
 
-  const search = await mp<{ results?: AuthorizedPayment[] }>(
-    token,
-    `/authorized_payments/search?preapproval_id=${encodeURIComponent(pre.id)}&limit=50`,
-  )
+  // Esta busca do Mercado Pago aceita no máximo 12 por página (20 ou 50 dão "Invalid value for limit").
+  const PAGE = 10
   let payments = 0
-  for (const ap of search.results ?? []) {
-    await applyAuthorizedPayment(server, { ...ap, preapproval_id: ap.preapproval_id ?? pre.id }, ext)
-    payments++
+  for (let offset = 0; offset < PAGE * 20; offset += PAGE) {
+    const search = await mp<{ results?: AuthorizedPayment[]; paging?: { total?: number } }>(
+      token,
+      `/authorized_payments/search?preapproval_id=${encodeURIComponent(pre.id)}&limit=${PAGE}&offset=${offset}`,
+    )
+    const results = search.results ?? []
+    for (const ap of results) {
+      await applyAuthorizedPayment(server, { ...ap, preapproval_id: ap.preapproval_id ?? pre.id }, ext)
+      payments++
+    }
+    const total = search.paging?.total ?? 0
+    if (results.length < PAGE || offset + PAGE >= total) break
   }
   // Estado da assinatura de novo, depois dos pagamentos (ex.: autorizada + paga = ativa).
   await server.rpc('billing_apply_subscription_state', {

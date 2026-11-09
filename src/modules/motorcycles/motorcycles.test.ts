@@ -48,6 +48,19 @@ describe('translateDbError', () => {
       'Você não tem permissão para esta operação.',
     )
     expect(translateDbError({ code: 'XX000', message: 'internal' })).toMatch(/Não foi possível/)
+    expect(translateDbError({ code: '42501', message: 'new row violates row-level security policy for table "x"' })).toBe(
+      'Você não tem permissão para esta operação.',
+    )
+  })
+  it('mostra o motivo em português de uma recusa de permissão (KI-050)', () => {
+    expect(translateDbError({ code: '42501', message: 'Sua conta da pista foi desligada pela oficina.' })).toBe(
+      'Sua conta da pista foi desligada pela oficina.',
+    )
+  })
+  it('diz qual campo corrigir quando um formato é recusado', () => {
+    expect(translateDbError({ code: '23514', message: 'new row for relation "workshop_customers" violates check constraint "workshop_customers_whatsapp_check"' })).toMatch(/WhatsApp/)
+    expect(translateDbError({ code: '23514', message: 'violates check constraint "workshop_vehicles_plate_check"' })).toMatch(/placa/)
+    expect(translateDbError({ code: '23514', message: 'violates check constraint "x_status_check"' })).toMatch(/fora do formato/)
   })
 })
 

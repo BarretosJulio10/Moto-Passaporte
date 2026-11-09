@@ -1,9 +1,10 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/Button'
 import { Notice } from '@/components/Notice'
 import { formatPlanPrice } from './api'
-import { fetchMotorcycleSlots, payExtraMotorcycles, setSubscriptionExtras } from './billingApi'
+import { fetchMotorcycleSlots, payExtraMotorcycles, premiumEndingSoon, setSubscriptionExtras } from './billingApi'
 
 const PERIOD_UNIT: Record<string, string> = { monthly: 'mês', semiannual: 'semestre', annual: 'ano' }
 
@@ -97,5 +98,21 @@ export function ExtraMotorcyclesCard() {
       )}
       {msg && <div className="mt-3"><Notice tone={msg.tone}>{msg.text}</Notice></div>}
     </section>
+  )
+}
+
+/** Aviso no painel: o Premium com prazo está acabando e há motos além do plano grátis (KI-052). */
+export function PremiumEndingNotice() {
+  const slots = useMotorcycleSlots()
+  const soon = slots.data ? premiumEndingSoon(slots.data) : null
+  if (!soon) return null
+  const when = soon.days === 0 ? 'hoje' : soon.days === 1 ? 'amanhã' : `em ${soon.days} dias`
+  return (
+    <div className="mb-6">
+      <Notice tone="info">
+        Seu Premium termina {when}. Depois disso, {soon.extraMotos === 1 ? '1 moto fica' : `${soon.extraMotos} motos ficam`} só para leitura
+        (nada é apagado). <Link to="/painel/plano" className="font-semibold underline underline-offset-4">Ver planos</Link>
+      </Notice>
+    </div>
   )
 }

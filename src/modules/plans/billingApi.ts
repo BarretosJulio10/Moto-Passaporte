@@ -166,7 +166,23 @@ export type MotorcycleSlots = {
   billing_period: string | null
   pass_until: string | null
   pass_months_left: number | null
+  /** Fim do Premium de boas-vindas/cortesia (null = sem prazo ou não é cortesia). */
+  grant_until?: string | null
+  /** Quantas motos o plano grátis cobre. */
+  free_max?: number | null
   over_limit: string[]
+}
+
+/**
+ * Premium com prazo (boas-vindas ou Pix) acabando em até 15 dias, com mais motos que o grátis cobre:
+ * avisa antes, para a moto não virar "só leitura" de surpresa (KI-052).
+ */
+export function premiumEndingSoon(s: MotorcycleSlots, now = new Date()): { days: number; extraMotos: number } | null {
+  const until = s.mode === 'pass' ? s.pass_until : s.mode === 'grant' ? s.grant_until : null
+  if (!until || s.free_max == null || s.used <= s.free_max) return null
+  const days = Math.ceil((new Date(until).getTime() - now.getTime()) / 86_400_000)
+  if (days < 0 || days > 15) return null
+  return { days, extraMotos: s.used - s.free_max }
 }
 export async function fetchMotorcycleSlots(): Promise<MotorcycleSlots> {
   const { data, error } = await getSupabase().rpc('get_my_motorcycle_slots' as never)

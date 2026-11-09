@@ -16,6 +16,7 @@ import {
 } from './api'
 import { ContactButton } from './widgets'
 import { whatsappUrl } from '../quotes/api'
+import { entryPhoneProblem } from '../flow/entryValidation'
 
 type Err = { code?: string; message?: string }
 const VIEWS: { v: AgendaView; label: string }[] = [{ v: 'dia', label: 'Dia' }, { v: 'semana', label: 'Semana' }, { v: 'mes', label: 'Mês' }]
@@ -203,6 +204,8 @@ function AppointmentForm({ orgId, appt, defaultDay, onDone, onCancel }: { orgId:
   async function submit(e: FormEvent) {
     e.preventDefault()
     if (!v.customer_id && v.contact_name.trim().length < 2) return setError('Escolha um cliente ou informe o nome de quem vem.')
+    const phoneProblem = v.customer_id ? null : entryPhoneProblem(v.contact_phone)
+    if (phoneProblem) return setError(phoneProblem.replace('WhatsApp', 'telefone'))
     if (v.service.trim().length < 2) return setError('Descreva o serviço.')
     if (!v.starts_at) return setError('Informe data e hora.')
     if (!/^\d+$/.test(v.duration) || Number(v.duration) < 10) return setError('Duração em minutos (mínimo 10).')

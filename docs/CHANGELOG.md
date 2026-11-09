@@ -9,6 +9,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.64.0] — 09/11/2026 — Correções da rodada de testes (QA)
+
+### Corrigido
+- **Assinatura no cartão voltou a ser conferida** (KI-048): a busca de cobranças do Mercado Pago pedia 50 por página e a API aceita no máximo 12 ("Invalid value for limit"). A conciliação de 6 em 6 horas e os avisos (webhook) falhavam; agora busca de 10 em 10, com paginação. Conferido em produção: "1 de 1 assinatura conferida".
+- **Pista e painel não se derrubam mais** (KI-049): o App da Pista guarda a sessão numa chave própria. Entrar como mecânico no `/pista` não desloga o responsável do painel no mesmo aparelho. A sessão de mecânico que já existia é movida sozinha na primeira abertura.
+- **"Hoje" no horário de Brasília** (KI-050): 25 funções usavam a data do servidor (UTC); das 21h à meia-noite, validade de orçamento, vencimento de OS, lembretes e datas "não pode ser no futuro" viravam o dia seguinte.
+- **Nova entrada:** confere WhatsApp (DDD + número) e placa antes de salvar, com mensagem clara; se a moto falhar ao salvar, a nova tentativa não cadastra o cliente de novo. Agenda: telefone de contato também é conferido.
+- **Mensagens de erro:** recusa de permissão mostra o motivo em português quando o servidor manda (ex.: conta da pista desligada); erro de formato diz qual campo corrigir (telefone, placa, e-mail, CPF).
+- **Esteira:** a lista de OS cortava em 500 sem ordem definida; agora traz as abertas primeiro (KI-051).
+
+### Adicionado
+- Aviso no painel 15 dias antes do Premium com prazo (boas-vindas ou Pix) acabar, quando há motos além do plano grátis (KI-052).
+- App da Pista: pede ao navegador para guardar a fila offline; no iPhone sem o app instalado, aviso de que fotos e áudios guardados podem ser apagados pelo Safari; "Trocar mecânico" avisa quando há registros ainda não enviados.
+
+### Desempenho
+- Índice para as 79 chaves estrangeiras sem índice; RLS de gastos com `auth.uid()` avaliado uma vez por consulta.
+
 ## [0.63.0] — 09/11/2026 — Premium com 2 motos e moto extra
 
 ### Mudado

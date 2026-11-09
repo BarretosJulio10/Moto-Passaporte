@@ -8,6 +8,7 @@ import { formatKm } from '@/core/shared/format'
 import { fetchPistaContext, fetchPistaOrders, PISTA_STATUS_LABEL, PISTA_STATUS_TONE, vehicleLabel, type PistaOrderRow, type PistaShop } from './api'
 import { fetchWorkshopByCode, normalizeCode, pistaEmail, rememberCode, rememberedCode, validCode, validNickname, normalizeNickname } from './accountsApi'
 import { PistaInstallPrompt } from './PistaInstallPrompt'
+import { isIOS, isStandalone } from '@/core/pwa/pwa'
 import { listOutbox, onOutboxChange, startOutbox, flush, type OutboxEntry } from './outbox'
 
 /** App da Pista (ADR-057): PWA próprio em /pista, para o mecânico registrar rápido na moto. */
@@ -217,8 +218,11 @@ function PistaGate({ userId }: { userId: string }) {
   })
   const [orgId, setOrgId] = useState<string | null>(() => localStorage.getItem(ORG_KEY))
   const [outbox, setOutbox] = useState<OutboxEntry[]>([])
+  const [confirmLeave, setConfirmLeave] = useState(false)
 
   useEffect(() => startOutbox(userId), [userId])
+  // Pede ao navegador para não apagar a fila offline (fotos/áudios) quando faltar espaço.
+  useEffect(() => { void navigator.storage?.persist?.().catch(() => false) }, [])
   useEffect(() => {
     const load = () => { void listOutbox(userId).then(setOutbox) }
     load()
@@ -253,9 +257,19 @@ function PistaGate({ userId }: { userId: string }) {
               </button>
             ))}
             {!shop?.pista_account && <Link to="/oficina" className="block rounded-lg px-3 py-2 text-sm">Abrir o painel completo</Link>}
-            <button type="button" onClick={() => { localStorage.removeItem(ORG_KEY); void signOut() }}
+            {confirmLeave && (pending + failed) > 0 && (
+              <p className="px-3 py-2 text-xs text-danger" role="alert">
+                Ainda há {pending + failed} registro(s) deste mecânico sem enviar. Eles só vão quando ele entrar de novo neste celular. Toque de novo para sair mesmo assim.
+              </p>
+            )}
+            <button type="button"
+              onClick={() => {
+                if ((pending + failed) > 0 && !confirmLeave) return setConfirmLeave(true)
+                localStorage.removeItem(ORG_KEY)
+                void signOut()
+              }}
               className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-danger">
-              Trocar mecânico (sair)
+              {confirmLeave && (pending + failed) > 0 ? 'Sair mesmo assim' : 'Trocar mecânico (sair)'}
             </button>
           </div>
         </details>
@@ -294,6 +308,11 @@ function PistaGate({ userId }: { userId: string }) {
   return (
     <PistaFrame header={header}>
       <PistaInstallPrompt />
+      {pending + failed > 0 && isIOS() && !isStandalone() && (
+        <p className="mx-4 mt-3 rounded-xl bg-brass/15 p-3 text-sm text-ink" role="status">
+          No iPhone, o que fica guardado sem internet pode ser apagado pelo Safari se o app não estiver instalado. Abra com internet para enviar e instale o app na tela de início.
+        </p>
+      )}
       {failed > 0 && <FailedList outbox={outbox.filter((e) => e.failed)} />}
       <Outlet context={{ shop, userId, outbox, online } satisfies PistaCtx} />
     </PistaFrame>

@@ -73,3 +73,13 @@ select tests.ok(not has_function_privilege('authenticated', 'public.billing_prep
 
 \o
 \echo 'Moto extra no Premium: ok'
+
+\echo '--- Aviso antes do Premium acabar (KI-052)'
+insert into auth.users (id, email, raw_user_meta_data) values ('88888888-eeee-4eee-8eee-000000000009', 'aviso@teste.local', '{"full_name":"Ana Aviso"}');
+select set_config('request.jwt.claim.sub', '88888888-eeee-4eee-8eee-000000000009', false);
+set role authenticated;
+select tests.ok((public.get_my_motorcycle_slots() ->> 'mode') = 'grant' and (public.get_my_motorcycle_slots() ->> 'grant_until') is not null,
+                'boas-vindas informa até quando vale');
+select tests.ok((public.get_my_motorcycle_slots() ->> 'free_max')::int = 1, 'informa quantas motos o plano grátis cobre');
+reset role;
+select set_config('request.jwt.claim.sub', '', false);
