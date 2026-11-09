@@ -8,6 +8,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 |---|---|
 | `20261107003043_base.sql` | pgcrypto, utilitários (placa), auditoria imutável, triggers genéricos |
 | `20261107003102_identity.sql` | `profiles`, `user_roles`, criação automática no cadastro, `has_role`/`is_admin`, `system_settings` |
+| `20261109023541_admin_mfa_switch.sql` | ADR-054: chave `admin_mfa_required` (padrão 1); `is_admin()` e `my_admin_access()` respeitam a chave. Em produção está 0 temporariamente (KI-043). Reversão em `supabase/rollback/` |
 | `20261109022744_spending_phase_c.sql` | PRD 2.2 Fase C (ADR-052) + correção do resumo pelo site (DELETE sem WHERE barrado pelo `pg_safeupdate`): `get_spending_export` (Premium), `get_spending_entries` até 5.000, `export_my_data` com despesas, `admin_anonymize_account` apaga despesas, `storage_unlinked_objects` com comprovantes órfãos. Reversão em `supabase/rollback/` |
 | `20261109003133_spending_phase_b.sql` | PRD 2.2 Fase B (ADR-051): `expense_category`, `owner_expenses` (RLS só leitura do dono), bucket `expense-receipts`, `save_owner_expense`, `delete_owner_expense`, `get_spending_entries`; `get_spending_summary` com `p_kind`, km, custo por km, projeção e por moto; cota soma comprovantes. Reversão em `supabase/rollback/` |
 | `20261109001101_spending_source_evidence.sql` | ADR-050: `sp_records` classifica a origem pela evidência (anexo = comprovante), igual à linha do tempo. Reversão em `supabase/rollback/` |

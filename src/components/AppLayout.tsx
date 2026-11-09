@@ -6,6 +6,7 @@ import { useAuth } from '@/core/auth/AuthProvider'
 import { getSupabase } from '@/lib/supabase'
 import { fetchUnreadCount } from '@/modules/notifications/api'
 import { InstallBanner } from '@/core/pwa/PwaBanners'
+import { WorkshopSideNav } from '@/modules/workshop/shared/WorkshopNav'
 
 // Ícones simples (traço), herdam a cor do texto.
 const I = {
@@ -133,7 +134,14 @@ export function AppLayout() {
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-rule bg-sheet print:hidden lg:flex xl:w-72" aria-label="Menu">
         <div className="px-5 pb-4 pt-5"><Logo to="/painel" /></div>
         <nav aria-label="Áreas da conta" className="flex-1 overflow-y-auto px-3">
-          <div className="space-y-1">{items.map(side)}</div>
+          <div className="space-y-1">
+            {items.map((it) => (
+              <div key={it.to}>
+                {side(it)}
+                {it.to === '/oficina' && it.active && <WorkshopSideNav />}
+              </div>
+            ))}
+          </div>
           {isAdmin && (
             <div className="mt-6">
               <Link to="/admin" aria-current={inAdmin ? 'page' : undefined}

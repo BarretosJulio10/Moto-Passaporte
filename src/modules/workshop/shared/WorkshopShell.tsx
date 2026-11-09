@@ -1,35 +1,13 @@
-import type { ReactNode } from 'react'
-import { Link, NavLink, useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useEffect, useRef, type ReactNode } from 'react'
+import { Link, NavLink, useLocation, useParams } from 'react-router-dom'
 import { useMyWorkshops } from '../WorkshopIndexPage'
-import { fetchMyPermissions, type WorkshopPermissions } from '../customers/api'
+import type { WorkshopPermissions } from '../customers/api'
 import type { MyWorkshop } from '../api'
+import { WORKSHOP_NAV, navHref, useWorkshopPermissions, visibleNav } from './WorkshopNav'
 
-/** Abas do módulo Oficina (PRD 2.1 §22.1). Itens das próximas fases entram quando existirem. */
-type Tab = { to: string; label: string; end?: boolean; show?: (p: WorkshopPermissions) => boolean }
-const TABS: Tab[] = [
-  { to: '', label: 'Visão geral', end: true },
-  { to: 'agenda', label: 'Agenda' },
-  { to: 'orcamentos', label: 'Orçamentos' },
-  { to: 'os', label: 'Ordens de serviço' },
-  { to: 'clientes', label: 'Clientes' },
-  { to: 'relacionamento', label: 'Relacionamento' },
-  { to: 'campanhas', label: 'Campanhas' },
-  { to: 'avaliacoes', label: 'Avaliações' },
-  { to: 'motos', label: 'Motos' },
-  { to: 'servicos', label: 'Serviços e preços' },
-  { to: 'pecas', label: 'Peças' },
-  { to: 'financeiro', label: 'Financeiro', show: (p) => p.manage_finance },
-  { to: 'relatorios', label: 'Relatórios', show: (p) => p.manage_quotes || p.manage_finance },
-  { to: 'equipe', label: 'Equipe' },
-  { to: 'perfil', label: 'Perfil da oficina' },
-]
+export { useWorkshopPermissions }
 
 export type WorkshopContext = { orgId: string; shop: MyWorkshop; perms: WorkshopPermissions }
-
-export function useWorkshopPermissions(orgId: string) {
-  return useQuery({ queryKey: ['workshop-perms', orgId], queryFn: () => fetchMyPermissions(orgId), enabled: Boolean(orgId), staleTime: 60_000 })
-}
 
 /** Cabeçalho e abas da oficina; entrega oficina e permissões para a página. */
 export function WorkshopShell({ children }: { children: (ctx: WorkshopContext) => ReactNode }) {
@@ -48,28 +26,67 @@ export function WorkshopShell({ children }: { children: (ctx: WorkshopContext) =
       </div>
     )
   }
-  const tabs = TABS.filter((t) => (t.to !== 'perfil' || shop.role === 'responsible') && (!t.show || t.show(perms.data)))
-
   return (
     <div>
-      <div className="print:hidden">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted">Moto Passaporte Oficina</p>
-        <p className="heading text-lg text-ink">{shop.business_name}</p>
-        <nav aria-label="Áreas da oficina" className="-mx-1 mt-3 overflow-x-auto border-b border-rule">
-          <ul className="flex min-w-max gap-1 px-1">
-            {tabs.map((t) => (
-              <li key={t.label}>
-                <NavLink to={t.to ? `/oficina/${orgId}/${t.to}` : `/oficina/${orgId}`} end={t.end}
-                  className={({ isActive }) =>
-                    `-mb-px inline-block border-b-2 px-3 py-2.5 text-sm font-semibold ${isActive ? 'border-ink text-ink' : 'border-transparent text-muted hover:text-ink'}`}>
-                  {t.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
+      <MobileWorkshopNav orgId={orgId} shop={shop} perms={perms.data} />
+      <div className="print:mt-0">{children({ orgId, shop, perms: perms.data })}</div>
+    </div>
+  )
+}
+
+/**
+ * Celular e tablet (sem menu lateral): nome da oficina, atalhos do dia a dia e o menu completo
+ * agrupado num painel que abre e fecha. No computador o menu fica no lado esquerdo (WorkshopSideNav).
+ */
+function MobileWorkshopNav({ orgId, shop, perms }: { orgId: string; shop: MyWorkshop; perms: WorkshopPermissions }) {
+  const { pathname } = useLocation()
+  const ref = useRef<HTMLDetailsElement>(null)
+  useEffect(() => { if (ref.current) ref.current.open = false }, [pathname])
+  const groups = visibleNav(perms, shop)
+  const current = groups.flatMap((g) => g.items).filter((i) => {
+    const href = navHref(orgId, i.to)
+    return i.end ? pathname === href : pathname === href || pathname.startsWith(`${href}/`)
+  }).sort((a, b) => b.to.length - a.to.length)[0]
+  const quick = WORKSHOP_NAV[0]!.items
+  return (
+    <div className="mb-5 print:hidden lg:hidden">
+      <p className="text-xs font-semibold uppercase tracking-wider text-muted">Oficina</p>
+      <p className="heading truncate text-lg text-ink">{shop.business_name}</p>
+      <nav aria-label="Dia a dia da oficina" className="-mx-1 mt-2 overflow-x-auto">
+        <ul className="flex min-w-max gap-1.5 px-1">
+          {quick.map((i) => (
+            <li key={i.label}>
+              <NavLink to={navHref(orgId, i.to)} end={i.end}
+                className={({ isActive }) => `inline-block rounded-full border px-3 py-1.5 text-sm font-semibold ${isActive ? 'border-ink bg-ink text-sheet' : 'border-rule bg-sheet text-ink'}`}>
+                {i.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <details ref={ref} className="group mt-2 rounded-sheet border border-rule bg-sheet">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-2.5 text-sm font-semibold text-ink">
+          <span>Menu da oficina{current && !quick.includes(current) ? <span className="font-normal text-muted"> · {current.label}</span> : ''}</span>
+          <span aria-hidden="true" className="text-muted transition group-open:rotate-180">▾</span>
+        </summary>
+        <nav aria-label="Áreas da oficina" className="grid gap-4 border-t border-rule px-4 py-3 sm:grid-cols-2">
+          {groups.map((g) => (
+            <div key={g.label}>
+              <p className="text-[0.7rem] font-semibold uppercase tracking-wider text-muted">{g.label}</p>
+              <ul className="mt-1">
+                {g.items.map((i) => (
+                  <li key={i.label}>
+                    <NavLink to={navHref(orgId, i.to)} end={i.end}
+                      className={({ isActive }) => `block rounded-doc px-2 py-2 text-sm ${isActive ? 'bg-paper font-semibold text-ink' : 'text-graphite'}`}>
+                      {i.label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </nav>
-      </div>
-      <div className="mt-6 print:mt-0">{children({ orgId, shop, perms: perms.data })}</div>
+      </details>
     </div>
   )
 }

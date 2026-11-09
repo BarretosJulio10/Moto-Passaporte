@@ -46,5 +46,20 @@ reset role;
 set role anon;
 select tests.must_fail($$select public.my_admin_access()$$, 'anônimo não consulta acesso');
 reset role;
+
+-- Chave desligada (só em testes): admin entra sem a segunda etapa; usuário comum continua sem acesso
+update public.system_settings set value = '0'::jsonb where key = 'admin_mfa_required';
+select set_config('request.jwt.claim.sub', :'D', false);
+select set_config('request.jwt.claim.aal', 'aal1', false);
+set role authenticated;
+select tests.ok(public.is_admin() and (select (x ->> 'allowed')::boolean and not (x ->> 'mfa_required')::boolean from public.my_admin_access() x),
+                'chave desligada: admin entra sem a segunda etapa');
+reset role;
+select set_config('request.jwt.claim.sub', :'A', false);
+set role authenticated;
+select tests.ok(not public.is_admin(), 'chave desligada: usuário comum continua sem acesso');
+select tests.must_fail($$select public.admin_get_metrics()$$, 'chave desligada: usuário comum bloqueado');
+reset role;
+update public.system_settings set value = '1'::jsonb where key = 'admin_mfa_required';
 select set_config('request.jwt.claim.aal', '', false);
 \echo '=== TODOS OS TESTES DA VERIFICAÇÃO EM DUAS ETAPAS PASSARAM ==='

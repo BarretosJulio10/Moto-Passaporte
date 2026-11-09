@@ -9,6 +9,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.54.0] — 08/11/2026 — Oficina mais organizada
+
+### Mudado
+- **Menu da oficina agrupado** (Dia a dia, Clientes, Gestão, Oficina): no computador fica no menu lateral, abaixo de "Minha oficina"; no celular, atalhos do dia a dia e um "Menu da oficina" que abre e fecha. Acabou a barra de 15 abas com rolagem.
+- **Visão geral da oficina reorganizada por prioridade**: "Precisa de atenção" (só o que pede ação: OS atrasadas, motos prontas, orçamentos para cobrar, a receber, rascunhos, peças), "Hoje" (OS em andamento e horários), "Resultado do período" em 4 números do orçamento ao caixa (orçado → aprovado → concluído → recebido) e "Motos no Passaporte". Novo atalho "Abrir OS".
+
+### Segurança
+- Chave `admin_mfa_required` para a verificação em duas etapas do admin. **Desligada temporariamente** a pedido do responsável durante os testes (KI-043).
+
 ## [0.53.0] — 08/11/2026 — Controle de Gastos, Fase C (PRD 2.2)
 
 ### Adicionado

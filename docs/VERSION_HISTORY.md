@@ -20,6 +20,7 @@ Registro das versões do documento de requisitos e dos marcos do produto. O deta
 | 0.44 | 08/11/2026 | PRD 2.1 — Fase 1 do módulo Oficina (atendimento e orçamento) |
 | 0.45 | 08/11/2026 | PRD 2.1 — Fase 2 do módulo Oficina (ordem de serviço) |
 | 0.46 | 08/11/2026 | PRD 2.1 — Fase 3 do módulo Oficina (histórico permanente) |
+| 0.54 | 08/11/2026 | Oficina: menu agrupado e visão geral por prioridade; chave do 2FA do admin |
 | 0.53 | 08/11/2026 | PRD 2.2 — Fase C do Controle de Gastos (CSV, PDF, LGPD) |
 | 0.52 | 08/11/2026 | PRD 2.2 — Fase B do Controle de Gastos (despesas avulsas, custo por km, todas as motos) |
 | 0.51 | 08/11/2026 | PRD 2.2 — Fase A do Controle de Gastos (ver gastos) |

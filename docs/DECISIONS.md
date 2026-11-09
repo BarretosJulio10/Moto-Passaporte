@@ -109,6 +109,16 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-054 — Chave para a verificação em duas etapas do admin
+**Data:** 08/11/2026 · **Status:** aceita (temporária)
+- `is_admin()` exige aal2 só quando `admin_mfa_required` ≠ 0 (padrão 1). Configuração não pública e fora da tela de configurações: só se muda pelo banco, com registro na auditoria.
+- Desligada em 08/11/2026 a pedido do responsável para agilizar os testes. Religar antes de abrir para clientes: `update public.system_settings set value = '1' where key = 'admin_mfa_required';` (KI-043).
+
+### ADR-053 — Oficina: navegação agrupada e visão geral por prioridade
+**Data:** 08/11/2026 · **Status:** aceita
+- 15 abas numa barra com rolagem escondiam metade das áreas. Agora o menu é agrupado por tarefa (Dia a dia, Clientes, Gestão, Oficina) e vive no menu lateral do computador; no celular, atalhos do dia a dia + menu recolhível.
+- A visão geral segue a ordem de decisão de quem toca a oficina: primeiro o que precisa de ação agora (itens zerados somem), depois o dia, depois o resultado do período em 4 números que contam a jornada orçamento → caixa. Cada item leva à lista já filtrada.
+
 ### ADR-052 — Controle de Gastos, Fase C: levar para fora
 **Data:** 08/11/2026 · **Status:** aceita (PRD 2.2 RF-11, RF-12, §7)
 - CSV montado no navegador a partir de `get_spending_export` (Premium conferido no banco, até 5.000 linhas): ";" e vírgula decimal (padrão do Excel no Brasil), BOM UTF-8, linha de total.
