@@ -260,3 +260,8 @@ Ver `KNOWN_ISSUES.md`.
 - 5 tabelas novas (`workshop_parts_catalog`, `workshop_payments`, `workshop_appointments`, `workshop_reminders`, `workshop_contact_log`) com RLS; gravação só por funções. `workshop_payments` só é lida com a permissão `manage_finance`; custo de peça só sai para `manage_prices`.
 - Recebimentos e contatos não são apagados (gatilho); recebimento só muda para estorno com motivo. Excluir conta só zera o autor (`wq_only_user_nulled`).
 - Nenhuma função nova executável por `anon` (conferido em produção). Teste: `tests/security/phase7d_workshop_management_test.sql`.
+
+## Controle de Gastos (ADR-050)
+- RPCs `get_spending_summary`/`get_spending_snapshot` executáveis só por `authenticated`; leem apenas posses ativas do próprio usuário (`auth.uid()`). `sp_records` e `sp_ownership_start` sem acesso externo (lista `service_only` da varredura).
+- O corte "desde a compra" impede ver valores de serviços de dono anterior por padrão; o histórico visível segue as mesmas regras da linha do tempo.
+- O benefício Premium é verificado no banco: o gratuito não recebe os dados da análise, não só deixa de vê-los.

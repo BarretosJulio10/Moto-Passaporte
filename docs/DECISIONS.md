@@ -109,6 +109,14 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-050 — Controle de Gastos (PRD 2.2), Fase A: cálculo no banco, análise no Premium
+**Data:** 08/11/2026 · **Status:** aceita (PRD 2.2 aprovado com as recomendações da seção 12)
+- Soma feita no banco (`get_spending_summary`, `get_spending_snapshot`), sobre os serviços **vigentes** (não anulados e sem correção posterior). Serviço sem valor fica fora da soma e é mostrado à parte, com atalho para corrigir (o histórico continua imutável).
+- Gratuito vê total, média e contagem; Premium (`spending_insights`) vê mês a mês, comparação, categoria e oficina. A resposta do banco omite a análise para quem não tem o benefício.
+- Escopo padrão "desde a compra", cortando só o histórico de dono anterior; o primeiro dono vê todo o histórico que lançou.
+- Filtro de origem pela **evidência**, igual à linha do tempo (anexo conta como comprovante), para os dois totais nunca divergirem.
+- Gráfico em HTML (barras), não SVG escalado: texto legível no celular e no monitor.
+
 ### ADR-049 — Premium de boas-vindas no cadastro
 **Data:** 08/11/2026 · **Status:** aceita (pedido do responsável: "3 meses de Premium no cadastro; depois paga ou volta ao free")
 - Implementado como **bônus** (`premium_grants`, `source = 'welcome'`), o mesmo mecanismo da cortesia (ADR-037) e do bônus com cobrança adiada (ADR-038): sem cartão, sem fatura. Criado por gatilho ao nascer o perfil; erro no bônus nunca impede o cadastro.

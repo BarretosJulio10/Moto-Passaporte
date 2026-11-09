@@ -89,6 +89,7 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 | Oficina (PRD 2.1) Fase 2: ordens de serviço, checklists, fotos, comprovante | 2.1-F2 | `testado` (ADR-044) |
 | Oficina (PRD 2.1) Fase 3: OS concluída no histórico da moto | 2.1-F3 | `testado` (ADR-045) |
 | Oficina (PRD 2.1) Fase 4: agenda, peças, financeiro, relacionamento, relatórios | 2.1-F4 | `testado` (ADR-046) |
+| Gastos (PRD 2.2) Fase A: página de gastos, cartões, total na linha do tempo | 2.2-A | `testado` (ADR-050) |
 | Premium de boas-vindas (3 meses) no cadastro | — | `testado` (ADR-049) |
 | Oficina (PRD 2.1) Fase 5.1: vínculo do cliente, Meus atendimentos, avisos §23, logotipo | 2.1-F5.1 | `testado` (ADR-048) |
 | Oficina (PRD 2.1) Fase 5: perfil avançado, avaliações, agendamento público, campanhas | 2.1-F5 | `testado` (ADR-047); WhatsApp oficial `planejado` (KI-040) |

@@ -15,6 +15,7 @@ import { MyClaims, OwnershipNotices } from '@/modules/claims/MyClaims'
 import { PageHeader } from '@/components/AppLayout'
 import { daysSince, fetchCare } from '@/modules/motorcycles/careApi'
 import { MyWorkshopsCard } from '@/modules/customer_link/MyWorkshopsCard'
+import { DashboardSpendingCard } from '@/modules/spending/SpendingCards'
 
 export function DashboardPage() {
   const { user } = useAuth()
@@ -77,6 +78,7 @@ export function DashboardPage() {
 
         <aside className="flex min-w-0 flex-col gap-6" aria-label="Avisos e pendências">
           <MyWorkshopsCard />
+          <DashboardSpendingCard />
           <DueReminders />
           <OwnershipNotices />
           <MyClaims />

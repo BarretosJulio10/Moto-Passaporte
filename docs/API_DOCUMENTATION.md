@@ -409,3 +409,6 @@ Contrato completo em `docs/modules/WORKSHOP_GROWTH.md`. Públicas (sem conta, co
 ### Cliente com conta (Fase 5.1, ADR-048)
 
 Contrato em `docs/modules/WORKSHOP_CUSTOMER_LINK.md`: `workshop_create_customer_invite`, `get_customer_link_preview`, `claim_workshop_customer`, `get_my_workshop_records`, `unlink_my_workshop_customer`, `workshop_unlink_customer`. Rotina diária `system_workshop_reminders()` (serviço).
+
+## Controle de Gastos (PRD 2.2, ADR-050)
+- `get_spending_summary(...)` e `get_spending_snapshot(p_motorcycle)` — só `authenticated`, só motos de que a pessoa é dona atual. Contrato completo em `docs/modules/SPENDING.md`. A análise (meses, categoria, oficina, sem valor) só vem com o benefício `spending_insights`.

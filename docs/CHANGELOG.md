@@ -9,6 +9,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.51.0] — 08/11/2026 — Controle de Gastos, Fase A (PRD 2.2)
+
+### Adicionado
+- **Página "Gastos" da moto**: total, média por mês e serviços com valor, com filtros por período, categoria, oficina e origem (o recorte fica no endereço).
+- **Premium**: gasto mês a mês com comparação com o ano anterior, divisão por categoria e por oficina.
+- Cartão "Gastos" na página da moto e "Gastos com as motos" no painel; total em reais na linha do tempo, com link para a página de gastos.
+- Aviso dos serviços sem valor, com atalho para corrigir.
+- Benefício `spending_insights` ("Análise de gastos") nos planos Premium.
+
+### Regras
+- Só contam serviços vigentes (correção substitui o original; anulado não conta); sem valor fica fora da soma.
+- Padrão "desde a compra" só corta histórico de dono anterior.
+
 ## [0.50.0] — 08/11/2026 — Premium de boas-vindas no cadastro
 
 ### Adicionado

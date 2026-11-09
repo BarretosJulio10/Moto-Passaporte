@@ -56,6 +56,7 @@ const ReportsPage = lazy(() => import('@/modules/workshop/management/ReportsPage
 const RelationshipPage = lazy(() => import('@/modules/workshop/management/RelationshipPage').then((m) => ({ default: m.RelationshipPage })))
 const ReviewsPage = lazy(() => import('@/modules/workshop/growth/ReviewsPage').then((m) => ({ default: m.ReviewsPage })))
 const CampaignsPage = lazy(() => import('@/modules/workshop/growth/CampaignsPage').then((m) => ({ default: m.CampaignsPage })))
+const SpendingPage = lazy(() => import('@/modules/spending/SpendingPage').then((m) => ({ default: m.SpendingPage })))
 const AdminReviewsPage = lazy(() => import('@/modules/admin/AdminReviewsPage').then((m) => ({ default: m.AdminReviewsPage })))
 const ClaimPage = lazy(() => import('@/modules/customer_link/ClaimPage').then((m) => ({ default: m.ClaimPage })))
 const MyRecordsPage = lazy(() => import('@/modules/customer_link/MyRecordsPage').then((m) => ({ default: m.MyRecordsPage })))
@@ -167,6 +168,7 @@ export const routes = [
           { path: '/painel/motos/:id/checkup', element: <CheckupPage /> },
           { path: '/painel/motos/:id/historico', element: <TimelinePage /> },
           { path: '/painel/motos/:id/relatorio', element: <ReportPage /> },
+          { path: '/painel/motos/:id/gastos', element: <SpendingPage /> },
           { path: '/painel/motos/:id/historico/novo', element: <RecordFormPage /> },
           { path: '/painel/motos/:id/diario', element: <DiaryPage /> },
           { path: '/painel/motos-anteriores/:id', element: <PreviousDiaryPage /> },

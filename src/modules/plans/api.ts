@@ -23,11 +23,12 @@ export type PublicPlan = {
   max_share_links: number
 }
 
-export type Entitlement = 'pdf_reports' | 'maintenance_reminders'
+export type Entitlement = 'pdf_reports' | 'maintenance_reminders' | 'spending_insights'
 
 export const ENTITLEMENT_LABEL: Record<Entitlement, string> = {
   pdf_reports: 'Relatórios em PDF',
   maintenance_reminders: 'Lembretes de manutenção',
+  spending_insights: 'Análise de gastos',
 }
 
 export type MyPlan = {

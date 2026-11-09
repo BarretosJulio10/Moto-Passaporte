@@ -15,6 +15,8 @@
 
 > **Complemento — Versão 2.1 (08/11/2026):** a evolução do módulo Oficina (clientes, orçamentos, aprovação digital, ordens de serviço, catálogo, preços, agenda, checklist, financeiro básico, equipe e integração com o histórico) está em [`PRD_v2.1_OFICINA.md`](PRD_v2.1_OFICINA.md). A versão 2.0 continua sendo o documento-base; a 2.1 acrescenta requisitos sem apagar decisões anteriores.
 
+> **Complemento — Versão 2.2 (08/11/2026):** Controle de Gastos da Moto (painel de gastos com filtros, mês a mês, categorias, oficinas, custo por km, despesas avulsas, exportação) está em [`PRD_v2.2_GASTOS.md`](PRD_v2.2_GASTOS.md). Implementação em 3 fases (A, B, C).
+
 ## Controle do documento
 
 | Campo | Definição |
@@ -23,7 +25,7 @@
 | Data | 06/11/2026 |
 | Escopo desta revisão | SaaS, site institucional/comercial, painel do usuário, painel da oficina, painel administrativo, Mercado Pago, arquitetura modular, segurança, memória técnica e controle de versões |
 | Regra de preservação | Os fluxos e regras de negócio da versão 1.0 permanecem válidos, exceto quando este documento os detalhar ou complementar expressamente |
-| Complementos | v2.1 — Módulo Oficina (`PRD_v2.1_OFICINA.md`), 08/11/2026 |
+| Complementos | v2.1 — Módulo Oficina (`PRD_v2.1_OFICINA.md`), 08/11/2026 · v2.2 — Controle de Gastos (`PRD_v2.2_GASTOS.md`), 08/11/2026 |
 | Pendências | Decisões comerciais e operacionais listadas na seção “Decisões pendentes” |
 
 ## 1. Visão geral do produto

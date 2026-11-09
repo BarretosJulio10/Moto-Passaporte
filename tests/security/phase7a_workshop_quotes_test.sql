@@ -180,7 +180,7 @@ select public.workshop_send_quote(:'org_c', :'q4') ->> 'token' as tok5 \gset
 select public.workshop_revoke_quote_link(:'org_c', :'q4');
 reset role;
 alter table public.workshop_quote_versions disable trigger workshop_quote_versions_protect;
-update public.workshop_quote_versions set valid_until = current_date - 1 where quote_id = :'q3';
+update public.workshop_quote_versions set valid_until = (now() at time zone 'America/Sao_Paulo')::date - 1 where quote_id = :'q3';
 alter table public.workshop_quote_versions enable trigger workshop_quote_versions_protect;
 select tests.ok(public.workshop_expire_quotes() >= 1, 'rotina diária vence orçamentos sem resposta');
 set role anon;

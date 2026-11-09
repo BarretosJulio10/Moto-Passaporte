@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ButtonLink } from '@/components/Button'
 import { Notice } from '@/components/Notice'
@@ -9,6 +9,8 @@ import { MotoHeader } from '@/modules/motorcycles/MotoHeader'
 import { CATEGORIES, CATEGORY_LABEL, SOURCE_LABEL, type MaintenanceCategory, type RecordSource } from './labels'
 import { applyFilters, EMPTY_FILTERS, fetchTimeline, voidMaintenanceRecord, type TimelineFilters } from './api'
 import { TimelineEntryCard } from './TimelineEntryCard'
+import { formatBRL } from './schemas'
+import { timelineToSpendingQuery, timelineTotal } from '@/modules/spending/api'
 import { getStorageUsage, uploadAll } from '@/modules/attachments/api'
 import type { PendingAttachment } from '@/modules/attachments/AttachmentPicker'
 
@@ -37,6 +39,8 @@ export function TimelinePage() {
   )
   const visible = applyFilters(all, filters)
   const filtered = JSON.stringify(filters) !== JSON.stringify(EMPTY_FILTERS)
+  const total = timelineTotal(visible)
+  const spendingLink = `/painel/motos/${id}/gastos${timelineToSpendingQuery(filters)}`
 
   // Agrupa por ano para leitura rápida da trajetória.
   const groups = useMemo(() => {
@@ -95,6 +99,9 @@ export function TimelinePage() {
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <p className="text-muted">
           {timeline.isSuccess && `${visible.length} ${visible.length === 1 ? 'registro' : 'registros'}${filtered ? ' com os filtros escolhidos' : ''}`}
+          {timeline.isSuccess && total.withValue > 0 && <> · <span className="font-semibold text-ink">{formatBRL(total.cents)}</span></>}
+          {timeline.isSuccess && total.missing > 0 && <span className="text-sm"> ({total.missing} sem valor)</span>}
+          {timeline.isSuccess && total.withValue > 0 && <> · <Link to={spendingLink} className="text-sm font-semibold text-ink underline underline-offset-4">Ver gastos</Link></>}
         </p>
         <ButtonLink to={`/painel/motos/${id}/historico/novo`}>Adicionar registro</ButtonLink>
       </div>

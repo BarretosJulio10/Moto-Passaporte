@@ -13,6 +13,7 @@ import { RecentRecords } from '@/modules/maintenance/RecentRecords'
 import { OwnerAccessSection } from '@/modules/workshop_access/OwnerAccessSection'
 import { TransferSection } from '@/modules/transfers/TransferSection'
 import { ShareSection } from '@/modules/sharing/ShareSection'
+import { MotoSpendingCard } from '@/modules/spending/SpendingCards'
 import { RemindersSection } from '@/modules/reminders/RemindersSection'
 
 function Field({ label, value }: { label: string; value: string }) {
@@ -95,6 +96,7 @@ export function MotorcyclePage() {
               Relatório do histórico em PDF
             </Link>
           </p>
+          <MotoSpendingCard motorcycleId={motoId} />
           <MileageSection motorcycleId={motoId} />
         </div>
         <aside className="flex min-w-0 flex-col gap-8 lg:col-start-2 lg:row-start-1 2xl:col-start-3">
