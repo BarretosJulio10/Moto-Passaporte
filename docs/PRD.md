@@ -17,6 +17,8 @@
 
 > **Complemento — Versão 2.2 (08/11/2026):** Controle de Gastos da Moto (painel de gastos com filtros, mês a mês, categorias, oficinas, custo por km, despesas avulsas, exportação) está em [`PRD_v2.2_GASTOS.md`](PRD_v2.2_GASTOS.md). Implementação em 3 fases (A, B, C).
 
+> **Complemento — Versão 2.3 (09/11/2026, guardado, não iniciado):** todos os veículos (carro, caminhão, moto aquática, embarcações com motores e horímetro) está em [`PRD_v2.3_TODOS_VEICULOS.md`](PRD_v2.3_TODOS_VEICULOS.md). Só implementar quando o responsável pedir.
+
 ## Controle do documento
 
 | Campo | Definição |
@@ -25,7 +27,7 @@
 | Data | 06/11/2026 |
 | Escopo desta revisão | SaaS, site institucional/comercial, painel do usuário, painel da oficina, painel administrativo, Mercado Pago, arquitetura modular, segurança, memória técnica e controle de versões |
 | Regra de preservação | Os fluxos e regras de negócio da versão 1.0 permanecem válidos, exceto quando este documento os detalhar ou complementar expressamente |
-| Complementos | v2.1 — Módulo Oficina (`PRD_v2.1_OFICINA.md`), 08/11/2026 · v2.2 — Controle de Gastos (`PRD_v2.2_GASTOS.md`), 08/11/2026 |
+| Complementos | v2.1 — Módulo Oficina (`PRD_v2.1_OFICINA.md`), 08/11/2026 · v2.2 — Controle de Gastos (`PRD_v2.2_GASTOS.md`), 08/11/2026 · v2.3 — Todos os veículos (`PRD_v2.3_TODOS_VEICULOS.md`), 09/11/2026, guardado |
 | Pendências | Decisões comerciais e operacionais listadas na seção “Decisões pendentes” |
 
 ## 1. Visão geral do produto
