@@ -9,6 +9,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.66.0] — 09/11/2026 — Avisos por e-mail e WhatsApp
+
+### Adicionado
+- **Avisos por e-mail (Resend) e WhatsApp (FZAP)** (ADR-064): fim do Premium, falha de cobrança, pagamento confirmado e **limite de motos** saem também por e-mail e, para quem autorizar, por WhatsApp, com o link para resolver no site. É o caminho do convite para assinar fora do app da Google Play.
+- Novo aviso **"Seu plano chegou ao limite de motos"**: ao tentar cadastrar além do plano, a pessoa recebe (no máximo 1 por semana) o caminho para assinar o Premium ou incluir moto extra.
+- **Admin → E-mail e WhatsApp:** liga e desliga cada canal, guarda as chaves do Resend e da FZAP no cofre, envia e-mail de teste, conecta o número do WhatsApp lendo o QR Code, envia WhatsApp de teste e mostra o histórico de envios.
+- **Notificações → Por onde receber:** e-mail (ligado por padrão) e WhatsApp (precisa de celular em Minha conta); nova coluna WhatsApp por tipo de aviso.
+- Página pública **/avisos/sair** (link "parar de receber" de todo e-mail), sem precisar entrar.
+
+### Segurança
+- Chaves só no Vault (a tela mostra os 4 últimos caracteres); WhatsApp com intervalo mínimo entre avisos opcionais e envios espaçados para reduzir risco de bloqueio do número.
+
 ## [0.65.0] — 09/11/2026 — Modo loja (app na Google Play, fase 1)
 
 ### Adicionado

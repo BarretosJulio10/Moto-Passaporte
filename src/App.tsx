@@ -7,6 +7,7 @@ import { LegalPage } from '@/modules/public_site/LegalPage'
 import { FaqPage } from '@/modules/public_site/FaqPage'
 import { ContactPage } from '@/modules/public_site/ContactPage'
 import { DeleteAccountPage } from '@/modules/public_site/DeleteAccountPage'
+import { UnsubscribePage } from '@/modules/public_site/UnsubscribePage'
 import { InstallPage } from '@/modules/public_site/InstallPage'
 import { UpdateBanner } from '@/core/pwa/PwaBanners'
 import { SignUpPage } from '@/modules/auth/SignUpPage'
@@ -75,6 +76,7 @@ const PublicWorkshopPage = lazy(() => import('@/modules/workshop/PublicWorkshopP
 const AdminDashboardPage = lazy(() => import('@/modules/admin/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })))
 const AdminPlansPage = lazy(() => import('@/modules/admin/AdminPlansPage').then((m) => ({ default: m.AdminPlansPage })))
 const AdminPaymentsPage = lazy(() => import('@/modules/admin/AdminPaymentsPage').then((m) => ({ default: m.AdminPaymentsPage })))
+const AdminMessagingPage = lazy(() => import('@/modules/admin/AdminMessagingPage').then((m) => ({ default: m.AdminMessagingPage })))
 const AdminSubscriptionsPage = lazy(() => import('@/modules/admin/AdminSubscriptionsPage').then((m) => ({ default: m.AdminSubscriptionsPage })))
 const AdminUsersPage = lazy(() => import('@/modules/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })))
 const AdminSettingsPage = lazy(() => import('@/modules/admin/AdminSettingsPage').then((m) => ({ default: m.AdminSettingsPage })))
@@ -154,6 +156,7 @@ export const routes = [
           { path: '/perguntas-frequentes', element: <FaqPage /> },
           { path: '/contato', element: <ContactPage /> },
           { path: '/excluir-conta', element: <DeleteAccountPage /> },
+          { path: '/avisos/sair', element: <UnsubscribePage /> },
           { path: '/instalar', element: <InstallPage /> },
           { path: '/criar-conta', element: <SignUpPage /> },
           { path: '/entrar', element: <SignInPage /> },
@@ -318,6 +321,14 @@ export const routes = [
             element: (
               <RequireAdmin>
                 <AdminStoragePage />
+              </RequireAdmin>
+            ),
+          },
+          {
+            path: '/admin/mensagens',
+            element: (
+              <RequireAdmin>
+                <AdminMessagingPage />
               </RequireAdmin>
             ),
           },

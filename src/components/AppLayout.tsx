@@ -37,6 +37,7 @@ const ADMIN_LINKS: [string, string][] = [
   ['/admin/assinaturas', 'Assinaturas e pagamentos'],
   ['/admin/planos', 'Planos'],
   ['/admin/pagamentos', 'Mercado Pago'],
+  ['/admin/mensagens', 'E-mail e WhatsApp'],
   ['/admin/armazenamento', 'Armazenamento'],
   ['/admin/privacidade', 'Privacidade (LGPD)'],
   ['/admin/configuracoes', 'Configurações'],

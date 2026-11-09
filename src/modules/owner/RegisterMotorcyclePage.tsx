@@ -13,6 +13,7 @@ import { registerMotorcycle } from '@/modules/motorcycles/api'
 import { OIL_SUGGESTED_KM, setCare } from '@/modules/motorcycles/careApi'
 import { useFipeSuggestions } from '@/components/Autofill'
 import { PremiumLink } from '@/modules/plans/PremiumLink'
+import { notifyMotorcycleLimit } from '@/modules/notifications/api'
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -57,7 +58,10 @@ export function RegisterMotorcyclePage() {
         setClaimed(true)
       }
     } catch (error) {
-      setFormError(translateDbError(error as { code?: string; message?: string }))
+      const message = translateDbError(error as { code?: string; message?: string })
+      setFormError(message)
+      // Limite do plano: avisa por e-mail/WhatsApp com o caminho para incluir mais motos (ADR-064).
+      if (/limite/i.test((error as { message?: string })?.message ?? message)) void notifyMotorcycleLimit().catch(() => undefined)
     } finally {
       setLoading(false)
     }

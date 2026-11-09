@@ -864,9 +864,9 @@ export type Database = {
       mark_my_notifications_read: { Args: { p_ids?: string[] }; Returns: number }
       get_my_notification_preferences: {
         Args: Record<PropertyKey, never>
-        Returns: { kind: string; optional: boolean; in_app: boolean; email: boolean; push: boolean }[]
+        Returns: { kind: string; optional: boolean; in_app: boolean; email: boolean; push: boolean; whatsapp: boolean }[]
       }
-      set_my_notification_preference: { Args: { p_kind: string; p_in_app: boolean; p_email: boolean; p_push?: boolean | null }; Returns: undefined }
+      set_my_notification_preference: { Args: { p_kind: string; p_in_app: boolean; p_email: boolean; p_push?: boolean | null; p_whatsapp?: boolean | null }; Returns: undefined }
       admin_send_notice: { Args: { p_user_id: string; p_title: string; p_body: string; p_reason: string }; Returns: undefined }
       get_my_chassis: { Args: { p_motorcycle_id: string }; Returns: string | null }
       set_my_chassis: { Args: { p_motorcycle_id: string; p_chassis: string }; Returns: undefined }

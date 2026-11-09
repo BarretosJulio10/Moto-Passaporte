@@ -1,0 +1,86 @@
+import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const calls: Array<{ fn: string; args: unknown[] }> = []
+let status = { connected: false, loggedIn: false, number: null as string | null }
+const settings = {
+  email_enabled: false, email_from: 'Moto Passaporte <avisos@motopassaporte.com.br>', link_base: 'https://www.motopassaporte.com.br',
+  resend_key_configured: true, resend_key_hint: 'abcd', whatsapp_enabled: false, fzap_url: 'https://fzap.exemplo.com.br',
+  fzap_token_configured: true, fzap_token_hint: '3456', whatsapp_cooldown_hours: 48, updated_at: '2026-11-09T12:00:00Z', updated_by_name: 'Admin',
+  last_24h: { 'email:sent': 3 }, pending: { email: 1, whatsapp: 0 },
+}
+
+vi.mock('./messagingApi', () => ({
+  fetchMessagingSettings: async () => settings,
+  fetchOutboundMessages: async () => [
+    { id: 'm1', channel: 'email', kind: 'limit_reached', destination: 'ju***@hotmail.com', status: 'sent', error: null, created_at: '2026-11-09T12:00:00Z', user_name: 'Julio' },
+  ],
+  saveMessagingSettings: async (...args: unknown[]) => { calls.push({ fn: 'save', args }) },
+  messagingAction: async (action: string, extra?: unknown) => {
+    calls.push({ fn: action, args: [extra] })
+    if (action === 'wa_status') return status
+    if (action === 'wa_connect') { status = { connected: true, loggedIn: false, number: null }; return status }
+    if (action === 'wa_qr') return { qr: 'data:image/png;base64,AAAA' }
+    if (action === 'test_email') return { ok: true, detail: 'Enviado para admin@teste.com.' }
+    return { ok: true }
+  },
+}))
+
+const rpc = vi.fn(async () => ({ data: true, error: null }))
+vi.mock('@/lib/supabase', () => ({ getSupabase: () => ({ rpc }) }))
+
+import { AdminMessagingPage } from './AdminMessagingPage'
+import { UnsubscribePage } from '@/modules/public_site/UnsubscribePage'
+
+function wrap(node: React.ReactNode, path = '/admin/mensagens') {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  return render(
+    <QueryClientProvider client={qc}>
+      <MemoryRouter initialEntries={[path]}><Routes><Route path="*" element={node} /></Routes></MemoryRouter>
+    </QueryClientProvider>,
+  )
+}
+
+beforeEach(() => {
+  calls.length = 0
+  status = { connected: false, loggedIn: false, number: null }
+})
+
+describe('admin: e-mail e WhatsApp (ADR-064)', () => {
+  it('mostra só o final das chaves, salva e testa o e-mail', async () => {
+    const user = userEvent.setup()
+    wrap(<AdminMessagingPage />)
+    expect(await screen.findByPlaceholderText('Cadastrada, termina em abcd')).toHaveValue('')
+    await user.click(screen.getByLabelText('Enviar avisos por e-mail'))
+    await user.click(screen.getByRole('button', { name: 'Salvar' }))
+    await waitFor(() => expect(calls.find((c) => c.fn === 'save')?.args[0]).toMatchObject({ emailEnabled: true, resendKey: '', fzapUrl: 'https://fzap.exemplo.com.br' }))
+    await user.click(screen.getByRole('button', { name: 'Enviar e-mail de teste para mim' }))
+    expect(await screen.findByText('Enviado para admin@teste.com.')).toBeVisible()
+    expect(screen.getByText(/Limite de motos do plano · Julio/)).toBeVisible()
+  })
+
+  it('conecta o WhatsApp mostrando o QR Code', async () => {
+    const user = userEvent.setup()
+    wrap(<AdminMessagingPage />)
+    expect(await screen.findByText('Desconectado.')).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Conectar (QR Code)' }))
+    expect(await screen.findByAltText('QR Code para conectar o WhatsApp')).toHaveAttribute('src', 'data:image/png;base64,AAAA')
+  })
+})
+
+describe('parar de receber por e-mail', () => {
+  it('funciona pelo link, sem entrar na conta', async () => {
+    wrap(<UnsubscribePage />, '/avisos/sair?t=0b8c6a8e-6a1f-4c3e-9e4a-2f6d8b1a9c01')
+    expect(await screen.findByText('Pronto, você não vai mais receber avisos por e-mail.')).toBeVisible()
+    expect(rpc).toHaveBeenCalledWith('email_unsubscribe', { p_token: '0b8c6a8e-6a1f-4c3e-9e4a-2f6d8b1a9c01' })
+  })
+  it('link quebrado não chama o servidor', async () => {
+    rpc.mockClear()
+    wrap(<UnsubscribePage />, '/avisos/sair?t=abc')
+    expect(await screen.findByText(/não é válido/)).toBeVisible()
+    expect(rpc).not.toHaveBeenCalled()
+  })
+})

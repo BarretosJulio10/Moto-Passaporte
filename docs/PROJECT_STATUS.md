@@ -1,6 +1,6 @@
 # PROJECT_STATUS — Moto Passaporte
 
-**Versão atual:** 0.65.0
+**Versão atual:** 0.66.0
 **Data:** 09/11/2026
 **Fase:** Fases 1 a 4 concluídas. Fases 1 a 5 concluídas (Mercado Pago aguardando teste ponta a ponta). Fase 6 em andamento: painel administrativo
 **Progresso geral:** PRD 2.0: 97,5% (39 de 40 itens — `PRD_CHECKLIST.md`). PRD 2.1 (módulo Oficina): Fases 1 a 5 e acabamento 5.1 concluídos (100%). PRD 2.2 (Gastos): Fases A, B e C concluídas (100%). PRD 2.3 (todos os veículos): guardado, não iniciado (0%). PRD 2.4 (modelo cofre): Fases A a C no ar (100%; falta revisão jurídica, KI-044). PRD 2.5 (App da Pista): no ar (100%, com conta da pista v0.58.0)
@@ -34,7 +34,7 @@
 
 ## Próximos passos (em ordem)
 
-0. **Responsável:** validar o fluxo da oficina completo (Fases A a D, v0.59.0 a v0.61.0). Testar a conta da pista (criar um mecânico em Equipe e entrar pelo link `/pista/<código>`). Domínio `www.motopassaporte.com.br` no ar (v0.64.1). App na Google Play: fase 1 (modo loja) no ar em v0.65.0; falta a conta de desenvolvedor, gerar a casca no PWABuilder, a impressão digital no assetlinks e o teste fechado (12 pessoas, 14 dias). Depois: avisos por e-mail (Resend) e WhatsApp (FZAP); login por digital (passkeys); religar MFA do admin (KI-043); PRD 2.3 quando pedido.
+0. **Responsável:** validar o fluxo da oficina completo (Fases A a D, v0.59.0 a v0.61.0). Testar a conta da pista (criar um mecânico em Equipe e entrar pelo link `/pista/<código>`). Domínio `www.motopassaporte.com.br` no ar (v0.64.1). App na Google Play: fase 1 (modo loja) no ar em v0.65.0; falta a conta de desenvolvedor, gerar a casca no PWABuilder, a impressão digital no assetlinks e o teste fechado (12 pessoas, 14 dias). Avisos por e-mail e WhatsApp no ar em v0.66.0 (desligados até configurar: domínio no Resend, chave e QR da FZAP no admin; SMTP do Supabase Auth pelo Resend). Depois: login por digital (passkeys); religar MFA do admin (KI-043); PRD 2.3 quando pedido.
 1. **Responsável:** percorrer o roteiro do `HOMOLOGATION.md` com contas reais (proprietário, oficina, comprador) e fazer uma assinatura real do plano mais barato (KI-026); o Claude acompanha pelo banco e corrige o que aparecer.
 2. **Responsável:** cadastrar os segredos do backup no GitHub (OPERATIONS.md §2), ligar a proteção contra senhas vazadas (KI-021, exige plano Pro) e decidir sobre repositório privado (KI-031).
 3. **Decisões antes de vender em escala:** nota fiscal de serviço (KI-027), revisão jurídica de Termos/Privacidade/LGPD, ambiente de produção separado (KI-007).

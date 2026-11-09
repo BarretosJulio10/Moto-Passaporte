@@ -17,6 +17,7 @@ export const KIND_LABEL: Record<string, string> = {
   transfer_decided: 'Respostas às minhas transferências',
   reminder_due: 'Lembretes de manutenção',
   subscription_ending: 'Fim do período Premium',
+  limit_reached: 'Limite de motos do plano',
   payment_approved: 'Pagamentos confirmados',
   payment_failed: 'Falhas e atrasos de pagamento',
   storage_limit: 'Espaço quase cheio',
@@ -58,7 +59,31 @@ export async function fetchPreferences(): Promise<NotificationPreference[]> {
   return data ?? []
 }
 
-export async function setPreference(kind: string, inApp: boolean, email: boolean, push?: boolean): Promise<void> {
-  const { error } = await getSupabase().rpc('set_my_notification_preference', { p_kind: kind, p_in_app: inApp, p_email: email, p_push: push ?? null })
+export async function setPreference(kind: string, inApp: boolean, email: boolean, push?: boolean, whatsapp?: boolean): Promise<void> {
+  const { error } = await getSupabase().rpc('set_my_notification_preference', {
+    p_kind: kind, p_in_app: inApp, p_email: email, p_push: push ?? null, p_whatsapp: whatsapp ?? null,
+  })
   if (error) throw error
+}
+
+/** Canais fora do site (ADR-064): e-mail e WhatsApp. */
+export type MessagingPrefs = {
+  email: string | null; email_optout: boolean; email_active: boolean
+  phone: string | null; phone_ok: boolean; whatsapp_optin: boolean; whatsapp_active: boolean
+}
+
+export async function fetchMessagingPrefs(): Promise<MessagingPrefs> {
+  const { data, error } = await getSupabase().rpc('get_my_messaging_prefs' as never)
+  if (error) throw error
+  return data as unknown as MessagingPrefs
+}
+
+export async function setMessagingPrefs(emailOptout: boolean | null, whatsappOptin: boolean | null): Promise<void> {
+  const { error } = await getSupabase().rpc('set_my_messaging_prefs' as never, { p_email_optout: emailOptout, p_whatsapp_optin: whatsappOptin } as never)
+  if (error) throw error
+}
+
+/** Ao bater no limite de motos: aviso com o caminho para incluir mais (vai por e-mail/WhatsApp). */
+export async function notifyMotorcycleLimit(): Promise<void> {
+  await getSupabase().rpc('notify_motorcycle_limit' as never)
 }

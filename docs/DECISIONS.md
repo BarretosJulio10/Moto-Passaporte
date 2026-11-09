@@ -109,6 +109,15 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-064 — Avisos por e-mail (Resend) e WhatsApp (FZAP)
+**Data:** 09/11/2026 · **Status:** aceita (responsável: Resend para avisos e para os e-mails de cadastro/senha; FZAP com Whatsmeow em `fzap.pagoupix.com.br`, número conectado por QR no painel admin)
+- Os avisos continuam nascendo em `notify()`. Cada aviso marca `email_pending` e `whatsapp_pending` pela preferência do usuário; padrões por tipo em `notification_email_default` (fim do Premium, cobrança, pagamento confirmado, limite de motos, transferência recebida, pedido de acesso de oficina) e `notification_whatsapp_default` (fim do Premium, cobrança, limite de motos). WhatsApp só com `profiles.whatsapp_optin` e celular válido.
+- Novo aviso `limit_reached` (opcional, sem push), disparado por `notify_motorcycle_limit()` quando o cadastro bate no limite; 1 por semana. É ele que leva o preço da moto extra para fora do app da Google Play.
+- Envio: Edge Function `messages-send` (pg_cron a cada 2 min, só com pendentes e canal ligado). Resend com `Idempotency-Key` por aviso e `List-Unsubscribe`; FZAP `POST /chat/send/text` (cabeçalho `token`), 2,5 s entre mensagens, máx. 20 por rodada e intervalo mínimo (padrão 48 h) para avisos opcionais à mesma pessoa. Histórico em `outbound_messages` (destino mascarado, sem texto).
+- Painel admin `/admin/mensagens` (`messaging_settings` + Vault): liga/desliga canais, chaves, remetente, endereço dos links; `messages-admin` faz o e-mail de teste e a conexão do WhatsApp (connect → QR → status → logout, teste para um número).
+- Usuário: "Por onde receber" em Notificações (e-mail ligado por padrão; WhatsApp só com celular) e coluna WhatsApp por tipo. Link público `/avisos/sair?t=` desliga os e-mails opcionais sem login; cobrança continua.
+- Links dos avisos usam `messaging_settings.link_base`. Com o app da Play publicado, trocar para um subdomínio que o app não captura (ex.: `conta.motopassaporte.com.br`), senão o Android abre o link no app, onde a compra não aparece.
+
 ### ADR-063 — App na Google Play (casca TWA) e modo loja
 **Data:** 09/11/2026 · **Status:** aceita (responsável: publicar na Play com conta pessoal; compra só pelo site; avisos com link por e-mail e WhatsApp, fora do app)
 - O app da Play é uma casca (Trusted Web Activity, gerada pelo PWABuilder) que abre `https://www.motopassaporte.com.br/painel?origem=play`; pacote `br.com.motopassaporte.app`, nome "Moto Passaporte". Atualizações do site valem no app sem nova versão na loja.

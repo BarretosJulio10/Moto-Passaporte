@@ -5,9 +5,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const calls: Array<{ fn: string; args: unknown[] }> = []
+let messaging = { email: 'ana@teste.com', email_optout: false, email_active: true, phone: null as string | null, phone_ok: false, whatsapp_optin: false, whatsapp_active: true }
 let prefs = [
-  { kind: 'payment_failed', optional: false, in_app: true, email: false, push: true },
-  { kind: 'reminder_due', optional: true, in_app: true, email: false, push: false },
+  { kind: 'payment_failed', optional: false, in_app: true, email: false, push: true, whatsapp: true },
+  { kind: 'reminder_due', optional: true, in_app: true, email: false, push: false, whatsapp: false },
 ]
 
 vi.mock('./api', async () => {
@@ -24,7 +25,12 @@ vi.mock('./api', async () => {
     fetchPreferences: async () => prefs,
     setPreference: async (...args: unknown[]) => {
       calls.push({ fn: 'setPreference', args })
-      prefs = prefs.map((p) => (p.kind === args[0] ? { ...p, in_app: args[1] as boolean, email: args[2] as boolean, push: args[3] as boolean } : p))
+      prefs = prefs.map((p) => (p.kind === args[0] ? { ...p, in_app: args[1] as boolean, email: args[2] as boolean, push: args[3] as boolean, whatsapp: args[4] as boolean } : p))
+    },
+    fetchMessagingPrefs: async () => messaging,
+    setMessagingPrefs: async (...args: unknown[]) => {
+      calls.push({ fn: 'setMessagingPrefs', args })
+      messaging = { ...messaging, ...(args[0] === null ? {} : { email_optout: args[0] as boolean }), ...(args[1] === null ? {} : { whatsapp_optin: args[1] as boolean }) }
     },
     fetchUnreadCount: async () => 3,
   }
@@ -54,6 +60,7 @@ beforeEach(() => {
   subscribed = null
   calls.length = 0
   prefs = prefs.map((p) => ({ ...p, in_app: true, email: false }))
+  messaging = { email: 'ana@teste.com', email_optout: false, email_active: true, phone: null, phone_ok: false, whatsapp_optin: false, whatsapp_active: true }
 })
 
 describe('NotificationsPage', () => {
@@ -72,11 +79,27 @@ describe('NotificationsPage', () => {
     const table = await screen.findByRole('table')
     expect(within(table).getByLabelText(/Falhas e atrasos de pagamento no site \(essencial\)/)).toBeDisabled()
     await user.click(within(table).getByLabelText('Lembretes de manutenção no site'))
-    await waitFor(() => expect(calls.find((c) => c.fn === 'setPreference')?.args).toEqual(['reminder_due', false, false, false]))
+    await waitFor(() => expect(calls.find((c) => c.fn === 'setPreference')?.args).toEqual(['reminder_due', false, false, false, false]))
     await user.click(within(table).getByLabelText('Falhas e atrasos de pagamento por e-mail'))
-    await waitFor(() => expect(calls.filter((c) => c.fn === 'setPreference')[1]?.args).toEqual(['payment_failed', true, true, true]))
+    await waitFor(() => expect(calls.filter((c) => c.fn === 'setPreference')[1]?.args).toEqual(['payment_failed', true, true, true, true]))
     await user.click(within(table).getByLabelText('Lembretes de manutenção no celular'))
-    await waitFor(() => expect(calls.filter((c) => c.fn === 'setPreference')[2]?.args).toEqual(['reminder_due', false, false, true]))
+    await waitFor(() => expect(calls.filter((c) => c.fn === 'setPreference')[2]?.args).toEqual(['reminder_due', false, false, true, false]))
+  })
+
+  it('canais: e-mail liga e desliga; WhatsApp só com celular cadastrado (ADR-064)', async () => {
+    const user = userEvent.setup()
+    const { unmount } = wrap(<NotificationsPage />)
+    const wa = await screen.findByLabelText('Avisos por WhatsApp')
+    expect(wa).toBeDisabled()
+    expect(screen.getByRole('link', { name: 'Minha conta' })).toHaveAttribute('href', '/painel/conta')
+    await user.click(screen.getByLabelText('Avisos por e-mail'))
+    await waitFor(() => expect(calls.find((c) => c.fn === 'setMessagingPrefs')?.args).toEqual([true, null]))
+    unmount()
+    messaging = { ...messaging, phone: '17999990001', phone_ok: true }
+    wrap(<NotificationsPage />)
+    expect(await screen.findByText('(17) 99999-0001')).toBeVisible()
+    await user.click(screen.getByLabelText('Avisos por WhatsApp'))
+    await waitFor(() => expect(calls.filter((c) => c.fn === 'setMessagingPrefs').at(-1)?.args).toEqual([null, true]))
   })
 
   it('ativa o celular com um toque, envia teste e lista o aparelho', async () => {
