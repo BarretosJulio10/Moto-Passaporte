@@ -4,9 +4,9 @@
 > Toda sessão de IA ou desenvolvedor deve ler este arquivo **antes** de qualquer alteração.
 > Nunca registrar aqui senhas, tokens, chaves, dados pessoais ou segredos operacionais.
 
-**Última atualização:** 06/11/2026
-**Versão do projeto:** 0.7.0
-**Situação geral:** Fase 1 concluída (base); Fase 2 em andamento — linha do tempo e manutenção publicadas em https://moto-passaporte.vercel.app.
+**Última atualização:** 09/11/2026
+**Versão do projeto:** 0.57.1
+**Situação geral:** PRD 2.0 em 97,5% (falta homologação com contas reais); complementos 2.1, 2.2, 2.4 e 2.5 no ar; 2.3 guardado. Publicado em https://moto-passaporte.vercel.app. Estado detalhado em `PROJECT_STATUS.md`.
 
 Legenda de estados (seção 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 
@@ -83,8 +83,8 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 | Transferência do passaporte | 4 | `implementado` (ADR-016) |
 | Compartilhamento público controlado | 4 | `implementado` (ADR-017) |
 | Planos e preços configuráveis | 5 | `implementado` (ADR-018) |
-| Mercado Pago, assinaturas, cotas | 5 | `planejado` |
-| Painel administrativo, testes de segurança, lançamento | 6 | `planejado` |
+| Mercado Pago, assinaturas, cotas | 5 | `implementado` (ADR-019 a ADR-022; falta teste real, KI-026) |
+| Painel administrativo, testes de segurança, lançamento | 6 | `testado`; homologação com contas reais pendente (6.6) |
 | Oficina (PRD 2.1) Fase 1: clientes, catálogo, preços, orçamentos, aprovação por link | 2.1-F1 | `testado` (ADR-043, `docs/modules/`) |
 | Oficina (PRD 2.1) Fase 2: ordens de serviço, checklists, fotos, comprovante | 2.1-F2 | `testado` (ADR-044) |
 | Oficina (PRD 2.1) Fase 3: OS concluída no histórico da moto | 2.1-F3 | `testado` (ADR-045) |
@@ -95,6 +95,10 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 | Premium de boas-vindas (3 meses) no cadastro | — | `testado` (ADR-049) |
 | Oficina (PRD 2.1) Fase 5.1: vínculo do cliente, Meus atendimentos, avisos §23, logotipo | 2.1-F5.1 | `testado` (ADR-048) |
 | Oficina (PRD 2.1) Fase 5: perfil avançado, avaliações, agendamento público, campanhas | 2.1-F5 | `testado` (ADR-047); WhatsApp oficial `planejado` (KI-040) |
+| Planos: modelo cofre (PRD 2.4) | 2.4 | `publicado` (ADR-056); revisão jurídica KI-044 |
+| App da Pista, PWA do mecânico (PRD 2.5) | 2.5 | `publicado` (ADR-057); conta da pista em estudo |
+| Janela de pedido de acesso de oficina | — | `publicado` (v0.57.1) |
+| Todos os veículos (PRD 2.3) | 2.3 | `planejado` — só iniciar quando pedido |
 
 ## 6. Ambientes
 
@@ -124,6 +128,9 @@ Ainda por criar: cobrança e `notifications` (F5), `support_cases` (F6).
 - v0.32.0: conferência de conteúdo no servidor (ADR-033, KI-018). Testes que inserem em `storage.objects` no banco local passam pela conferência simulada no stub; para testar a recusa, `set tests.skip_file_check = 'on'`. No Supabase real, gravar o resultado como service_role (`record_attachment_check`).
 - v0.33.0: comprovantes pelo link (ADR-034, KI-022) e KI-023. Edge Functions publicadas pelo MCP podem levar só o trecho de `_shared` que usam; ao republicar a partir do Git, mandar o `_shared/mercadopago.ts` completo.
 - v0.34.0: limite de consultas anônimas (ADR-035, KI-003). Testes que chamam `get_public_passport`/`get_shared_passport` como anônimo com `request.headers` definido passam pelo limite (padrão 120/h). Ao mudar `get_shared_passport`, o rollback de `public_rate_limit` restaura a versão com ids de comprovantes e o de `shared_files` a versão anterior.
+- v0.56.0: modelo cofre (ADR-056). Bloqueio por `maintenance_record_locked` nas políticas de registros e anexos e em `can_access_attachment_object`; `user_has_full_history` = plano premium (cortesia e boas-vindas contam). Funções novas de serviço entram nas listas da varredura (`sweep_violations.sql.inc` e `phase6e_security_sweep.sql`).
+- v0.57.0: App da Pista (ADR-057). Arquivos da oficina usam o prefixo `workshop-files:` na limpeza de órfãos; áudio conferido por assinatura no `attachment-check`; `scheduled-jobs` precisa do `_shared/mercadopago.ts` completo no deploy.
+- Padrão para alterar função existente numa migração: bloco `DO` com `replace(pg_get_functiondef(...))`, gerando erro se o trecho esperado não existir.
 - Criar ambientes de homologação e produção antes de usuários reais (KI-007).
 - Decidir criptografia do chassi (D-T3) antes de produção.
 

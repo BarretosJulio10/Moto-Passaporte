@@ -4,7 +4,7 @@ Conferência item a item do PRD v2.0 (`docs/PRD.md`). **Atualizar a cada entrega
 Estados (PRD 17.2): `planejado` · `em desenvolvimento` · `implementado` · `testado` · `homologado` · `publicado`.
 "(banco)" = só a parte de banco de dados; interface ainda pendente.
 
-**Última conferência:** 08/11/2026 — v0.34.0
+**Última conferência:** 09/11/2026 — v0.57.1
 **Item atual na ordem:** Fase 6 → homologação e publicação (6.6)
 
 ## Progresso
@@ -105,6 +105,16 @@ Histórico: 0.7.0 = 45% · 0.8.0 = 47,5% · 0.9.0 = 48,8% · 0.10.0 = 53,8% · 0
 | 6.4 | Testes de segurança, integração, regressão, E2E | 19 | `testado` — 20 suítes de banco (regras, RLS, IDOR, arquivos, pagamentos) + varredura de segurança por catálogo (local e Supabase real: 0 violações); 174 testes de tela; 7 cenários ponta a ponta no navegador (visitante, proprietário, comprador, oficina, admin, bloqueios); `run_all.sh` para regressão (ADR-027). Fluxos com Supabase e Mercado Pago reais: roteiro em `HOMOLOGATION.md` (6.6, KI-009) |
 | 6.5 | Backup, restauração e rollback testados | 18.4, 20 | `testado` — backup diário criptografado (age, chave privada só com o responsável) de dados, contas, metadados e arquivos pelo GitHub Actions; restauração "estrutura do Git + dados do backup" e rollback das migrações da Fase 6 testados de ponta a ponta em banco de teste (`restore_check.sh`, 13 verificações); manual em `OPERATIONS.md` (ADR-028). **Ativação** depende dos segredos no GitHub (responsável) |
 | 6.6 | Homologação e publicação | 22 | `em homologação` — parte técnica feita em 08/11/2026 (tipos, 187 testes de tela, 9 cenários ponta a ponta, varredura de segurança no Supabase real sem violações, monitor ativo). Falta: roteiro do `HOMOLOGATION.md` com contas reais (proprietário, oficina, comprador, admin) e uma assinatura real de ponta a ponta (KI-026) |
+
+## Complementos do PRD
+
+| Complemento | Estado |
+|---|---|
+| 2.1 — Módulo Oficina | `publicado` — Fases 1 a 5.1 (100%) |
+| 2.2 — Controle de Gastos | `publicado` — Fases A a C (100%) |
+| 2.3 — Todos os veículos | `planejado` — guardado, só iniciar quando pedido (0%) |
+| 2.4 — Planos: modelo cofre | `publicado` — Fases A a C (100%); revisão jurídica pendente (KI-044) |
+| 2.5 — App da Pista | `publicado` (100% do plano); "conta da pista" em estudo |
 
 ## Pendências transversais
 

@@ -19,7 +19,9 @@
 
 > **Complemento — Versão 2.3 (09/11/2026, guardado, não iniciado):** todos os veículos (carro, caminhão, moto aquática, embarcações com motores e horímetro) está em [`PRD_v2.3_TODOS_VEICULOS.md`](PRD_v2.3_TODOS_VEICULOS.md). Só implementar quando o responsável pedir.
 
-> **Complemento — Versão 2.4 (09/11/2026, rascunho):** planos no modelo cofre (gratuito vê detalhes só dos 3 registros mais recentes; exportação sempre grátis; passe de venda) está em [`PRD_v2.4_PLANOS_COFRE.md`](PRD_v2.4_PLANOS_COFRE.md). Aguarda validação e revisão jurídica.
+> **Complemento — Versão 2.4 (09/11/2026, implementado v0.56.0):** planos no modelo cofre (gratuito vê detalhes só dos 2 registros mais recentes de cada moto; exportação sempre grátis; cortesia e teste de 3 meses liberam tudo) está em [`PRD_v2.4_PLANOS_COFRE.md`](PRD_v2.4_PLANOS_COFRE.md). Pendente: revisão jurídica dos Termos 0.2 (KI-044).
+
+> **Complemento — Versão 2.5 (09/11/2026, implementado v0.57.0):** App da Pista, PWA do mecânico (fotos, notas, áudio arquivado por 90 dias, fila sem internet) está em [`PRD_v2.5_APP_DA_PISTA.md`](PRD_v2.5_APP_DA_PISTA.md). Em estudo: "conta da pista" criada pelo responsável (nome, apelido e senha, sem convite).
 
 ## Controle do documento
 
@@ -29,7 +31,7 @@
 | Data | 06/11/2026 |
 | Escopo desta revisão | SaaS, site institucional/comercial, painel do usuário, painel da oficina, painel administrativo, Mercado Pago, arquitetura modular, segurança, memória técnica e controle de versões |
 | Regra de preservação | Os fluxos e regras de negócio da versão 1.0 permanecem válidos, exceto quando este documento os detalhar ou complementar expressamente |
-| Complementos | v2.1 — Módulo Oficina (`PRD_v2.1_OFICINA.md`), 08/11/2026 · v2.2 — Controle de Gastos (`PRD_v2.2_GASTOS.md`), 08/11/2026 · v2.3 — Todos os veículos (`PRD_v2.3_TODOS_VEICULOS.md`), 09/11/2026, guardado · v2.4 — Planos: modelo cofre (`PRD_v2.4_PLANOS_COFRE.md`), 09/11/2026, rascunho |
+| Complementos | v2.1 — Módulo Oficina (`PRD_v2.1_OFICINA.md`), 08/11/2026 · v2.2 — Controle de Gastos (`PRD_v2.2_GASTOS.md`), 08/11/2026 · v2.3 — Todos os veículos (`PRD_v2.3_TODOS_VEICULOS.md`), 09/11/2026, guardado · v2.4 — Planos: modelo cofre (`PRD_v2.4_PLANOS_COFRE.md`), 09/11/2026, implementado · v2.5 — App da Pista (`PRD_v2.5_APP_DA_PISTA.md`), 09/11/2026, implementado |
 | Pendências | Decisões comerciais e operacionais listadas na seção “Decisões pendentes” |
 
 ## 1. Visão geral do produto

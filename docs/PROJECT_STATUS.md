@@ -1,9 +1,9 @@
 # PROJECT_STATUS — Moto Passaporte
 
-**Versão atual:** 0.55.0
-**Data:** 08/11/2026
+**Versão atual:** 0.57.1
+**Data:** 09/11/2026
 **Fase:** Fases 1 a 4 concluídas. Fases 1 a 5 concluídas (Mercado Pago aguardando teste ponta a ponta). Fase 6 em andamento: painel administrativo
-**Progresso geral:** PRD 2.0: 97,5% (39 de 40 itens — `PRD_CHECKLIST.md`). PRD 2.1 (módulo Oficina): Fases 1 a 5 e acabamento 5.1 concluídos (100%). PRD 2.2 (Gastos): Fases A, B e C concluídas (100%)
+**Progresso geral:** PRD 2.0: 97,5% (39 de 40 itens — `PRD_CHECKLIST.md`). PRD 2.1 (módulo Oficina): Fases 1 a 5 e acabamento 5.1 concluídos (100%). PRD 2.2 (Gastos): Fases A, B e C concluídas (100%). PRD 2.3 (todos os veículos): guardado, não iniciado (0%). PRD 2.4 (modelo cofre): Fases A a C no ar (100%; falta revisão jurídica, KI-044). PRD 2.5 (App da Pista): no ar (100% do plano; "conta da pista" em estudo)
 
 ## Ambientes
 
@@ -28,10 +28,13 @@
 | PRD 2.1 — Oficina, Fase 4 (gestão) | concluída (v0.47.0): agenda, peças, financeiro com permissão própria, lembretes e recuperação, relatórios |
 | PRD 2.1 — Oficina, Fase 5 (crescimento comercial) | concluída (v0.48.0): perfil público avançado, avaliações com moderação, agendamento pelo site, campanhas; WhatsApp oficial preparado |
 | PRD 2.1 — Oficina, Fase 5.1 (acabamento) | concluída (v0.49.0): cliente com conta ligada por link seguro, Meus atendimentos, avisos do §23, logotipo nos documentos |
+| PRD 2.4 — Planos: modelo cofre | concluída (v0.56.0, ADR-056): 2 registros abertos por moto no gratuito, cofre por moto, exportação grátis, Termos 0.2 com aceite; `vault_enabled` ligado em produção e 7 contas avisadas |
+| PRD 2.5 — App da Pista | concluída (v0.57.0, ADR-057): PWA `/pista` do mecânico, link no menu da oficina, áudio apagado em 90 dias; v0.57.1: janela de pedido de acesso de oficina |
 | 6 — Administração e lançamento | em andamento: painel administrativo completo, verificação de placa, armazenamento, testes/regressão e backup/restauração; falta homologação e lançamento |
 
 ## Próximos passos (em ordem)
 
+0. **Aguardando decisões do responsável:** "conta da pista" (formato do login, troca de mecânico no celular compartilhado, mecânicos já convidados) — `PRD_v2.5_APP_DA_PISTA.md`. Depois: migração do domínio `motopassaporte.com.br` e login por digital (passkeys); religar MFA do admin (KI-043); PRD 2.3 quando pedido.
 1. **Responsável:** percorrer o roteiro do `HOMOLOGATION.md` com contas reais (proprietário, oficina, comprador) e fazer uma assinatura real do plano mais barato (KI-026); o Claude acompanha pelo banco e corrige o que aparecer.
 2. **Responsável:** cadastrar os segredos do backup no GitHub (OPERATIONS.md §2), ligar a proteção contra senhas vazadas (KI-021, exige plano Pro) e decidir sobre repositório privado (KI-031).
 3. **Decisões antes de vender em escala:** nota fiscal de serviço (KI-027), revisão jurídica de Termos/Privacidade/LGPD, ambiente de produção separado (KI-007).
