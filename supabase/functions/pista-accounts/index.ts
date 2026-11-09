@@ -37,10 +37,13 @@ Deno.serve(async (req) => {
   const authHeader = req.headers.get('Authorization') ?? ''
   const jwt = authHeader.replace(/^Bearer\s+/i, '')
   if (!jwt) return reply(401, { message: 'Entre na sua conta.' })
-  const asUser = createClient(url, Deno.env.get('SUPABASE_ANON_KEY')!, { auth: { persistSession: false } })
-  const { data: auth } = await asUser.auth.getUser(jwt)
+  const server = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } })
+  const { data: auth, error: authError } = await server.auth.getUser(jwt)
   const actor = auth?.user
-  if (!actor) return reply(401, { message: 'Entre na sua conta.' })
+  if (!actor) {
+    console.error('pista-accounts: sessão não reconhecida', authError?.message)
+    return reply(401, { message: 'Sua sessão expirou. Saia e entre de novo.' })
+  }
 
   let body: Body = {}
   try {
@@ -49,7 +52,6 @@ Deno.serve(async (req) => {
     return reply(400, { message: 'Pedido inválido.' })
   }
   if (!body.org || !UUID.test(body.org)) return reply(400, { message: 'Oficina inválida.' })
-  const server = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } })
   const dbError = (e: { message?: string; code?: string }) =>
     reply(e.code === '42501' ? 403 : 409, { message: e.message ?? 'Não foi possível concluir agora.' })
 
@@ -80,6 +82,7 @@ Deno.serve(async (req) => {
       user_metadata: { full_name: fullName },
     })
     if (created.error || !created.data.user) {
+      console.error('pista-accounts: createUser', created.error?.message)
       return reply(409, { message: 'Não foi possível criar o acesso. Tente outro apelido.' })
     }
     const { error: regError } = await server.rpc('pista_account_register', {
