@@ -4,7 +4,9 @@
     "target": {
       "namespace": "android_app",
       "package_name": "br.com.motopassaporte.app",
-      "sha256_cert_fingerprints": []
+      "sha256_cert_fingerprints": [
+        "28:1F:D0:EA:66:87:C7:7F:4F:01:31:0D:4C:A9:21:CC:66:51:BB:B6:0F:A7:27:8C:24:CC:45:67:42:89:49:45"
+      ]
     }
   }
 ]

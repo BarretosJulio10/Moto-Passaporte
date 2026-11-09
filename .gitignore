@@ -30,3 +30,7 @@ Thumbs.db
 *.dump
 *.sql.gz
 backups/
+
+# Chaves do app Android: nunca no repositório
+*.jks
+*.keystore

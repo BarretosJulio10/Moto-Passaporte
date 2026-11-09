@@ -1,0 +1,67 @@
+name: Android (TWA)
+
+# Gera o pacote da Google Play (sem assinatura) e publica no ramo twa-build.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['android/**', '.github/workflows/android-twa.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Bubblewrap
+        run: |
+          mkdir -p /tmp/bw && cd /tmp/bw && npm init -y >/dev/null && npm i --no-audit --no-fund @bubblewrap/core@^1.22
+          node -e "console.log('bubblewrap/core', require('/tmp/bw/node_modules/@bubblewrap/core/package.json').version)"
+
+      - name: Gerar o projeto Android
+        working-directory: /tmp/bw
+        run: node "$GITHUB_WORKSPACE/android/build-twa.mjs" /tmp/twa
+
+      - name: Android 16 (API 36), exigido pela Play desde 31/08/2026
+        working-directory: /tmp/twa
+        run: |
+          sed -i -E 's/(targetSdkVersion|targetSdk)( *=? *)[0-9]+/\1\236/; s/(compileSdkVersion|compileSdk)( *=? *)[0-9]+/\1\236/' app/build.gradle
+          grep -nE "compileSdk|targetSdk|minSdk|versionCode|versionName|applicationId" app/build.gradle
+
+      - name: Compilar
+        working-directory: /tmp/twa
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          chmod +x gradlew
+          ./gradlew --no-daemon bundleRelease
+          ls -la app/build/outputs/bundle/release/
+
+      - name: Conferir o manifesto Android
+        working-directory: /tmp/twa
+        run: |
+          M=$(find app/build -path '*merged_manifest*' -name AndroidManifest.xml | head -1)
+          echo "$M"; grep -nE "package=|targetSdk|uses-permission|android:host|DEFAULT_URL|delegation" "$M" | head -40 || true
+
+      - name: Publicar no ramo twa-build
+        run: |
+          mkdir -p /tmp/out && cp /tmp/twa/app/build/outputs/bundle/release/app-release.aab /tmp/out/moto-passaporte-unsigned.aab
+          cp android/twa-manifest.json /tmp/out/
+          cp /tmp/twa/app/build.gradle /tmp/out/build.gradle.txt
+          cd /tmp/out
+          git init -q -b twa-build
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A && git commit -q -m "Pacote da Google Play (sem assinatura) de ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" twa-build

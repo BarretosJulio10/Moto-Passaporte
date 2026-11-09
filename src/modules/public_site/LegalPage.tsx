@@ -17,12 +17,17 @@ const TERMS: Array<[string, string]> = [
 ]
 
 const PRIVACY: Array<[string, string]> = [
-  ['Quais dados tratamos', 'Nome, e-mail e telefone da conta; dados da motocicleta; registros, fotos e documentos enviados por você ou por oficinas autorizadas.'],
-  ['Para que usamos', 'Para prestar o serviço: manter o histórico, controlar acessos, enviar avisos e cumprir obrigações legais.'],
+  ['Quais dados tratamos', 'Nome, e-mail e telefone da conta (a senha fica guardada só em forma cifrada); dados da moto, como placa, chassi (cifrado) e quilometragem; registros, fotos, notas e documentos enviados por você ou por oficinas autorizadas; o diário privado; e, se você ativar, o endereço do aparelho para notificações. No App da Pista, a oficina registra fotos, notas e áudios do serviço.'],
+  ['Para que usamos', 'Para prestar o serviço: manter o histórico, controlar acessos, enviar avisos e cumprir obrigações legais. Não vendemos dados, não mostramos anúncios e não usamos ferramentas de rastreamento ou de publicidade.'],
+  ['Avisos', 'Notificações no celular só depois que você permite, e você desliga quando quiser. Avisos por e-mail podem ser desligados em Notificações ou pelo link no próprio e-mail. Avisos por WhatsApp só chegam se você autorizar em Notificações.'],
   ['O que nunca fica público', 'CPF, endereço, telefone e e-mail pessoais, dados de pagamento, chassi completo, documentos pessoais, dados de proprietários anteriores e o diário privado.'],
-  ['Compartilhamento', 'Só com quem você autorizar (oficinas e compradores) e com fornecedores necessários à operação, como hospedagem e pagamento.'],
+  ['Compartilhamento', 'Só com quem você autorizar (oficinas e compradores) e com fornecedores necessários à operação: Supabase (banco de dados e arquivos), Vercel (site), Resend (e-mails), o serviço de envio de WhatsApp e Mercado Pago (pagamentos feitos no site). Esses fornecedores só usam os dados para prestar o serviço.'],
+  ['Onde ficam', 'Os dados ficam em servidores nos Estados Unidos, com as garantias contratuais dos fornecedores. Todo o tráfego usa conexão criptografada (HTTPS).'],
+  ['Por quanto tempo', 'Enquanto a conta existir. Áudios do App da Pista são apagados 90 dias após a entrega da moto. Registros de cobrança são guardados por 5 anos, por obrigação fiscal. O histórico de manutenção pertence à moto e continua com o próximo dono, sem ligação com você.'],
+  ['Como excluir a conta', 'No painel, em Minha conta, escolha o pedido de exclusão. Seus dados pessoais (nome, e-mail, telefone, diário, fotos do diário, avisos) são apagados ou anonimizados. Veja o passo a passo em motopassaporte.com.br/excluir-conta.'],
   ['Seus direitos (LGPD)', 'Você pode pedir acesso, correção, portabilidade e exclusão dos seus dados pessoais, nos limites da lei e da preservação do histórico de terceiros. A cópia dos seus dados e comprovantes é gratuita em qualquer plano e pode ser baixada a qualquer momento em Minha conta.'],
   ['Segurança', 'Acesso controlado no banco de dados, registros de auditoria e arquivos privados sem links públicos permanentes.'],
+  ['Contato', 'Dúvidas sobre privacidade: pela página Contato do site.'],
 ]
 
 export function LegalPage({ kind }: { kind: 'terms' | 'privacy' }) {
