@@ -143,10 +143,12 @@ function NewQuote({ orgId }: { orgId: string }) {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div>
       <PageHeader title="Novo orçamento" intro="Escolha o cliente e a moto. Na próxima tela você adiciona os serviços e as peças." />
+      <div className="mt-6 grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem] 2xl:grid-cols-[minmax(0,1fr)_26rem]">
+      <div className="min-w-0">
       {!customerId && (
-        <div className="mt-6">
+        <div>
           <div className="flex flex-wrap items-end gap-3">
             <label className="flex flex-1 flex-col gap-1.5">
               <span className="text-sm font-semibold text-graphite">Cliente</span>
@@ -171,7 +173,7 @@ function NewQuote({ orgId }: { orgId: string }) {
         </div>
       )}
       {customerId && (
-        <div className="mt-6 rounded-sheet border border-rule bg-sheet p-5">
+        <div className="rounded-sheet border border-rule bg-sheet p-5">
           {customer.isLoading && <p className="text-muted" role="status">Carregando…</p>}
           {customer.data && (
             <>
@@ -201,6 +203,24 @@ function NewQuote({ orgId }: { orgId: string }) {
           )}
         </div>
       )}
+      </div>
+      <aside aria-labelledby="como-funciona" className="rounded-sheet border border-rule bg-sheet p-4 sm:p-5 xl:sticky xl:top-6">
+        <h2 id="como-funciona" className="heading text-lg text-ink">Como funciona</h2>
+        <ol className="mt-3 space-y-3 text-sm">
+          {[
+            ['Cliente e moto', 'Busque pelo nome, telefone ou placa. Cliente novo leva 30 segundos.'],
+            ['Serviços e peças', 'Na próxima tela, puxe itens do catálogo de preços ou digite; o total se calcula sozinho.'],
+            ['Envio e aprovação', 'O cliente recebe um link pelo seu WhatsApp e aprova ou recusa item por item, sem precisar de conta.'],
+            ['Ordem de serviço', 'Aprovado, o orçamento vira OS com um clique, e o serviço entra no histórico da moto.'],
+          ].map(([t, d], i) => (
+            <li key={t} className="flex gap-3">
+              <span aria-hidden="true" className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${i === 0 ? 'bg-ink text-sheet' : 'bg-paper text-graphite'}`}>{i + 1}</span>
+              <span><span className="block font-semibold text-ink">{t}</span><span className="text-muted">{d}</span></span>
+            </li>
+          ))}
+        </ol>
+      </aside>
+      </div>
     </div>
   )
 }

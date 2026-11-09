@@ -9,6 +9,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.55.0] — 08/11/2026 — Preenchimento automático e telas na largura toda
+
+### Adicionado
+- **CEP preenche o endereço** (rua, bairro, cidade e estado) no perfil/cadastro da oficina e no cadastro de cliente da oficina. Grátis: BrasilAPI, com reserva no ViaCEP.
+- **CNPJ preenche a oficina**: razão social, nome fantasia, cidade, estado, telefone, e-mail e endereço vêm da Receita (BrasilAPI), só nos campos vazios.
+- **Marca e modelo pela Tabela FIPE**: sugestões ao digitar no cadastro da moto (dono) e nas motos dos clientes da oficina; dá para digitar outro.
+- Se os serviços gratuitos estiverem fora do ar, os formulários continuam funcionando à mão.
+
+### Mudado
+- "Abrir OS sem orçamento": duas colunas no computador, com **Resumo da OS** fixo ao lado (cliente, moto, total por tipo, o que falta, botão); no celular o resumo fica embaixo.
+- "Novo orçamento": painel "Como funciona" ao lado.
+- Perfil e cadastro da oficina em seções (Empresa, Endereço, Contato, Sobre) usando a largura da tela.
+
 ## [0.54.0] — 08/11/2026 — Oficina mais organizada
 
 ### Mudado

@@ -60,13 +60,14 @@ export function WorkshopProfilePage() {
   }
 
   return (
-    <div className="max-w-5xl">
+    <div>
       <h1 className="heading text-3xl text-ink">Perfil da oficina</h1>
       <form onSubmit={onSubmit} noValidate className="mt-8 flex flex-col gap-6">
         {formError && <Notice tone="error">{formError}</Notice>}
         <WorkshopBasicFields
           errors={errors}
           origin={window.location.origin}
+          address={{ defaultValue: w.address ?? '', error: errors.address }}
           defaults={{
             businessName: w.business_name,
             publicSlug: w.public_slug,
@@ -80,14 +81,13 @@ export function WorkshopProfilePage() {
           }}
         >
           <TextField label="Responsável (opcional)" name="responsibleName" defaultValue={w.responsible_name ?? ''} error={errors.responsibleName} />
-          <TextField label="Endereço (opcional)" name="address" defaultValue={w.address ?? ''} autoComplete="street-address" error={errors.address} />
           <TextField
             label="Horário de funcionamento (opcional)"
             name="openingHours"
             defaultValue={w.opening_hours ?? ''}
             placeholder="Ex.: seg a sex, 8h às 18h; sáb, 8h às 12h"
             hint="Texto livre, usado se você não preencher o horário por dia em Perfil público, abaixo."
-            className="sm:col-span-2"
+            className="sm:col-span-2 xl:col-span-2"
             error={errors.openingHours}
           />
           <TextAreaField
@@ -96,14 +96,15 @@ export function WorkshopProfilePage() {
             defaultValue={w.description ?? ''}
             maxLength={2000}
             rows={4}
-            className="sm:col-span-2"
+            className="sm:col-span-2 xl:col-span-3"
             error={errors.description}
           />
         </WorkshopBasicFields>
 
-        <fieldset className="border-t border-rule pt-5">
-          <legend className="pr-3 font-semibold text-ink">Especialidades</legend>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <fieldset className="rounded-sheet border border-rule bg-sheet p-4 sm:p-5">
+          <legend className="sr-only">Especialidades</legend>
+          <h2 aria-hidden="true" className="heading text-lg text-ink">Especialidades</h2>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {SPECIALTIES.map((s) => (
               <CheckboxField key={s} name="specialties" value={s} defaultChecked={w.specialties.includes(s)} label={s} />
             ))}

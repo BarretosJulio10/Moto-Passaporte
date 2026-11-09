@@ -109,6 +109,12 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-055 — Preenchimento automático com serviços públicos gratuitos
+**Data:** 08/11/2026 · **Status:** aceita
+- CEP: BrasilAPI v2 com reserva no ViaCEP; CNPJ: BrasilAPI (dados públicos da Receita); marcas/modelos de moto: Tabela FIPE pela BrasilAPI (marcas guardadas no aparelho por 30 dias). Chamadas direto do navegador, sem chave, com limite de 6 s.
+- Só sugerem: nada é salvo sem o usuário confirmar, o CNPJ só preenche campos vazios, e os formulários funcionam à mão se os serviços caírem. Só o CEP/CNPJ digitado sai do app.
+- Consulta por placa fica fora: não há fonte gratuita e confiável só com a placa; se vier, será paga (Premium/oficina).
+
 ### ADR-054 — Chave para a verificação em duas etapas do admin
 **Data:** 08/11/2026 · **Status:** aceita (temporária)
 - `is_admin()` exige aal2 só quando `admin_mfa_required` ≠ 0 (padrão 1). Configuração não pública e fora da tela de configurações: só se muda pelo banco, com registro na auditoria.

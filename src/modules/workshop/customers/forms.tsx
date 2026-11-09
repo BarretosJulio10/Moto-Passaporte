@@ -6,6 +6,8 @@ import { translateDbError } from '@/core/shared/dbErrors'
 import { formatPlate, isValidPlate } from '@/core/shared/format'
 import { CUSTOMER_SOURCES, SOURCE_LABEL, type CustomerInput, type CustomerSource, type Vehicle, type VehicleInput } from './api'
 import { onlyDigits } from '../shared/rpc'
+import { CepField, useFipeSuggestions } from '@/components/Autofill'
+import { formatAddressLine } from '@/lib/brasil'
 
 type Errors = Partial<Record<string, string>>
 
@@ -50,7 +52,9 @@ export function CustomerFields({ value, onChange, errors, compact = false }: {
           <TextField label="E-mail" type="email" value={value.email ?? ''} onChange={set('email')} error={errors.email} />
           <TextField label="CPF (opcional)" value={value.cpf ?? ''} onChange={set('cpf')} error={errors.cpf} inputMode="numeric"
             hint="Fica visível só para a equipe da oficina." />
-          <TextField label="Endereço (opcional)" value={value.address ?? ''} onChange={set('address')} className="sm:col-span-2" />
+          <CepField onFound={(a) => onChange({ ...value, address: formatAddressLine(a) })} />
+          <TextField label="Endereço (opcional)" value={value.address ?? ''} onChange={set('address')} autoComplete="street-address"
+            hint="Pelo CEP, rua, bairro e cidade vêm prontos; acrescente o número." />
           <TextField label="Data de nascimento (opcional)" type="date" value={value.birth_date ?? ''} onChange={set('birth_date')} />
           <TextField label="Primeiro atendimento" type="date" value={value.first_visit_at ?? ''} onChange={set('first_visit_at')} />
           <SelectField label="Como chegou à oficina" value={value.source ?? 'balcao'} options={CUSTOMER_SOURCES}
@@ -65,10 +69,13 @@ export function CustomerFields({ value, onChange, errors, compact = false }: {
 
 export function VehicleFields({ value, onChange, errors }: { value: VehicleInput; onChange: (v: VehicleInput) => void; errors: Errors }) {
   const set = (k: keyof VehicleInput) => (ev: { target: { value: string } }) => onChange({ ...value, [k]: ev.target.value })
+  const fipe = useFipeSuggestions(value.brand)
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <TextField label="Marca" value={value.brand} onChange={set('brand')} error={errors.brand} required placeholder="Honda" />
-      <TextField label="Modelo" value={value.model} onChange={set('model')} error={errors.model} required placeholder="CG 160" />
+      {fipe.lists}
+      <TextField label="Marca" value={value.brand} onChange={set('brand')} error={errors.brand} required placeholder="Honda" list={fipe.brandListId} autoComplete="off" />
+      <TextField label="Modelo" value={value.model} onChange={set('model')} error={errors.model} required placeholder="CG 160" list={fipe.modelListId} autoComplete="off"
+        hint={errors.model ? undefined : fipe.hasModels ? 'Escolha da lista FIPE ou digite.' : undefined} />
       <TextField label="Versão" value={value.version ?? ''} onChange={set('version')} placeholder="Titan" />
       <TextField label="Ano" value={value.year ?? ''} onChange={set('year')} error={errors.year} inputMode="numeric" />
       <TextField label="Placa" value={value.plate ?? ''} onChange={set('plate')} error={errors.plate} placeholder="ABC1D23"

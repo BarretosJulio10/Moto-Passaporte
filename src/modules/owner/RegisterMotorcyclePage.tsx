@@ -10,6 +10,7 @@ import { todayISO } from '@/core/shared/format'
 import { registerMotorcycleSchema } from '@/modules/motorcycles/schemas'
 import { registerMotorcycle } from '@/modules/motorcycles/api'
 import { OIL_SUGGESTED_KM, setCare } from '@/modules/motorcycles/careApi'
+import { useFipeSuggestions } from '@/components/Autofill'
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -27,6 +28,8 @@ export function RegisterMotorcyclePage() {
   const [formError, setFormError] = useState<string | null>(null)
   const [claimed, setClaimed] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [brand, setBrand] = useState('')
+  const fipe = useFipeSuggestions(brand)
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -87,8 +90,11 @@ export function RegisterMotorcyclePage() {
         {formError && <Notice tone="error">{formError}</Notice>}
 
         <Group title="Identificação">
-          <TextField label="Marca" name="brand" required autoComplete="off" placeholder="Ex.: Honda" error={errors.brand} />
-          <TextField label="Modelo" name="model" required autoComplete="off" placeholder="Ex.: CB 500F" error={errors.model} />
+          {fipe.lists}
+          <TextField label="Marca" name="brand" required autoComplete="off" placeholder="Ex.: Honda" error={errors.brand} list={fipe.brandListId}
+            onChange={(e) => setBrand(e.target.value)} hint={errors.brand ? undefined : 'Comece a digitar e escolha na lista (Tabela FIPE).'} />
+          <TextField label="Modelo" name="model" required autoComplete="off" placeholder="Ex.: CB 500F" error={errors.model} list={fipe.modelListId}
+            hint={errors.model ? undefined : fipe.hasModels ? 'Escolha o modelo da lista ou digite.' : undefined} />
           <TextField label="Versão (opcional)" name="version" autoComplete="off" placeholder="Ex.: ABS" error={errors.version} />
           <TextField label="Cor (opcional)" name="color" autoComplete="off" error={errors.color} />
           <TextField label="Ano de fabricação" name="manufacturingYear" required inputMode="numeric" maxLength={4} placeholder="Ex.: 2022" error={errors.manufacturingYear} />

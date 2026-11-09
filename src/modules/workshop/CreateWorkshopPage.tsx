@@ -44,7 +44,7 @@ export function CreateWorkshopPage() {
   }
 
   return (
-    <div className="max-w-4xl">
+    <div>
       <h1 className="heading text-3xl text-ink">Cadastrar oficina</h1>
       <p className="mt-2 text-muted">
         Grátis, sem mensalidade e sem cobrança por moto atendida. Você será o responsável pela oficina e poderá adicionar funcionários depois.

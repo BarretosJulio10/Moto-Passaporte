@@ -152,11 +152,22 @@ function NewOrder({ orgId }: { orgId: string }) {
     }
   }
 
+  const lineTotal = (r: Row) => (parseMoney(r.price || '0') ?? 0) * (Number(r.quantity.replace(',', '.')) || 0)
+  const total = rows.reduce((a, r) => a + lineTotal(r), 0)
+  const byKind = ITEM_KINDS.map((k) => [k, rows.filter((r) => r.kind === k).reduce((a, r) => a + lineTotal(r), 0)] as const).filter(([, v]) => v > 0)
+  const vehicle = vehicles.find((v) => v.id === vehicleId)
+  const steps = [
+    { done: Boolean(customerId), label: 'Cliente escolhido' },
+    { done: by.trim().length >= 3, label: 'Quem autorizou' },
+    { done: rows.every((r) => r.description.trim().length >= 2), label: 'Serviços descritos' },
+  ]
+
   return (
-    <div className="max-w-4xl">
+    <div>
       <PageHeader title="Abrir OS sem orçamento"
         intro="Para serviços que o cliente autorizou na hora. Fica registrado como e por quem foi autorizado. Para valores maiores, prefira o orçamento com aprovação pelo link." />
-      <div className="mt-6 flex flex-col gap-6">
+      <div className="mt-6 grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem] 2xl:grid-cols-[minmax(0,1fr)_26rem]">
+      <div className="flex min-w-0 flex-col gap-6">
         <Card title="Cliente e moto">
           {!customerId ? (
             <>
@@ -196,10 +207,10 @@ function NewOrder({ orgId }: { orgId: string }) {
         <Card title="Serviços autorizados">
           <ol className="flex flex-col gap-3">
             {rows.map((r, idx) => (
-              <li key={r.key} className="grid gap-3 rounded-doc border border-rule p-3 sm:grid-cols-[9rem_minmax(0,1fr)_5rem_8rem_auto]">
+              <li key={r.key} className="grid grid-cols-2 gap-3 rounded-doc border border-rule p-3 sm:grid-cols-[9rem_minmax(0,1fr)_5rem_8rem_auto]">
                 <SelectField label="Tipo" value={r.kind} options={ITEM_KINDS} optionLabel={(o) => ITEM_KIND_LABEL[o as ItemKind]}
                   onChange={(e) => setRows(rows.map((x) => (x.key === r.key ? { ...x, kind: e.target.value as ItemKind } : x)))} />
-                <TextField label={`Serviço ${idx + 1}`} value={r.description} onChange={(e) => setRows(rows.map((x) => (x.key === r.key ? { ...x, description: e.target.value } : x)))} />
+                <TextField className="col-span-2 sm:col-span-1 max-sm:order-first" label={`Serviço ${idx + 1}`} value={r.description} onChange={(e) => setRows(rows.map((x) => (x.key === r.key ? { ...x, description: e.target.value } : x)))} />
                 <TextField label="Qtd." value={r.quantity} inputMode="decimal" onChange={(e) => setRows(rows.map((x) => (x.key === r.key ? { ...x, quantity: e.target.value } : x)))} />
                 <TextField label="Valor (R$)" value={r.price} inputMode="decimal" placeholder={centsToInput(0)} onChange={(e) => setRows(rows.map((x) => (x.key === r.key ? { ...x, price: e.target.value } : x)))} />
                 <div className="flex items-end">
@@ -210,9 +221,41 @@ function NewOrder({ orgId }: { orgId: string }) {
           </ol>
           <Button className="mt-3" size="sm" variant="secondary" onClick={() => setRows([...rows, { key: Date.now(), kind: 'part', description: '', quantity: '1', price: '' }])}>Adicionar serviço</Button>
         </Card>
-        {error && <Notice tone="error">{error}</Notice>}
-        <div className="flex gap-2"><Button onClick={submit} loading={saving}>Abrir ordem de serviço</Button>
-          <ButtonLink to={`/oficina/${orgId}/os`} variant="quiet">Cancelar</ButtonLink></div>
+      </div>
+
+      {/* Resumo: ao lado no computador (fixo ao rolar), embaixo no celular */}
+      <aside aria-labelledby="resumo-os" className="rounded-sheet border border-ink/20 bg-sheet p-4 sm:p-5 xl:sticky xl:top-6">
+        <h2 id="resumo-os" className="heading text-lg text-ink">Resumo da OS</h2>
+        <dl className="mt-3 space-y-2 text-sm">
+          <div className="flex justify-between gap-3"><dt className="text-muted">Cliente</dt><dd className="text-right font-semibold text-ink">{customer.data?.full_name ?? '—'}</dd></div>
+          <div className="flex justify-between gap-3"><dt className="text-muted">Moto</dt>
+            <dd className="text-right text-ink">{vehicle ? `${vehicleLabel(vehicle)}${vehicle.plate ? ` · ${formatPlate(vehicle.plate)}` : ''}` : '—'}</dd></div>
+          <div className="flex justify-between gap-3"><dt className="text-muted">Autorizado</dt>
+            <dd className="text-right text-ink">{AUTH_LABEL[method]}{by.trim() ? ` · ${by.trim()}` : ''}</dd></div>
+        </dl>
+        <dl className="mt-4 space-y-1 border-t border-rule pt-3 text-sm">
+          {byKind.map(([k, v]) => (
+            <div key={k} className="flex justify-between gap-3"><dt className="text-muted">{ITEM_KIND_LABEL[k]}</dt><dd className="tabular-nums text-ink">{formatCents(Math.round(v))}</dd></div>
+          ))}
+          <div className="flex items-baseline justify-between gap-3 pt-1">
+            <dt className="font-semibold text-ink">Total autorizado</dt>
+            <dd className="heading text-2xl tabular-nums text-ink">{formatCents(Math.round(total))}</dd>
+          </div>
+        </dl>
+        <ul className="mt-4 space-y-1 text-sm">
+          {steps.map((st) => (
+            <li key={st.label} className={`flex items-center gap-2 ${st.done ? 'text-ink' : 'text-muted'}`}>
+              <span aria-hidden="true" className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-[0.6rem] ${st.done ? 'border-ink bg-ink text-sheet' : 'border-rule'}`}>{st.done ? '✓' : ''}</span>
+              {st.label}<span className="sr-only">{st.done ? ' (feito)' : ' (pendente)'}</span>
+            </li>
+          ))}
+        </ul>
+        {error && <div className="mt-4"><Notice tone="error">{error}</Notice></div>}
+        <div className="mt-4 flex flex-col gap-2">
+          <Button onClick={submit} loading={saving} className="w-full">Abrir ordem de serviço</Button>
+          <ButtonLink to={`/oficina/${orgId}/os`} variant="quiet" className="w-full justify-center">Cancelar</ButtonLink>
+        </div>
+      </aside>
       </div>
     </div>
   )
