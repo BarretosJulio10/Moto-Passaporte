@@ -65,7 +65,12 @@ const ORDER_ACTION: Record<OrderStatus, string> = {
   canceled: 'Ver',
 }
 
-export type OrderRowFlow = OrderRow & { delivered_at?: string | null }
+export type OrderRowFlow = OrderRow & {
+  delivered_at?: string | null
+  opened_at_entry?: boolean
+  diagnosed_at?: string | null
+  entry_quote?: { id: string; number: number; status: string } | null
+}
 
 const vehicleOf = (r: { brand: string | null; model: string | null }) => [r.brand, r.model].filter(Boolean).join(' ') || 'Moto sem modelo'
 const isToday = (iso: string | null | undefined, now: Date) => {
@@ -86,11 +91,33 @@ export function buildFlow(
   const quotesWithOrder = new Set(orders.filter((o) => o.status !== 'canceled' && o.quote_number !== null).map((o) => o.quote_number))
   const cards: FlowCard[] = []
 
+  const entryQuotes = new Set(orders.map((o) => o.entry_quote?.id).filter(Boolean) as string[])
+
   for (const o of orders) {
-    const stage = ORDER_STAGE[o.status]
+    let stage = ORDER_STAGE[o.status]
     if (!stage) continue
+    let action = ORDER_ACTION[o.status]
+    let href = `${base}/os/${o.id}`
+    const entryBadges: FlowCard['badges'] = []
+    // Entrada antes do orçamento (Fase B): enquanto não há item autorizado, a etapa vem do diagnóstico e do orçamento.
+    if (o.opened_at_entry && o.items === 0 && stage !== 'entregue') {
+      const q = o.entry_quote && !['canceled', 'rejected', 'expired'].includes(o.entry_quote.status) ? o.entry_quote : null
+      if (o.status === 'open') { stage = 'entrada'; action = 'Mandar para diagnóstico' }
+      else if (!o.diagnosed_at && !q) { stage = 'diagnostico'; action = 'Ver a moto' }
+      else if (!q) {
+        stage = 'orcamento'; action = 'Montar orçamento'
+        entryBadges.push({ label: 'Diagnóstico pronto', tone: 'ok' })
+        if (o.entry_quote) entryBadges.push({ label: 'Orçamento anterior recusado', tone: 'warn' })
+      } else if (q.status === 'draft') { stage = 'orcamento'; action = 'Terminar e enviar'; href = `${base}/orcamentos/${q.id}`; entryBadges.push({ label: 'Rascunho', tone: 'info' }) }
+      else if (q.status === 'sent' || q.status === 'viewed') {
+        stage = 'orcamento'; action = 'Cobrar resposta'; href = `${base}/orcamentos/${q.id}`
+        entryBadges.push(q.status === 'viewed' ? { label: 'Cliente abriu', tone: 'ok' } : { label: 'Cliente não abriu', tone: 'warn' })
+      } else { stage = 'aprovado'; action = 'Passar itens para a OS'; entryBadges.push({ label: 'Aprovado', tone: 'ok' }) }
+    } else if (o.status === 'open' && o.items > 0) {
+      stage = 'aprovado'; action = 'Liberar para a pista'
+    }
     if (stage === 'entregue' && !isToday(o.delivered_at ?? o.completed_at, now)) continue
-    const badges: FlowCard['badges'] = []
+    const badges: FlowCard['badges'] = [...entryBadges]
     const late = o.due_date && stage !== 'caixa' && stage !== 'entregue' && o.due_date < now.toISOString().slice(0, 10)
     if (late) badges.push({ label: 'Atrasada', tone: 'danger' })
     if (o.status === 'awaiting_parts') badges.push({ label: 'Aguardando peça', tone: 'warn' })
@@ -105,11 +132,12 @@ export function buildFlow(
     cards.push({
       id: o.id, kind: 'order', stage, number: o.number, plate: o.plate, vehicle: vehicleOf(o), customer: o.customer_name,
       mechanic: o.mechanic_name, since: o.created_at, due: o.due_date, badges,
-      action: ORDER_ACTION[o.status], href: `${base}/os/${o.id}`, pendingCents: receivables ? (due ?? null) : null,
+      action, href, pendingCents: receivables ? (due ?? null) : null,
     })
   }
 
   for (const q of quotes) {
+    if (entryQuotes.has(q.id)) continue
     let action: string
     const badges: FlowCard['badges'] = []
     let stage: StageKey = 'orcamento'

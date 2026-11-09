@@ -18,7 +18,8 @@ const quote = (over: Partial<QuoteRow>): QuoteRow => ({
 describe('Esteira da oficina (Fase A)', () => {
   it('coloca cada OS e orçamento na etapa certa, com o próximo passo', () => {
     const cards = buildFlow('org', [
-      order({ id: 'a', status: 'open' }),
+      order({ id: 'a', status: 'open', items: 0 }),
+      order({ id: 'a2', status: 'open', items: 1 }),
       order({ id: 'b', status: 'awaiting_diagnosis' }),
       order({ id: 'c', status: 'in_progress', mechanic_name: 'Davi' }),
       order({ id: 'd', status: 'ready' }),
@@ -36,6 +37,7 @@ describe('Esteira da oficina (Fase A)', () => {
     ], [{ order_id: 'e', order_number: 1, customer_id: 'c1', customer_name: 'João', whatsapp: null, status: 'completed', completed_at: '', due_cents: 10000, paid_cents: 0, pending_cents: 10000 }], now)
     const stageOf = (id: string) => cards.find((c) => c.id === id)?.stage
     expect(stageOf('a')).toBe('entrada')
+    expect(stageOf('a2')).toBe('aprovado')
     expect(stageOf('b')).toBe('diagnostico')
     expect(stageOf('c')).toBe('pista')
     expect(stageOf('d')).toBe('caixa')
@@ -55,6 +57,27 @@ describe('Esteira da oficina (Fase A)', () => {
     expect(cards.find((c) => c.id === 'e')?.href).toBe('/oficina/org/os/e')
   })
 
+  it('entrada antes do orçamento anda pelas etapas sem duplicar o orçamento', () => {
+    const e = (over: Partial<OrderRowFlow>) => order({ opened_at_entry: true, items: 0, items_done: 0, ...over })
+    const cards = buildFlow('org', [
+      e({ id: 'e1', status: 'open' }),
+      e({ id: 'e2', status: 'awaiting_diagnosis' }),
+      e({ id: 'e3', status: 'awaiting_diagnosis', diagnosed_at: '2026-11-09T14:00:00' }),
+      e({ id: 'e4', status: 'awaiting_approval', diagnosed_at: '2026-11-09T14:00:00', entry_quote: { id: 'qe', number: 12, status: 'sent' } }),
+      e({ id: 'e5', status: 'awaiting_approval', entry_quote: { id: 'qa', number: 13, status: 'approved' } }),
+      e({ id: 'e6', status: 'awaiting_execution', items: 1, entry_quote: { id: 'qb', number: 14, status: 'approved' } }),
+    ], [quote({ id: 'qe', number: 12 }), quote({ id: 'qa', number: 13, status: 'approved' })], null, now)
+    const get = (id: string) => cards.find((c) => c.id === id)
+    expect([get('e1')?.stage, get('e1')?.action]).toEqual(['entrada', 'Mandar para diagnóstico'])
+    expect(get('e2')?.stage).toBe('diagnostico')
+    expect([get('e3')?.stage, get('e3')?.action]).toEqual(['orcamento', 'Montar orçamento'])
+    expect([get('e4')?.stage, get('e4')?.action, get('e4')?.href]).toEqual(['orcamento', 'Cobrar resposta', '/oficina/org/orcamentos/qe'])
+    expect([get('e5')?.stage, get('e5')?.action]).toEqual(['aprovado', 'Passar itens para a OS'])
+    expect([get('e6')?.stage, get('e6')?.action]).toEqual(['aprovado', 'Liberar para a pista'])
+    expect(get('qe')).toBeUndefined()
+    expect(get('qa')).toBeUndefined()
+  })
+
   it('sem permissão de financeiro não mostra valores', () => {
     const [card] = buildFlow('org', [order({ status: 'completed' })], [], null, now)
     expect(card?.pendingCents).toBeNull()
@@ -64,7 +87,7 @@ describe('Esteira da oficina (Fase A)', () => {
   it('tempo de espera, cartão parado e busca por placa', () => {
     expect(waitLabel('2026-11-09T14:30:00', now)).toBe('há 30 min')
     expect(waitLabel('2026-11-07T15:00:00', now)).toBe('há 2 dias')
-    const [card] = buildFlow('org', [order({ status: 'open', created_at: '2026-11-09T10:00:00' })], [], null, now)
+    const [card] = buildFlow('org', [order({ status: 'open', items: 0, created_at: '2026-11-09T10:00:00' })], [], null, now)
     expect(isStale(card!, now)).toBe(true)
     expect(matches(card!, 'abc-1d')).toBe(true)
     expect(matches(card!, 'joão')).toBe(true)
@@ -72,7 +95,7 @@ describe('Esteira da oficina (Fase A)', () => {
   })
 
   it('menu na ordem do trabalho', () => {
-    expect(WORKSHOP_NAV[0]!.items.map((i) => i.label)).toEqual(['Esteira', 'Agenda', 'Orçamentos', 'Ordens de serviço', 'Caixa'])
+    expect(WORKSHOP_NAV[0]!.items.map((i) => i.label)).toEqual(['Esteira', '+ Nova entrada', 'Agenda', 'Orçamentos', 'Ordens de serviço', 'Caixa'])
     expect(WORKSHOP_NAV.find((g) => g.label === 'Gestão')!.items[0]!.label).toBe('Resultados')
     expect(WORKSHOP_NAV.find((g) => g.label === 'Oficina')!.items.map((i) => i.label)).toContain('App da Pista')
   })

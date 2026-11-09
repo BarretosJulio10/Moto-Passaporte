@@ -9,6 +9,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.60.0] — 09/11/2026 — Entrada antes do orçamento (fluxo da oficina, Fase B)
+
+### Adicionado
+- **+ Nova entrada** (Esteira e menu Trabalho): acha a moto pela placa, modelo ou cliente — ou cadastra cliente e moto na hora —, anota km de entrada, problema relatado e previsão, e manda direto para o diagnóstico. Em seguida abre a OS para checklist de entrada, fotos e link de ciência.
+- **Diagnóstico pronto:** no App da Pista (OS ainda sem serviço autorizado mostra o quadro "Diagnóstico" no lugar de Iniciar/Pronto) e no painel. O texto vai para as observações técnicas.
+- **Atendimento desta entrada** na OS: passos (Entrada, Diagnóstico, Orçamento, Aprovado na OS) e o botão do próximo — Mandar para diagnóstico, Montar orçamento (já com cliente, moto, km, problema e diagnóstico), Terminar e enviar, Passar itens aprovados para esta OS.
+- Esteira mostra cada entrada na etapa certa (sem cartão duplicado do orçamento) e "Orçamento sem a moto" para quem pede preço antes de trazer.
+
+### Mudado (banco, ADR-060)
+- A OS pode nascer na entrada sem itens e sem autorização; a autorização continua por item. OS sem serviço autorizado não vai para execução nem fica "Pronta".
+- Orçamento da entrada fica ligado à OS; ao aprovar, "Abrir ordem de serviço" põe os itens aprovados na mesma OS (sem OS nova). Orçamento sem entrada e OS manual seguem como antes.
+- Uma moto não ganha segunda entrada enquanto tiver OS em aberto.
+
 ## [0.59.0] — 09/11/2026 — Esteira da oficina (fluxo em ordem de trabalho, Fase A)
 
 ### Adicionado

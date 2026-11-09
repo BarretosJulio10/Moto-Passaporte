@@ -18,6 +18,7 @@ export const WORKSHOP_NAV: NavGroup[] = [
     label: 'Trabalho',
     items: [
       { to: '', label: 'Esteira', end: true },
+      { to: 'entrada/nova', label: '+ Nova entrada', show: (p) => p.manage_quotes },
       { to: 'agenda', label: 'Agenda' },
       { to: 'orcamentos', label: 'Orçamentos' },
       { to: 'os', label: 'Ordens de serviço' },

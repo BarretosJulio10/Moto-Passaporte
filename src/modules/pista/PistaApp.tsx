@@ -302,7 +302,7 @@ function PistaGate({ userId }: { userId: string }) {
 
 function FailedList({ outbox }: { outbox: OutboxEntry[] }) {
   const LABEL: Record<OutboxEntry['kind'], string> = {
-    photo: 'Foto', audio: 'Áudio', note: 'Nota', item: 'Item', status: 'Situação', ready: 'Pronto', take: 'Pegar OS', inspection: 'Checklist',
+    photo: 'Foto', audio: 'Áudio', note: 'Nota', item: 'Item', status: 'Situação', ready: 'Pronto', take: 'Pegar OS', inspection: 'Checklist', diagnosed: 'Diagnóstico',
   }
   return (
     <div className="m-3 rounded-xl border border-danger/40 bg-danger/5 p-3 text-sm" role="alert">

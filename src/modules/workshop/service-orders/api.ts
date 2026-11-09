@@ -304,3 +304,21 @@ export async function photoUrls(paths: string[]): Promise<Record<string, string>
   for (const item of data ?? []) if (item.path && item.signedUrl) out[item.path] = item.signedUrl
   return out
 }
+
+// Fluxo da oficina, Fase B (ADR-060): a moto entra antes do orçamento.
+export type EntryInfo = {
+  opened_at_entry: boolean
+  diagnosed_at: string | null
+  diagnosed_by_name: string | null
+  has_work: boolean
+  quote: { id: string; number: number; status: string } | null
+}
+export const createEntry = (org: string, d: { customer: string; vehicle: string; km?: number | null; problem?: string; due?: string | null; toDiagnosis: boolean }) =>
+  rpc<string>('workshop_create_entry', {
+    p_org: org, p_customer: d.customer, p_vehicle: d.vehicle, p_km: d.km ?? null, p_problem: d.problem || null,
+    p_due: d.due || null, p_to_diagnosis: d.toDiagnosis,
+  })
+export const fetchEntryInfo = (org: string, id: string) => rpc<EntryInfo>('workshop_order_entry_info', { p_org: org, p_order: id })
+export const markDiagnosed = (org: string, id: string, text: string) =>
+  rpc<void>('workshop_mark_diagnosed', { p_org: org, p_order: id, p_text: text || null })
+export const quoteFromOrder = (org: string, id: string) => rpc<string>('workshop_quote_from_order', { p_org: org, p_order: id })

@@ -74,7 +74,8 @@ function Esteira({ orgId, shop, perms }: WorkshopContext) {
 
   const actions = (
     <>
-      {perms.manage_quotes && <ButtonLink to={`${base}/orcamentos/novo`} className={touch ? 'h-14 text-lg' : ''}>+ Novo orçamento</ButtonLink>}
+      {perms.manage_quotes && <ButtonLink to={`${base}/entrada/nova`} className={touch ? 'h-14 text-lg' : ''}>+ Nova entrada</ButtonLink>}
+      {perms.manage_quotes && <ButtonLink to={`${base}/orcamentos/novo`} variant="secondary" className={touch ? 'h-14 text-lg' : ''}>Orçamento sem a moto</ButtonLink>}
       {perms.execute_orders && <ButtonLink to={`${base}/os/nova`} variant="secondary" className={touch ? 'h-14 text-lg' : ''}>Abrir OS direto</ButtonLink>}
       <button type="button" onClick={() => setTouch(!touch)} aria-pressed={touch}
         className={`rounded-doc border px-4 font-semibold ${touch ? 'h-14 border-ink bg-ink text-sheet' : 'h-11 border-rule bg-sheet text-ink hover:border-ink'}`}>

@@ -73,7 +73,8 @@ export function PistaOrderPage() {
         {o.mechanic_user_id && !o.mine && <p className="mt-2 text-sm text-muted">Mecânico: {o.mechanic_name ?? '—'}</p>}
       </section>
 
-      {canAct && <StatusBar order={o} allowReady={shop.allow_ready || shop.is_responsible} queue={queue} />}
+      {canAct && o.items.length > 0 && <StatusBar order={o} allowReady={shop.allow_ready || shop.is_responsible} queue={queue} />}
+      {canAct && o.items.length === 0 && <DiagnosisSection pending={mine} queue={queue} />}
       {closed && <p className="m-3 rounded-xl bg-paper p-3 text-graphite">Esta OS foi encerrada no painel. Os registros ficam guardados.</p>}
 
       <ItemsSection order={o} pending={mine} canAct={canAct} queue={queue} />
@@ -513,5 +514,27 @@ function MicHelp({ onRetry }: { onRetry: () => void }) {
       )}
       <button type="button" onClick={onRetry} className="mt-3 h-11 w-full rounded-xl bg-ink font-bold text-sheet">Tentar de novo</button>
     </div>
+  )
+}
+
+/** OS da entrada, ainda sem serviço autorizado: o mecânico olha a moto e avisa o balcão (ADR-060). */
+function DiagnosisSection({ pending, queue }: { pending: OutboxEntry[]; queue: Queue }) {
+  const [text, setText] = useState('')
+  const [sent, setSent] = useState(false)
+  const sending = pending.some((e) => e.kind === 'diagnosed')
+  return (
+    <section className="mx-3 mt-3 rounded-2xl border-2 border-[#D66C20] bg-sheet p-4">
+      <h2 className="text-lg font-bold">Diagnóstico</h2>
+      <p className="mt-1 text-sm text-graphite">Olhe a moto, tire fotos e grave áudio se precisar. Quando terminar, escreva o que encontrou e toque em “Diagnóstico pronto”: o balcão monta o orçamento.</p>
+      <textarea value={text} onChange={(e) => setText(e.target.value.slice(0, 2000))} rows={4} aria-label="O que foi encontrado"
+        placeholder="O que você encontrou na moto (ou dite pelo microfone do teclado)"
+        className="mt-3 w-full rounded-xl border border-rule bg-paper px-3 py-2 text-base" />
+      {sent || sending ? (
+        <p className="mt-3 rounded-xl bg-ok/10 px-3 py-3 font-semibold text-ok" role="status">{sending ? 'Enviando o diagnóstico…' : 'Diagnóstico enviado ao balcão. ✓'}</p>
+      ) : (
+        <button type="button" onClick={() => { void queue('diagnosed', { text: text.trim() || null }); setSent(true); setText('') }}
+          className="mt-3 h-14 w-full rounded-xl bg-[#D66C20] text-lg font-bold text-white">Diagnóstico pronto</button>
+      )}
+    </section>
   )
 }

@@ -1,3 +1,4 @@
+import { EntryFlowCard } from '../flow/EntryFlowCard'
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -52,7 +53,7 @@ const EVENT_LABEL: Record<string, string> = {
   photo_added: 'Foto incluída', photo_removed: 'Foto removida', link_created: 'Link criado para o cliente', customer_ack: 'Cliente deu ciência da entrada',
   completed: 'OS concluída', pickup_notified: 'Cliente avisado da retirada', delivered: 'Moto entregue', canceled: 'OS cancelada', notes_updated: 'Observações atualizadas',
   history_published: 'Registrado no histórico da moto', history_photo_added: 'Foto enviada ao histórico da moto',
-  note_added: 'Nota da pista', note_voided: 'Nota anulada', audio_added: 'Áudio da pista', mechanic_ready: 'Mecânico marcou Pronto', taken: 'Mecânico pegou a OS',
+  note_added: 'Nota da pista', note_voided: 'Nota anulada', audio_added: 'Áudio da pista', mechanic_ready: 'Mecânico marcou Pronto', taken: 'Mecânico pegou a OS', diagnosed: 'Diagnóstico pronto', quote_created: 'Orçamento montado a partir da entrada', quote_items_added: 'Itens aprovados entraram na OS',
 }
 
 function OrderView({ orgId, perms }: { orgId: string; perms: WorkshopPermissions & { user_id?: string } }) {
@@ -104,7 +105,7 @@ function OrderView({ orgId, perms }: { orgId: string; perms: WorkshopPermissions
             intro={<>
               <Link to={`/oficina/${orgId}/clientes/${o.customer_id}`} className="underline underline-offset-4">{o.customer.full_name}</Link>
               {vText ? ` · ${vText}` : ''}{o.vehicle?.plate ? ` · ${formatPlate(o.vehicle.plate)}` : ''}
-              {o.quote ? <> · do <Link to={`/oficina/${orgId}/orcamentos/${o.quote.id}`} className="underline underline-offset-4">orçamento nº {o.quote.number}</Link></> : ' · aberta sem orçamento'}
+              {o.quote ? <> · do <Link to={`/oficina/${orgId}/orcamentos/${o.quote.id}`} className="underline underline-offset-4">orçamento nº {o.quote.number}</Link></> : o.auth_method ? ' · aberta sem orçamento' : ' · entrada da moto'}
             </>}
             actions={o.completed_at && <Button variant="secondary" onClick={() => window.print()}>Imprimir comprovante</Button>} />
         </div>
@@ -120,6 +121,7 @@ function OrderView({ orgId, perms }: { orgId: string; perms: WorkshopPermissions
               Autorizada {AUTH_LABEL[o.auth_method].toLowerCase()} por {o.auth_by_name}{o.auth_note ? ` (${o.auth_note})` : ''}.
             </Notice>
           )}
+          <EntryFlowCard orgId={orgId} order={o} canManage={manage} canExecute={execute} onChanged={refresh} run={run} busy={busy} />
           <ItemsCard orgId={orgId} order={o} canExecute={execute && !closed} canManage={manage && !closed} run={run} busy={busy} />
           {o.complements.length > 0 && (
             <Card title="Orçamentos complementares">

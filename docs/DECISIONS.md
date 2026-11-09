@@ -109,6 +109,13 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-060 — Entrada antes do orçamento (fluxo da oficina, Fase B)
+**Data:** 09/11/2026 · **Status:** aceita (responsável pediu "continue" depois da Fase A)
+- `workshop_service_orders.opened_at_entry`: OS nasce na entrada (`workshop_create_entry`) sem itens e sem autorização; restrição `workshop_service_orders_authorized_check` = orçamento OU entrada OU autorização. `wo_has_work` impede execução/Pronto sem item autorizado (`workshop_set_order_status`, `pista_mark_ready`).
+- Diagnóstico: `diagnosed_at/by` + texto em `technical_notes` (`workshop_mark_diagnosed`, `pista_mark_diagnosed`).
+- `workshop_quotes.entry_order_id`: `workshop_quote_from_order` cria o orçamento preenchido; `workshop_create_order_from_quote` com entrada copia os itens aprovados para a mesma OS e grava `quote_id` (complementar continua funcionando).
+- `workshop_list_orders` passa a trazer `opened_at_entry`, `diagnosed_at`, `entry_quote`; `workshop_order_entry_info` alimenta o cartão da OS. Novos eventos: `diagnosed`, `quote_created`, `quote_items_added`.
+
 ### ADR-059 — Esteira da oficina (fluxo em ordem de trabalho)
 **Data:** 09/11/2026 · **Status:** aceita (Fase A; responsável pediu "execute" sobre o plano https://claude.ai/artifact/MutLTuC3J7vzqxyEJsF9JZ)
 - Tela inicial da oficina = Esteira; as 13 situações da OS e as do orçamento são agrupadas em 7 etapas só na tela (`src/modules/workshop/flow/stages.ts`), sem mudar o banco. Orçamento aprovado sem OS aparece em "Aprovado" com "Abrir OS".

@@ -8,7 +8,7 @@ import { uploadWorkshopFile } from './api'
  * roda ao abrir o app, ao voltar para ele, quando a internet volta e a cada 30 s.
  */
 
-export type OutboxKind = 'photo' | 'audio' | 'note' | 'item' | 'status' | 'ready' | 'take' | 'inspection'
+export type OutboxKind = 'photo' | 'audio' | 'note' | 'item' | 'status' | 'ready' | 'take' | 'inspection' | 'diagnosed'
 
 export type OutboxEntry = {
   id: string
@@ -124,6 +124,9 @@ async function send(e: OutboxEntry) {
       return
     case 'inspection':
       await rpc('pista_save_inspection', { ...base, p_phase: e.args.phase, p_data: e.args.data })
+      return
+    case 'diagnosed':
+      await rpc('pista_mark_diagnosed', { ...base, p_text: e.args.text ?? null })
       return
   }
 }
