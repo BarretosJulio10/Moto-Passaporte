@@ -9,7 +9,7 @@ let status = { connected: false, loggedIn: false, number: null as string | null 
 const settings = {
   email_enabled: false, email_from: 'Moto Passaporte <avisos@motopassaporte.com.br>', link_base: 'https://www.motopassaporte.com.br',
   resend_key_configured: true, resend_key_hint: 'abcd', whatsapp_enabled: false, fzap_url: 'https://fzap.exemplo.com.br',
-  fzap_token_configured: true, fzap_token_hint: '3456', whatsapp_cooldown_hours: 48, updated_at: '2026-11-09T12:00:00Z', updated_by_name: 'Admin',
+  fzap_token_configured: true, fzap_token_hint: '3456', fzap_instance_id: null as string | null, whatsapp_cooldown_hours: 48, updated_at: '2026-11-09T12:00:00Z', updated_by_name: 'Admin',
   last_24h: { 'email:sent': 3 }, pending: { email: 1, whatsapp: 0 },
 }
 
@@ -83,6 +83,24 @@ describe('admin: criar a instância da FZAP pelo painel', () => {
     expect(await screen.findByText(/motopassaporte-avisos-ab12 criada/)).toBeVisible()
     expect(await screen.findByAltText('QR Code para conectar o WhatsApp')).toBeVisible()
     settings.fzap_token_configured = true
+  })
+
+  it('com a instância criada, mostra só um lugar para conectar e nenhum campo de token', async () => {
+    settings.fzap_instance_id = 'motopassaporte-avisos-eeb3'
+    wrap(<AdminMessagingPage />)
+    expect(await screen.findByText('motopassaporte-avisos-eeb3')).toBeVisible()
+    expect(await screen.findByRole('button', { name: 'Conectar (QR Code)' })).toBeVisible()
+    expect(screen.queryByLabelText('Token da instância')).toBeNull()
+    expect(screen.queryByText('Criar uma instância nova na FZAP')).toBeNull()
+    settings.fzap_instance_id = null
+  })
+
+  it('se a consulta da conexão falhar, não fica preso em "Conferindo"', async () => {
+    const orig = status
+    status = undefined as unknown as typeof status
+    wrap(<AdminMessagingPage />)
+    expect(await screen.findByText('Desconectado.')).toBeVisible()
+    status = orig
   })
 })
 

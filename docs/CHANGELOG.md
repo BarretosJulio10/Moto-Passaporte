@@ -9,6 +9,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.66.2] — 09/11/2026 — Um só lugar para conectar o WhatsApp
+
+### Alterado
+- `/admin/mensagens`: o campo "Token da instância" saiu do formulário; o número é conectado só no quadro "Número do WhatsApp", que mostra o nome da instância. "Criar instância" só aparece enquanto não houver instância.
+- `admin_get_messaging_settings` devolve `fzap_instance_id` (nunca o token). Migração `20261109201149`, com rollback.
+
+### Corrigido
+- O quadro não fica mais preso em "Conferindo a conexão…" quando a consulta à FZAP falha.
+
 ## [0.66.1] — 09/11/2026 — Instância do WhatsApp criada pelo painel
 
 ### Adicionado

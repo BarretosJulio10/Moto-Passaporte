@@ -11,6 +11,7 @@ export type MessagingSettings = {
   fzap_url: string | null
   fzap_token_configured: boolean
   fzap_token_hint: string | null
+  fzap_instance_id: string | null
   whatsapp_cooldown_hours: number
   updated_at: string
   updated_by_name: string | null

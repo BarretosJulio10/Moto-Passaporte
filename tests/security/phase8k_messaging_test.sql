@@ -119,4 +119,11 @@ select public.messaging_set_fzap_instance('token_da_instancia_123456', 'inst-1',
 select tests.ok((public.messaging_config() ->> 'fzap_token') = 'token_da_instancia_123456'
                 and (select fzap_instance_id = 'inst-1' and fzap_token_hint = '3456' from public.messaging_settings where id),
   'servidor grava o token da instância no cofre');
+insert into public.user_roles (user_id, role) values (:'M', 'admin') on conflict do nothing;
+set role authenticated;
+select tests.ok((public.admin_get_messaging_settings() ->> 'fzap_instance_id') = 'inst-1'
+                and position('token_da_instancia' in public.admin_get_messaging_settings()::text) = 0,
+  'a tela do admin vê o nome da instância, nunca o token');
+reset role;
+delete from public.user_roles where user_id = :'M' and role = 'admin';
 update public.messaging_settings set fzap_token_secret_id = null, fzap_instance_id = null where id;
