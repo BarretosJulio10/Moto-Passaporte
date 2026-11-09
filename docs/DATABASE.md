@@ -8,6 +8,7 @@ Migrações em `supabase/migrations/`, aplicadas em ordem (prefixo = versão no 
 |---|---|
 | `20261107003043_base.sql` | pgcrypto, utilitários (placa), auditoria imutável, triggers genéricos |
 | `20261107003102_identity.sql` | `profiles`, `user_roles`, criação automática no cadastro, `has_role`/`is_admin`, `system_settings` |
+| `20261109003133_spending_phase_b.sql` | PRD 2.2 Fase B (ADR-051): `expense_category`, `owner_expenses` (RLS só leitura do dono), bucket `expense-receipts`, `save_owner_expense`, `delete_owner_expense`, `get_spending_entries`; `get_spending_summary` com `p_kind`, km, custo por km, projeção e por moto; cota soma comprovantes. Reversão em `supabase/rollback/` |
 | `20261109001101_spending_source_evidence.sql` | ADR-050: `sp_records` classifica a origem pela evidência (anexo = comprovante), igual à linha do tempo. Reversão em `supabase/rollback/` |
 | `20261109000635_spending_phase_a.sql` | PRD 2.2 Fase A (ADR-050): benefício `spending_insights` nos planos Premium; `sp_ownership_start`, `sp_records` (internas), `get_spending_summary`, `get_spending_snapshot`. Reversão em `supabase/rollback/` |
 | `20261108205242_welcome_premium.sql` | ADR-049: `premium_grants.source` (`admin`/`welcome`), configuração `welcome_premium_days` (90), gatilho em `profiles` que dá o Premium de boas-vindas; `user_plan` e `get_my_plan` reconhecem o bônus de boas-vindas. Reversão em `supabase/rollback/` |

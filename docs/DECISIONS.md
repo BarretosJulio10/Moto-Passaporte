@@ -109,6 +109,15 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 - Histórico, autoria, comprovantes e quilometragem permanecem com a moto. Diário privado do antigo titular continua só dele, consultável em "Motos anteriores" (só leitura e exclusão).
 - Sem e-mail ou notificação externa por enquanto: o comprador vê o pedido no painel ao entrar (KI-020). Fluxo sem participação do dono anterior segue pendente (P-7). Não é transferência no DETRAN.
 
+### ADR-051 — Controle de Gastos, Fase B: despesas avulsas pessoais, fora do histórico
+**Data:** 08/11/2026 · **Status:** aceita (PRD 2.2 §5, §7 e §12)
+- Tabela própria `owner_expenses` (não `maintenance_records`): o histórico técnico segue imutável e transferível; a despesa é pessoal, editável e apagável (exclusão lógica + auditoria só com metadados, nunca a descrição).
+- Comprovante em bucket próprio `expense-receipts/<usuário>/…`, não em `attachments`: anexos da moto passam ao próximo dono; comprovante de despesa não. Conta na cota do plano (`user_storage_used_bytes`).
+- Limite do gratuito: 10 despesas **criadas** por mês (horário de Brasília; editar não conta), em `free_expenses_per_month`.
+- Filtros de oficina e origem valem só para serviços; despesas ficam fora quando um deles está ativo.
+- Custo por km, projeção e todas as motos só no Premium (o banco não envia esses campos ao gratuito). Km: maior leitura válida do período − última antes do início; menos de 2 leituras ou de 100 km = dados insuficientes.
+- Pendente para a Fase C: despesas na exportação "Meus dados" e limpeza dos comprovantes ao excluir a conta.
+
 ### ADR-050 — Controle de Gastos (PRD 2.2), Fase A: cálculo no banco, análise no Premium
 **Data:** 08/11/2026 · **Status:** aceita (PRD 2.2 aprovado com as recomendações da seção 12)
 - Soma feita no banco (`get_spending_summary`, `get_spending_snapshot`), sobre os serviços **vigentes** (não anulados e sem correção posterior). Serviço sem valor fica fora da soma e é mostrado à parte, com atalho para corrigir (o histórico continua imutável).

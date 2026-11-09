@@ -9,6 +9,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.52.0] — 08/11/2026 — Controle de Gastos, Fase B (PRD 2.2)
+
+### Adicionado
+- **Despesas avulsas**: lançar combustível, seguro, IPVA e licenciamento, multa, estacionamento e pedágio, acessórios, lavagem, financiamento e outras, com data, valor, descrição, km e comprovante opcionais. Editar e apagar (fica na auditoria).
+- Despesas são pessoais: só quem lançou vê; não entram no histórico da moto, não passam na transferência, não aparecem para oficina, comprador ou link público.
+- Gratuito: até 10 despesas por mês (configurável); Premium sem limite.
+- **Premium**: custo por km (com "dados insuficientes" quando faltam leituras), projeção do ano (a partir de 90 dias), página **"Gastos de todas as motos"** (`/painel/gastos`) com total por moto.
+- Lista de lançamentos do recorte (serviços e despesas) e filtro "Tipo".
+- Comprovantes de despesa contam no espaço de anexos do plano.
+
 ## [0.51.0] — 08/11/2026 — Controle de Gastos, Fase A (PRD 2.2)
 
 ### Adicionado

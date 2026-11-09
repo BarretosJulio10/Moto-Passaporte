@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_FILTERS, filtersFromParams, filtersToParams, monthLabel, periodRange, timelineToSpendingQuery, timelineTotal } from './api'
+import { DEFAULT_FILTERS, categoryLabel, formatPerKm, filtersFromParams, filtersToParams, monthLabel, periodRange, timelineToSpendingQuery, timelineTotal } from './api'
 
 describe('gastos — filtros', () => {
   it('padrão não suja o endereço e volta igual', () => {
@@ -8,7 +8,7 @@ describe('gastos — filtros', () => {
   })
   it('ida e volta com todos os campos', () => {
     const f = { ...DEFAULT_FILTERS, period: 'custom' as const, from: '2026-01-01', to: '2026-03-31', category: 'tires' as const,
-      workshop: '__none__', source: 'document' as const, scope: 'all' as const, compare: true }
+      workshop: '__none__', source: 'document' as const, scope: 'all' as const, compare: true, kind: 'expense' as const }
     expect(filtersFromParams(filtersToParams(f))).toEqual(f)
   })
   it('valores inválidos caem no padrão', () => {
@@ -23,9 +23,9 @@ describe('gastos — filtros', () => {
     expect(periodRange('all', today)).toEqual({ from: null, to: null })
   })
   it('linha do tempo → gastos com o mesmo recorte', () => {
-    expect(timelineToSpendingQuery({ category: '', source: '', workshop: '', from: '', to: '' })).toBe('?periodo=all&escopo=tudo')
+    expect(timelineToSpendingQuery({ category: '', source: '', workshop: '', from: '', to: '' })).toBe('?periodo=all&escopo=tudo&tipo=servicos')
     expect(timelineToSpendingQuery({ category: 'brakes', source: 'workshop', workshop: 'Oficina X', from: '2026-01-01', to: '' }))
-      .toBe('?periodo=custom&de=2026-01-01&categoria=brakes&oficina=Oficina+X&origem=workshop&escopo=tudo')
+      .toBe('?periodo=custom&de=2026-01-01&categoria=brakes&oficina=Oficina+X&origem=workshop&escopo=tudo&tipo=servicos')
   })
 })
 
@@ -39,6 +39,11 @@ describe('gastos — soma da linha do tempo', () => {
       { status: 'current', is_void: true, service_value_cents: 99900 },
     ])
     expect(t).toEqual({ cents: 60000, withValue: 2, missing: 1 })
+  })
+  it('rótulos de categoria de serviço e de despesa', () => {
+    expect(categoryLabel('fuel')).toBe('Combustível')
+    expect(categoryLabel('tires')).toBe('Pneus')
+    expect(formatPerKm(57)).toMatch(/0,57\/km$/)
   })
   it('rótulo de mês', () => {
     expect(monthLabel('2026-03')).toBe('mar/26')

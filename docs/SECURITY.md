@@ -265,3 +265,4 @@ Ver `KNOWN_ISSUES.md`.
 - RPCs `get_spending_summary`/`get_spending_snapshot` executáveis só por `authenticated`; leem apenas posses ativas do próprio usuário (`auth.uid()`). `sp_records` e `sp_ownership_start` sem acesso externo (lista `service_only` da varredura).
 - O corte "desde a compra" impede ver valores de serviços de dono anterior por padrão; o histórico visível segue as mesmas regras da linha do tempo.
 - O benefício Premium é verificado no banco: o gratuito não recebe os dados da análise, não só deixa de vê-los.
+- Fase B (ADR-051): `owner_expenses` com RLS só de leitura do próprio usuário e sem escrita direta (só pelas funções). Bucket `expense-receipts` privado; políticas de envio, leitura e exclusão limitadas à pasta `auth.uid()`. Comprovante conferido no banco (dono do arquivo, pasta, tipo, tamanho, cota). Auditoria sem descrição. Despesas não aparecem para oficina, comprador nem links públicos.

@@ -19,7 +19,7 @@ export function MotoSpendingCard({ motorcycleId }: { motorcycleId: string }) {
         <div><dt className="text-sm text-muted">Este mês</dt><dd className="heading text-2xl tabular-nums text-ink">{formatBRL(s.month_cents)}</dd></div>
       </dl>
       <p className="mt-2 text-xs text-muted">
-        {s.year_entries} serviço{s.year_entries === 1 ? '' : 's'} com valor no ano
+        {s.year_entries} lançamento{s.year_entries === 1 ? '' : 's'} com valor no ano
         {s.year_missing > 0 ? ` · ${s.year_missing} sem valor (fora da soma)` : ''}
       </p>
     </section>
@@ -30,14 +30,18 @@ export function MotoSpendingCard({ motorcycleId }: { motorcycleId: string }) {
 export function DashboardSpendingCard() {
   const q = useQuery({ queryKey: ['spending-snapshot', 'all'], queryFn: () => fetchSpendingSnapshot(null) })
   const s = q.data
-  if (!s || (s.year_cents === 0 && s.year_missing === 0)) return null
+  if (!s) return null
   return (
     <section aria-labelledby="gastos-painel" className="rounded-sheet border border-rule bg-sheet p-5">
-      <h2 id="gastos-painel" className="heading text-lg text-ink">Gastos com as motos</h2>
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <h2 id="gastos-painel" className="heading text-lg text-ink">Gastos com as motos</h2>
+        <Link to="/painel/gastos" className="text-sm font-semibold text-ink underline underline-offset-4">Ver gastos</Link>
+      </div>
       <dl className="mt-2 grid grid-cols-2 gap-4">
         <div><dt className="text-sm text-muted">Este mês</dt><dd className="heading text-xl tabular-nums text-ink">{formatBRL(s.month_cents)}</dd></div>
         <div><dt className="text-sm text-muted">Este ano</dt><dd className="heading text-xl tabular-nums text-ink">{formatBRL(s.year_cents)}</dd></div>
       </dl>
+      {s.year_cents === 0 && <p className="mt-2 text-xs text-muted">Nada lançado este ano. Informe o valor nos serviços ou lance despesas como combustível e seguro.</p>}
       {s.year_missing > 0 && <p className="mt-2 text-xs text-muted">{s.year_missing} serviço{s.year_missing === 1 ? '' : 's'} sem valor fora da soma.</p>}
     </section>
   )
