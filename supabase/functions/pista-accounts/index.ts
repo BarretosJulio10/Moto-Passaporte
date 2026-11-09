@@ -19,6 +19,16 @@ export function normalizeNickname(raw: string): string {
   return raw.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '')
 }
 
+function readClaims(jwt: string): { sub?: string; role?: string; exp?: number } | null {
+  try {
+    const part = jwt.split('.')[1] ?? ''
+    const b64 = part.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(part.length / 4) * 4, '=')
+    return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))))
+  } catch {
+    return null
+  }
+}
+
 type Body = {
   action?: 'create' | 'convert' | 'password' | 'disable' | 'enable'
   org?: string
@@ -38,10 +48,17 @@ Deno.serve(async (req) => {
   const jwt = authHeader.replace(/^Bearer\s+/i, '')
   if (!jwt) return reply(401, { message: 'Entre na sua conta.' })
   const server = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } })
-  const { data: auth, error: authError } = await server.auth.getUser(jwt)
-  const actor = auth?.user
-  if (!actor) {
-    console.error('pista-accounts: sessão não reconhecida', authError?.message)
+  // A assinatura do token já foi conferida pelo Supabase antes de chegar aqui (verify_jwt);
+  // lê o usuário do token e confirma que a conta existe e não está bloqueada.
+  const claims = readClaims(jwt)
+  const now = Math.floor(Date.now() / 1000)
+  if (!claims?.sub || !UUID.test(claims.sub) || claims.role !== 'authenticated' || (claims.exp ?? 0) < now) {
+    return reply(401, { message: 'Sua sessão expirou. Saia e entre de novo.' })
+  }
+  const { data: found, error: authError } = await server.auth.admin.getUserById(claims.sub)
+  const actor = found?.user
+  if (!actor || (actor.banned_until && new Date(actor.banned_until).getTime() > Date.now())) {
+    console.error('pista-accounts: conta não encontrada', authError?.message)
     return reply(401, { message: 'Sua sessão expirou. Saia e entre de novo.' })
   }
 

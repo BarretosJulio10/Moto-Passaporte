@@ -50,3 +50,8 @@ Problemas conhecidos e sua situação.
 | KI-045 | Ao mudar `free_open_records` no admin, os textos fixos ("2 registros") do card de preços, do cadastro e do aceite dos Termos não mudam sozinhos | Baixa | Aberto — editar textos junto |
 | KI-043 | Verificação em duas etapas do admin **desligada temporariamente** (testes, a pedido do responsável). Religar antes de abrir para clientes (ADR-054) | Alta | Aberto — religar |
 
+
+### KI-046 — `auth.getUser(jwt)` nas Edge Functions com tokens ES256
+**Status:** aberto (09/11/2026)
+- Na `pista-accounts`, `getUser(jwt)` devolveu "Auth session missing!" com sessão válida (token ES256, chaves novas do Supabase). Corrigido lá: a assinatura é conferida pelo gateway (`verify_jwt`) e a função lê o `sub` do token e confirma a conta com `auth.admin.getUserById`.
+- `export-files` e `mercadopago-billing` usam o mesmo `getUser(jwt)`: conferir com um teste real (baixar comprovantes, assinar) e aplicar a mesma correção se falharem.
