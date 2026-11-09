@@ -14,13 +14,16 @@ const STATUS_LABEL = { sent: 'enviado', failed: 'falhou', skipped: 'retido' } as
 const errText = (e: unknown) => (e instanceof Error && !(e as { code?: string }).code ? e.message : translateDbError(e as { code?: string; message?: string }))
 
 /** Conexão do WhatsApp pela FZAP: situação, QR Code para ler no celular e mensagem de teste. */
-function WhatsappConnection({ configured }: { configured: boolean }) {
+function WhatsappConnection({ hasUrl, hasToken, onCreated }: { hasUrl: boolean; hasToken: boolean; onCreated: () => void }) {
+  const [created, setCreated] = useState(false)
+  const configured = hasUrl && (hasToken || created)
   const [status, setStatus] = useState<WaStatus | null>(null)
   const [qr, setQr] = useState<string>('')
   const [waiting, setWaiting] = useState(false)
   const [msg, setMsg] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(null)
   const [phone, setPhone] = useState('')
   const [busy, setBusy] = useState<string | null>(null)
+  const [adminToken, setAdminToken] = useState('')
 
   async function run<T>(name: string, fn: () => Promise<T>): Promise<T | null> {
     setBusy(name)
@@ -36,7 +39,7 @@ function WhatsappConnection({ configured }: { configured: boolean }) {
   }
 
   const refresh = () => run('status', () => messagingAction<WaStatus>('wa_status')).then((s) => s && setStatus(s))
-  useEffect(() => { if (configured) void refresh() }, [configured])
+  useEffect(() => { if (hasUrl && hasToken) void refresh() }, [hasUrl, hasToken])
 
   // Enquanto espera a leitura: busca o QR (ele muda a cada ~20 s) e confere se conectou.
   useEffect(() => {
@@ -65,7 +68,37 @@ function WhatsappConnection({ configured }: { configured: boolean }) {
     return () => { stop = true; window.clearInterval(t); window.clearTimeout(end) }
   }, [waiting])
 
-  if (!configured) return <Notice tone="info">Salve o endereço e o token da FZAP para conectar o número.</Notice>
+  if (!hasUrl) return <Notice tone="info">Salve o endereço da FZAP para criar a instância e conectar o número.</Notice>
+
+  // Cria a instância com o token de administrador (usado só agora; o servidor guarda apenas o token da instância).
+  const createForm = (
+    <form className="space-y-2" onSubmit={(e) => {
+      e.preventDefault()
+      void run('create', () => messagingAction<{ name: string; loggedIn: boolean }>('wa_create_instance', { admin_token: adminToken })).then((r) => {
+        if (!r) return
+        setAdminToken('')
+        setCreated(true)
+        onCreated()
+        setMsg({ tone: 'success', text: `Instância ${r.name} criada. Leia o QR Code com o celular do número dos avisos.` })
+        setStatus({ connected: true, loggedIn: r.loggedIn })
+        if (!r.loggedIn) setWaiting(true)
+      })
+    }}>
+      <TextField label="Token de administrador da FZAP" type="password" autoComplete="off" spellCheck={false} value={adminToken}
+        onChange={(e) => setAdminToken(e.target.value)}
+        hint="Usado só para criar a instância agora. Não fica guardado: o sistema guarda apenas o token da instância nova." />
+      <Button size="sm" type="submit" loading={busy === 'create'} disabled={adminToken.trim().length < 6}>Criar instância e gerar QR Code</Button>
+    </form>
+  )
+
+  if (!configured) {
+    return (
+      <div className="space-y-3">
+        {createForm}
+        {msg && <Notice tone={msg.tone}>{msg.text}</Notice>}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-3">
@@ -100,6 +133,12 @@ function WhatsappConnection({ configured }: { configured: boolean }) {
           <TextField label="Celular para teste (com DDD)" value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" className="w-60" />
           <Button size="sm" type="submit" variant="secondary" loading={busy === 'test'}>Enviar teste</Button>
         </form>
+      )}
+      {!status?.loggedIn && !waiting && (
+        <details className="rounded-doc border border-rule p-3">
+          <summary className="cursor-pointer text-sm font-semibold text-ink">Criar uma instância nova na FZAP</summary>
+          <div className="mt-3">{createForm}</div>
+        </details>
       )}
       {msg && <Notice tone={msg.tone}>{msg.text}</Notice>}
     </div>
@@ -195,7 +234,7 @@ export function AdminMessagingPage() {
               <TextField label="Token da instância" type="password" autoComplete="new-password" spellCheck={false} value={form.fzapToken}
                 onChange={(e) => set('fzapToken', e.target.value)}
                 placeholder={s.fzap_token_configured ? `Cadastrado, termina em ${s.fzap_token_hint}` : 'Token do usuário/instância na FZAP'}
-                hint="Use um número só para os avisos, nunca o WhatsApp de atendimento: mensagens automáticas podem levar a bloqueio." />
+                hint="O token da instância, não o de administrador. Mais fácil: use “Criar instância e gerar QR Code” ao lado. Use um número só para os avisos, nunca o WhatsApp de atendimento." />
               <TextField label="Intervalo mínimo entre avisos opcionais para a mesma pessoa (horas)" type="number" min={1} max={720}
                 value={String(form.cooldownHours)} onChange={(e) => set('cooldownHours', Number(e.target.value) || 48)} className="max-w-xs" />
             </fieldset>
@@ -215,7 +254,8 @@ export function AdminMessagingPage() {
           <div className="grid gap-6">
             <section className="rounded-sheet border border-rule bg-sheet p-5" aria-labelledby="wa-title">
               <h2 id="wa-title" className="heading text-xl text-ink">Número do WhatsApp</h2>
-              <div className="mt-3"><WhatsappConnection configured={Boolean(s.fzap_url && s.fzap_token_configured)} /></div>
+              <div className="mt-3"><WhatsappConnection hasUrl={Boolean(s.fzap_url)} hasToken={s.fzap_token_configured}
+                onCreated={() => void qc.invalidateQueries({ queryKey: ['messaging-settings'] })} /></div>
             </section>
 
             <section className="rounded-sheet border border-rule bg-sheet p-5" aria-labelledby="hist-title">

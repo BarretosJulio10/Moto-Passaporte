@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
   const { data: isAdmin } = await userClient(authHeader).rpc('is_admin')
   if (isAdmin !== true) return reply(403, { message: 'Operação não permitida.' })
 
-  let body: { action?: string; phone?: string } = {}
+  let body: { action?: string; phone?: string; admin_token?: string } = {}
   try {
     body = await req.json()
   } catch {
@@ -52,6 +52,37 @@ Deno.serve(async (req) => {
       })
       const r = await sendResend(cfg, { to, subject: 'Teste de envio do Moto Passaporte', html, text, unsubscribeUrl: null })
       return r.ok ? reply(200, { ok: true, detail: `Enviado para ${to}.` }) : reply(502, { message: r.error ?? 'O Resend recusou o envio.' })
+    }
+    // Cria a instância na FZAP com o token de administrador (usado só agora, nunca guardado),
+    // grava apenas o token da instância no cofre e já inicia a conexão para o QR Code.
+    case 'wa_create_instance': {
+      const adminToken = String(body.admin_token ?? '').trim()
+      if (!cfg.fzap_url) return reply(400, { message: 'Salve o endereço da FZAP primeiro.' })
+      if (adminToken.length < 6 || adminToken.length > 300) return reply(400, { message: 'Informe o token de administrador da FZAP.' })
+      const bytes = crypto.getRandomValues(new Uint8Array(24))
+      const token = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+      const name = `motopassaporte-avisos-${token.slice(0, 4)}`
+      let created: { id?: string } | null = null
+      try {
+        const res = await fetch(`${cfg.fzap_url}/admin/users`, {
+          method: 'POST',
+          headers: { Authorization: adminToken, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, token, expiration: 0 }),
+          signal: AbortSignal.timeout(20_000),
+        })
+        const json = (await res.json().catch(() => null)) as { success?: boolean; data?: { id?: string }; error?: string } | null
+        if (res.status === 401 || res.status === 403) return reply(400, { message: 'A FZAP recusou o token de administrador. Confira e tente de novo.' })
+        if (!res.ok || json?.success === false) return reply(502, { message: `A FZAP não criou a instância (${res.status}${json?.error ? `: ${String(json.error).slice(0, 120)}` : ''}).` })
+        created = json?.data ?? null
+      } catch {
+        return reply(502, { message: 'A FZAP não respondeu. Confira o endereço.' })
+      }
+      const { error: saveError } = await server.rpc('messaging_set_fzap_instance', { p_token: token, p_instance_id: created?.id ?? name, p_actor: claims.sub })
+      if (saveError) return reply(500, { message: 'A instância foi criada, mas o token não foi salvo. Tente de novo.' })
+      const next = { ...cfg, fzap_token: token }
+      await fzap(next, '/session/connect', { method: 'POST', body: { immediate: true } })
+      const s = await fzap<Session>(next, '/session/status')
+      return reply(200, { ok: true, name, connected: Boolean(s.data?.connected), loggedIn: Boolean(s.data?.loggedIn) })
     }
     case 'wa_status': {
       const r = await fzap<Session>(cfg, '/session/status')

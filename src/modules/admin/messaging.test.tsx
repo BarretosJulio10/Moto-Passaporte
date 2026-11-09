@@ -25,6 +25,7 @@ vi.mock('./messagingApi', () => ({
     if (action === 'wa_connect') { status = { connected: true, loggedIn: false, number: null }; return status }
     if (action === 'wa_qr') return { qr: 'data:image/png;base64,AAAA' }
     if (action === 'test_email') return { ok: true, detail: 'Enviado para admin@teste.com.' }
+    if (action === 'wa_create_instance') return { ok: true, name: 'motopassaporte-avisos-ab12', connected: true, loggedIn: false }
     return { ok: true }
   },
 }))
@@ -68,6 +69,20 @@ describe('admin: e-mail e WhatsApp (ADR-064)', () => {
     expect(await screen.findByText('Desconectado.')).toBeVisible()
     await user.click(screen.getByRole('button', { name: 'Conectar (QR Code)' }))
     expect(await screen.findByAltText('QR Code para conectar o WhatsApp')).toHaveAttribute('src', 'data:image/png;base64,AAAA')
+  })
+})
+
+describe('admin: criar a instância da FZAP pelo painel', () => {
+  it('usa o token de administrador só na hora e já mostra o QR Code', async () => {
+    const user = userEvent.setup()
+    settings.fzap_token_configured = false
+    wrap(<AdminMessagingPage />)
+    await user.type(await screen.findByLabelText('Token de administrador da FZAP'), 'admin-token-123')
+    await user.click(screen.getByRole('button', { name: 'Criar instância e gerar QR Code' }))
+    await waitFor(() => expect(calls.find((c) => c.fn === 'wa_create_instance')?.args[0]).toEqual({ admin_token: 'admin-token-123' }))
+    expect(await screen.findByText(/motopassaporte-avisos-ab12 criada/)).toBeVisible()
+    expect(await screen.findByAltText('QR Code para conectar o WhatsApp')).toBeVisible()
+    settings.fzap_token_configured = true
   })
 })
 

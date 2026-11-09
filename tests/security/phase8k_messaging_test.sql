@@ -109,3 +109,14 @@ select tests.ok((select count(*) from public.messages_claim_email(50)) = 0 and (
 select tests.ok((select not whatsapp_pending from public.notifications where user_id = :'N' and dedupe_key = 'teste:desligado'),
   'sem autorização de WhatsApp, o aviso nem entra na fila do WhatsApp');
 update public.messaging_settings set email_enabled = false, whatsapp_enabled = false, resend_key_secret_id = null, fzap_token_secret_id = null where id;
+
+\echo '--- Instância da FZAP criada pelo painel'
+set role authenticated;
+select set_config('request.jwt.claim.sub', :'M', false);
+select tests.must_fail($$select public.messaging_set_fzap_instance('token_da_instancia_123456', 'abc', null)$$, 'só o servidor grava o token da instância');
+reset role;
+select public.messaging_set_fzap_instance('token_da_instancia_123456', 'inst-1', :'M');
+select tests.ok((public.messaging_config() ->> 'fzap_token') = 'token_da_instancia_123456'
+                and (select fzap_instance_id = 'inst-1' and fzap_token_hint = '3456' from public.messaging_settings where id),
+  'servidor grava o token da instância no cofre');
+update public.messaging_settings set fzap_token_secret_id = null, fzap_instance_id = null where id;

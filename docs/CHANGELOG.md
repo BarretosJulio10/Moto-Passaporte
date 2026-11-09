@@ -9,6 +9,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.66.1] — 09/11/2026 — Instância do WhatsApp criada pelo painel
+
+### Adicionado
+- **Admin → E-mail e WhatsApp → "Criar instância e gerar QR Code":** o painel cria a instância na FZAP com o token de administrador, que é usado só naquele momento e **não fica guardado**; o sistema gera e guarda apenas o token da instância nova e já mostra o QR Code.
+
+### Segurança
+- Evita guardar o token de administrador da FZAP (que controla todas as instâncias do servidor) no Moto Passaporte.
+
 ## [0.66.0] — 09/11/2026 — Avisos por e-mail e WhatsApp
 
 ### Adicionado
