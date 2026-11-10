@@ -37,7 +37,11 @@ jobs:
         working-directory: /tmp/twa
         run: |
           sed -i -E 's/(targetSdkVersion|targetSdk)( *=? *)[0-9]+/\1\236/; s/(compileSdkVersion|compileSdk)( *=? *)[0-9]+/\1\236/' app/build.gradle
-          grep -nE "compileSdk|targetSdk|minSdk|versionCode|versionName|applicationId" app/build.gradle
+          # Sem encurtar o código (R8): com ele, o androidbrowserhelper 2.7 procura a classe
+          # pelo nome encurtado ("R.u") e o app fecha ao abrir (v1.0.0). O app é pequeno.
+          sed -i -E 's/minifyEnabled +true/minifyEnabled false/' app/build.gradle
+          grep -q "minifyEnabled false" app/build.gradle
+          grep -nE "compileSdk|targetSdk|minSdk|versionCode|versionName|applicationId|minifyEnabled" app/build.gradle
 
       - name: Compilar
         working-directory: /tmp/twa
