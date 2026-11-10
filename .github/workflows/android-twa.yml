@@ -37,8 +37,7 @@ jobs:
         working-directory: /tmp/twa
         run: |
           sed -i -E 's/(targetSdkVersion|targetSdk)( *=? *)[0-9]+/\1\236/; s/(compileSdkVersion|compileSdk)( *=? *)[0-9]+/\1\236/' app/build.gradle
-          # Sem encurtar o código (R8): com ele, o androidbrowserhelper 2.7 procura a classe
-          # pelo nome encurtado ("R.u") e o app fecha ao abrir (v1.0.0). O app é pequeno.
+          # Sem encurtar o código (R8): o app é pequeno e os erros ficam legíveis.
           sed -i -E 's/minifyEnabled +true/minifyEnabled false/' app/build.gradle
           grep -q "minifyEnabled false" app/build.gradle
           grep -nE "compileSdk|targetSdk|minSdk|versionCode|versionName|applicationId|minifyEnabled" app/build.gradle
@@ -56,7 +55,10 @@ jobs:
         working-directory: /tmp/twa
         run: |
           M=$(find app/build -path '*merged_manifest*' -name AndroidManifest.xml | head -1)
-          echo "$M"; grep -nE "package=|targetSdk|uses-permission|android:host|DEFAULT_URL|delegation" "$M" | head -40 || true
+          echo "$M"
+          # O androidbrowserhelper 2.7 sempre ativa este componente ao abrir; sem ele o app fecha.
+          grep -q "ManageDataLauncherActivity" "$M"
+          grep -nE "package=|targetSdk|uses-permission|android:host|DEFAULT_URL|delegation" "$M" | head -40 || true
 
       - name: Publicar no ramo twa-build
         run: |

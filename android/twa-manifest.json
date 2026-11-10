@@ -18,15 +18,15 @@
   "maskableIconUrl": "https://www.motopassaporte.com.br/icons/maskable-512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": { "path": "./moto-passaporte-upload.jks", "alias": "motopassaporte" },
-  "appVersionName": "1.0.1",
-  "appVersionCode": 2,
+  "appVersionName": "1.0.2",
+  "appVersionCode": 3,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://www.motopassaporte.com.br/manifest.webmanifest",
   "fallbackType": "customtabs",
   "features": {},
   "alphaDependencies": { "enabled": false },
-  "enableSiteSettingsShortcut": false,
+  "enableSiteSettingsShortcut": true,
   "isChromeOSOnly": false,
   "isMetaQuest": false,
   "fullScopeUrl": "https://www.motopassaporte.com.br/",
@@ -34,5 +34,5 @@
   "fingerprints": [],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
-  "appVersion": "1.0.1"
+  "appVersion": "1.0.2"
 }
