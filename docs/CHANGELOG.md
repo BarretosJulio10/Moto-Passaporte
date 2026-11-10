@@ -9,6 +9,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.68.1] — 10/11/2026 — Nova senha em conta com verificação em duas etapas
+
+### Corrigido
+- `/redefinir-senha`: contas com app autenticador recebiam "Não foi possível concluir" (o Supabase exige AAL2 para trocar a senha). A tela agora pede o código de 6 dígitos e confirma antes de salvar.
+
 ## [0.68.0] — 10/11/2026 — E-mails de login pelo Resend
 
 ### Corrigido

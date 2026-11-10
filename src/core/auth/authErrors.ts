@@ -16,6 +16,8 @@ const BY_CODE: Record<string, string> = {
   otp_expired: 'O link expirou. Peça um novo link.',
   validation_failed: 'Confira os dados informados.',
   signup_disabled: 'Novos cadastros estão temporariamente desativados.',
+  insufficient_aal: 'Digite o código do app autenticador para confirmar.',
+  mfa_verification_failed: 'Código do app autenticador incorreto. Confira e tente de novo.',
 }
 
 const BY_MESSAGE: Array<[RegExp, string]> = [
@@ -23,6 +25,8 @@ const BY_MESSAGE: Array<[RegExp, string]> = [
   [/email not confirmed/i, BY_CODE.email_not_confirmed!],
   [/already registered/i, BY_CODE.user_already_exists!],
   [/password should be at least/i, BY_CODE.weak_password!],
+  [/AAL2 session is required/i, 'Digite o código do app autenticador para confirmar.'],
+  [/invalid totp code|mfa verification/i, 'Código do app autenticador incorreto. Confira e tente de novo.'],
   [/rate limit/i, BY_CODE.over_request_rate_limit!],
   [/failed to fetch|network/i, 'Sem conexão com o servidor. Verifique sua internet e tente de novo.'],
 ]
