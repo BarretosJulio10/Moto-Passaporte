@@ -18,6 +18,10 @@ vi.mock('./messagingApi', () => ({
   fetchOutboundMessages: async () => [
     { id: 'm1', channel: 'email', kind: 'limit_reached', destination: 'ju***@hotmail.com', status: 'sent', error: null, created_at: '2026-11-09T12:00:00Z', user_name: 'Julio' },
   ],
+  fetchAuthEmails: async () => [
+    { created_at: '2026-11-10T16:40:00Z', action: 'signup', email_hint: 'df***@gmail.com', status: 'aceito', detail: null },
+    { created_at: '2026-11-10T16:41:00Z', action: 'recovery', email_hint: 'ri***@gmail.com', status: 'recusado', detail: 'domínio não verificado' },
+  ],
   saveMessagingSettings: async (...args: unknown[]) => { calls.push({ fn: 'save', args }) },
   messagingAction: async (action: string, extra?: unknown) => {
     calls.push({ fn: action, args: [extra] })
@@ -127,5 +131,13 @@ describe('parar de receber por e-mail', () => {
     wrap(<UnsubscribePage />, '/avisos/sair?t=abc')
     expect(await screen.findByText(/não é válido/)).toBeVisible()
     expect(rpc).not.toHaveBeenCalled()
+  })
+
+  it('mostra os e-mails de login com o status do Resend', async () => {
+    wrap(<AdminMessagingPage />)
+    expect(await screen.findByText('Confirmação de cadastro')).toBeVisible()
+    expect(screen.getByText('Nova senha')).toBeVisible()
+    expect(screen.getByText('recusado')).toBeVisible()
+    expect(screen.getByText(/domínio não verificado/)).toBeVisible()
   })
 })

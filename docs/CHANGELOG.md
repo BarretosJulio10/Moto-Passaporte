@@ -9,6 +9,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e
 - `support_whatsapp` configurado; a página de contato passa a exibir o WhatsApp.
 - Primeiro cadastro real em produção confirmado de ponta a ponta (e-mail, perfil, aceite dos termos, papel).
 
+## [0.68.0] — 10/11/2026 — E-mails de login pelo Resend
+
+### Corrigido
+- Confirmação de cadastro e nova senha não chegavam: o SMTP do Supabase aceitava, mas o e-mail sumia. Agora o "Send Email Hook" (função `send_email_hook` no banco) envia pela API do Resend, a mesma dos avisos. Migração `20261110165432`, com rollback (ADR-065).
+- O link do e-mail abre `/auth/confirmar?token_hash=…` e confirma com `verifyOtp`: funciona em qualquer aparelho (antes só no navegador que pediu).
+
+### Adicionado
+- Login: botão "Reenviar e-mail de confirmação" quando o e-mail ainda não foi confirmado.
+- `/admin/mensagens`: lista "E-mails de login" com o status do Resend (aceito/recusado e motivo).
+- Casca Android 1.0.2 (código 3): corrigido o fechamento ao abrir (atalho de configurações do site).
+
 ## [0.67.0] — 09/11/2026 — App da Google Play (casca TWA)
 
 ### Adicionado

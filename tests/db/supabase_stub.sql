@@ -9,6 +9,12 @@ create role anon          nologin noinherit;
 create role authenticated nologin noinherit;
 create role service_role  nologin noinherit bypassrls;
 
+do $$ begin
+  if not exists (select 1 from pg_roles where rolname = 'supabase_auth_admin') then
+    create role supabase_auth_admin nologin noinherit;
+  end if;
+end $$;
+
 create schema auth;
 create schema extensions;
 
@@ -141,6 +147,10 @@ language sql as $$
 create or replace function cron.unschedule(p_jobid bigint) returns boolean
 language sql as $$ delete from cron.job where jobid = p_jobid returning true $$;
 create schema if not exists net;
+create table if not exists net.test_requests (id bigserial primary key, url text, body jsonb, headers jsonb);
+create table if not exists net._http_response (id bigint primary key, status_code integer, content text, error_msg text,
+                                               created timestamptz not null default now());
 create or replace function net.http_post(url text, body jsonb default '{}', params jsonb default '{}',
                                          headers jsonb default '{}', timeout_milliseconds int default 5000)
-returns bigint language sql as $$ select 1::bigint $$;
+returns bigint language sql as $$
+  insert into net.test_requests (url, body, headers) values (url, body, headers) returning id $$;

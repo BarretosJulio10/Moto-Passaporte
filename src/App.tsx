@@ -14,6 +14,7 @@ import { SignUpPage } from '@/modules/auth/SignUpPage'
 import { SignInPage } from '@/modules/auth/SignInPage'
 import { ForgotPasswordPage } from '@/modules/auth/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/modules/auth/ResetPasswordPage'
+import { AuthConfirmPage } from '@/modules/auth/AuthConfirmPage'
 import { AppLayout } from '@/components/AppLayout'
 import { Button } from '@/components/Button'
 import { RequireAdmin } from '@/modules/admin/RequireAdmin'
@@ -162,6 +163,7 @@ export const routes = [
           { path: '/entrar', element: <SignInPage /> },
           { path: '/recuperar-senha', element: <ForgotPasswordPage /> },
           { path: '/redefinir-senha', element: <ResetPasswordPage /> },
+          { path: '/auth/confirmar', element: <AuthConfirmPage /> },
           { path: '/termos', element: <LegalPage kind="terms" /> },
           { path: '/privacidade', element: <LegalPage kind="privacy" /> },
           { path: '/p/:publicId', element: <PublicPassportPage /> },

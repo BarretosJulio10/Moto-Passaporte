@@ -7,6 +7,7 @@ import { Notice } from '@/components/Notice'
 import { translateDbError } from '@/core/shared/dbErrors'
 import { KIND_LABEL } from '@/modules/notifications/api'
 import {
+  fetchAuthEmails,
   fetchMessagingSettings, fetchOutboundMessages, messagingAction, saveMessagingSettings, type WaStatus,
 } from './messagingApi'
 
@@ -288,6 +289,8 @@ export function AdminMessagingPage() {
                 onCreated={() => void qc.invalidateQueries({ queryKey: ['messaging-settings'] })} /></div>
             </section>
 
+            <AuthEmailsSection />
+
             <section className="rounded-sheet border border-rule bg-sheet p-5" aria-labelledby="hist-title">
               <h2 id="hist-title" className="heading text-xl text-ink">Envios</h2>
               <p className="mt-1 text-sm text-muted">
@@ -312,5 +315,34 @@ export function AdminMessagingPage() {
         </div>
       )}
     </div>
+  )
+}
+
+const AUTH_ACTION: Record<string, string> = {
+  signup: 'Confirmação de cadastro', recovery: 'Nova senha', email_change: 'Troca de e-mail',
+  invite: 'Convite', magiclink: 'Link de acesso', reauthentication: 'Código de confirmação',
+}
+
+function AuthEmailsSection() {
+  const list = useQuery({ queryKey: ['auth-emails'], queryFn: fetchAuthEmails, refetchInterval: 30_000 })
+  return (
+    <section className="rounded-sheet border border-rule bg-sheet p-5" aria-labelledby="auth-mail-title">
+      <h2 id="auth-mail-title" className="heading text-xl text-ink">E-mails de login</h2>
+      <p className="mt-1 text-sm text-muted">Confirmação de cadastro e nova senha, enviados pelo Resend. "Aceito" quer dizer que o Resend recebeu para entregar.</p>
+      {list.isError && <p className="mt-3 text-sm text-danger">Não foi possível carregar.</p>}
+      {list.data && list.data.length === 0 && <p className="mt-3 text-sm text-muted">Nenhum envio ainda.</p>}
+      {list.data && list.data.length > 0 && (
+        <ul className="mt-3 max-h-72 divide-y divide-rule overflow-auto border-y border-rule text-sm">
+          {list.data.map((m, i) => (
+            <li key={`${m.created_at}-${i}`} className="py-2">
+              <span className="font-semibold text-ink">{AUTH_ACTION[m.action] ?? m.action}</span>{' '}
+              <span className={m.status === 'recusado' ? 'text-danger' : 'text-muted'}>{m.status}</span>
+              <span className="text-graphite"> · {m.email_hint}</span>
+              <span className="block text-xs text-muted">{new Date(m.created_at).toLocaleString('pt-BR')}{m.detail ? ` · ${m.detail}` : ''}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   )
 }

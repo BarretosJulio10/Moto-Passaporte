@@ -59,6 +59,15 @@ export async function fetchOutboundMessages(): Promise<OutboundMessage[]> {
   return (data ?? []) as unknown as OutboundMessage[]
 }
 
+export type AuthEmail = { created_at: string; action: string; email_hint: string; status: 'enviado' | 'aceito' | 'recusado'; detail: string | null }
+
+/** E-mails de login (confirmação, nova senha…) enviados pelo Resend (ADR-065). */
+export async function fetchAuthEmails(): Promise<AuthEmail[]> {
+  const { data, error } = await call('admin_list_auth_emails', { p_limit: 30 })
+  if (error) throw error
+  return (data ?? []) as unknown as AuthEmail[]
+}
+
 /** Ações do painel (teste e conexão do WhatsApp) pela Edge Function messages-admin. */
 export async function messagingAction<T = { ok?: boolean; detail?: string }>(action: string, extra: Record<string, unknown> = {}): Promise<T> {
   const { data, error } = await getSupabase().functions.invoke('messages-admin', { body: { action, ...extra } })

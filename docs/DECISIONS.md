@@ -508,3 +508,11 @@ Até o frontend existir, um deploy na Vercel não terá o que publicar — isso 
 | P-9 | Canais e prazos de atendimento ao usuário | Não |
 | P-10 | Retenção/exportação de anexos após cancelamento e encerramento de conta | Não (Fase 5) |
 | P-11 | Responsável interno pelo tratamento de dados (LGPD) e procedimento de incidentes | Não (antes do lançamento) |
+
+## ADR-065 — E-mails de login pelo Resend (Send Email Hook) — 10/11/2026
+
+**Contexto.** Com o SMTP do Resend configurado no Supabase, cadastro e recuperação respondiam 200, mas nenhum e-mail chegava; a API do Resend entregava normalmente. O link padrão (PKCE) também só funcionava no mesmo navegador que pediu.
+
+**Decisão.** O Supabase Auth chama a função `public.send_email_hook(event)` (hook do tipo Postgres, sem segredo extra), que monta o e-mail e envia pela API do Resend com a chave do cofre (`messaging_settings`), registrando cada envio em `auth_email_log` (sem o e-mail completo). O link vai para `/auth/confirmar?token_hash=…&type=…`, que confirma com `verifyOtp` e redireciona (nova senha → `/redefinir-senha`; cadastro → `/painel`).
+
+**Consequências.** Sem a chave do Resend o hook devolve erro ao Auth (o cadastro falha visivelmente em vez de fingir). O hook precisa estar ligado em Authentication → Hooks → Send Email (Postgres → public.send_email_hook); desligar o hook volta ao SMTP.

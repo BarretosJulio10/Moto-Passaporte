@@ -18,6 +18,8 @@ export function SignInPage() {
   const [errors, setErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [unconfirmed, setUnconfirmed] = useState<string | null>(null)
+  const [resend, setResend] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
   const from = (location.state as { from?: string } | null)?.from ?? '/painel'
   if (user) return <Navigate to={from} replace />
@@ -25,6 +27,8 @@ export function SignInPage() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setFormError(null)
+    setUnconfirmed(null)
+    setResend('idle')
     const form = new FormData(event.currentTarget)
     const result = validate(signInSchema, { email: form.get('email'), password: form.get('password') })
     if (!result.ok) {
@@ -37,9 +41,23 @@ export function SignInPage() {
     setLoading(false)
     if (error) {
       setFormError(translateAuthError(error))
+      if ((error as { code?: string }).code === 'email_not_confirmed' || /email not confirmed/i.test(error.message)) {
+        setUnconfirmed(result.data.email)
+      }
       return
     }
     navigate(from, { replace: true })
+  }
+
+  async function resendConfirmation() {
+    if (!unconfirmed) return
+    setResend('sending')
+    const { error } = await getSupabase().auth.resend({
+      type: 'signup',
+      email: unconfirmed,
+      options: { emailRedirectTo: `${window.location.origin}/entrar?confirmado=1` },
+    })
+    setResend(error ? 'error' : 'sent')
   }
 
   return (
@@ -59,6 +77,17 @@ export function SignInPage() {
           <Notice tone="success">Senha alterada. Entre com a nova senha.</Notice>
         )}
         {formError && <Notice tone="error">{formError}</Notice>}
+        {unconfirmed && resend !== 'sent' && (
+          <Button type="button" variant="secondary" loading={resend === 'sending'} onClick={() => void resendConfirmation()}>
+            Reenviar e-mail de confirmação
+          </Button>
+        )}
+        {resend === 'sent' && (
+          <Notice tone="success">Enviamos um novo e-mail de confirmação para {unconfirmed}. Veja também a pasta de spam.</Notice>
+        )}
+        {resend === 'error' && (
+          <Notice tone="error">Não foi possível reenviar agora. Aguarde um minuto e tente de novo.</Notice>
+        )}
         <TextField label="E-mail" name="email" type="email" autoComplete="email" inputMode="email" required error={errors.email} />
         <TextField label="Senha" name="password" type="password" autoComplete="current-password" required error={errors.password} />
         <div className="-mt-2 text-right text-sm">
